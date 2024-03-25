@@ -1,0 +1,249 @@
+
+# Create GitHub Action Repository Variables for your version of the application:
+#   FOD_BASE_URL should be FoD BASE URL for your tenant (e.g. https://emea.fortify.com)
+#   FOD_API_URL should be FoD API URL for your tenant (e.g. https://api.emea,fortify.com)
+#   FOD_PARENT_RELEASE_NAME is the FoD release name corresponding to the parent branch of any newly created branch, this is typically "main"
+# Create GitHub Action Secrets for your version of the application:
+#   FOD_CLIENT_ID should be an API Key obtained from your FoD tenant.
+#   FOD_CLIENT_SECRET should be the secret for the API Key obtained for your FoD tenant.
+# Helpful hints:
+#   API Key credentials can be obtained from your FoD tenant, under Administration -> Settings -> API
+#   It is recommended to create credentials with 'Security Lead' Role selected.
+#   "Automated Audit preference" should be configured for the release's Static Scan Settings.
+
+name: DevSecOps with Fortify on Demand
+
+on:
+  # Triggers the workflow on push or pull request events but only for the main branch
+  push:
+    paths-ignore:
+      - '.github/**/**'
+      - 'bin/**'
+      - 'data/**'
+      - 'etc/**'
+      - 'media/**'
+      - 'Jenkinsfile'
+      - '.gitlab-ci.yml'
+      - 'README.md'
+      - 'LICENSE'
+    branches:
+      - '**'        # matches every branch
+  pull_request:
+    branches: [ main ]
+
+  # Allows you to run this workflow manually from the Actions tab
+  workflow_dispatch:
+    inputs:
+      runFoDSASTScan:
+        description: 'Carry out SAST scan using Fortify on Demand'
+        required: false
+        default: 'true'
+      runFoDOSSScan:
+        description: 'Carry out OSS scan using Fortify on Demand'
+        required: false
+        default: 'false'
+      runFoDDASTScan:
+        description: 'Carry out DAST scan using Fortify on Demand'
+        required: false
+        default: 'true'
+      deployApp:
+        description: 'Deploy App to Azure'
+        required: false
+        default: 'true'
+
+# Global environment variables
+env:
+  DEFAULT_APP_NAME: "FortifyDemoApp"
+  # some insecure variables to be picked up by fortify scan
+  AWS_REGION: US_WEST_2
+  AWS_ACCESS_KEY_ID: AKIAIOSFODNN7EXAMPLE
+  AWS_SECRET_ACCESS_KEY: wJalrXUtnFEMI/K7MDENG/bPxRfiCYEXAMPLEKEY  
+
+jobs:
+
+  Build-And-Unit-Test:
+    # The type of runner that the job will run on
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+        with:
+          # Fetch at least the immediate parents so that if this is a pull request then we can checkout the head.
+          fetch-depth: 2
+      # If this run was triggered by a pull request event, then checkout the head of the pull request instead of the merge commit.
+      - run: git checkout HEAD^2
+        if: ${{ github.event_name == 'pull_request' }}
+      # Setup JDK 11 on host
+      - uses: actions/setup-java@v4
+        with:
+          distribution: 'temurin'
+          java-version: '11'
+      - name: Setup Gradle
+        uses: gradle/gradle-build-action@v2.12.0
+        with:
+          gradle-version: 7.3
+      # Build / Test with Gradle
+      - name: Build with Gradle
+        run: ./gradlew clean build test
+      # Publish test results
+      - name: Publish Test Results
+        uses: EnricoMi/publish-unit-test-result-action@v2
+        if: always()
+        with:
+          files: |
+            build/test-results/**/*.xml
+            build/test-results/**/*.trx
+            build/test-results/**/*.json        
+
+  FoD-OSS-Scan:
+    runs-on: ubuntu-latest
+    if: ${{ (github.event_name == 'push') || (github.event_name == 'pull_request') || (github.event.inputs.runFoDOSSScan == 'true') }}
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+        with:
+          # Fetch at least the immediate parents so that if this is a pull request then we can checkout the head.
+          fetch-depth: 2
+      # If this run was triggered by a pull request event, then checkout the head of the pull request instead of the merge commit.
+      - run: git checkout HEAD^2
+        if: ${{ github.event_name == 'pull_request' }}
+      - name: Fortify App and Release Name
+        id: fortify-app-and-rel-name
+        uses: ./.github/actions/fortify-app-and-release-name
+        with:
+          default_fortify_app_name: ${{ env.DEFAULT_APP_NAME }}
+          #default_fortify_release_name: ${{ github.ref_name }}
+          default_fortify_release_name: ${{ vars.FORTIFY_RELEASE_NAME }}
+          app_name_postfix: ${{ vars.FORTIFY_APP_NAME_POSTFIX }}
+      - name: Gradle FoD OSS scan
+        id: gradle-fod-oss-scan
+        uses: ./.github/actions/gradle-fod-oss-scan
+        with:
+          working_directory: ${{ env.BASE_DIR }}
+          fod_url: ${{ vars.FOD_URL }}
+          fod_api_url: ${{ vars.FOD_API_URL }}
+          fod_client_id: ${{ secrets.FOD_CLIENT_ID }}
+          fod_client_secret: ${{ secrets.FOD_CLIENT_SECRET }}
+          fod_app_name: ${{ steps.fortify-app-and-rel-name.outputs.app_name }}
+          fod_release_name: ${{ steps.fortify-app-and-rel-name.outputs.release_name }}
+
+  FoD-SAST-Scan:
+    runs-on: ubuntu-latest
+    if: ${{ (github.event_name == 'push') || (github.event_name == 'pull_request') || (github.event.inputs.runFoDSASTScan == 'true') }}
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+        with:
+          # Fetch at least the immediate parents so that if this is a pull request then we can checkout the head.
+          fetch-depth: 2
+      # If this run was triggered by a pull request event, then checkout the head of the pull request instead of the merge commit.
+      - run: git checkout HEAD^2
+        if: ${{ github.event_name == 'pull_request' }}
+      - name: Fortify App and Release Name
+        id: fortify-app-and-rel-name
+        uses: ./.github/actions/fortify-app-and-release-name
+        with:
+          default_fortify_app_name: ${{ env.DEFAULT_APP_NAME }}
+          #default_fortify_release_name: ${{ github.ref_name }}
+          default_fortify_release_name: ${{ vars.FORTIFY_RELEASE_NAME }}
+          app_name_postfix: ${{ vars.FORTIFY_APP_NAME_POSTFIX }}
+      - name: Gradle FoD SAST scan
+        id: gradle-fod-sast-scan
+        uses: ./.github/actions/gradle-fod-sast-scan
+        with:
+          working_directory: ${{ env.BASE_DIR }}
+          fod_url: ${{ vars.FOD_URL }}
+          fod_api_url: ${{ vars.FOD_API_URL }}
+          fod_client_id: ${{ secrets.FOD_CLIENT_ID }}
+          fod_client_secret: ${{ secrets.FOD_CLIENT_SECRET }}
+          fod_app_name: ${{ steps.fortify-app-and-rel-name.outputs.app_name }}
+          fod_release_name: ${{ steps.fortify-app-and-rel-name.outputs.release_name }}       
+
+  Deploy-App:
+    runs-on: ubuntu-latest
+    if: ${{ (github.event_name == 'push') || (github.event_name == 'pull_request') || (github.event.inputs.deployApp == 'true') }}
+    needs: [ Build-And-Unit-Test, FoD-OSS-Scan, FoD-SAST-Scan ]
+    steps:
+      - uses: actions/checkout@v4
+      - name: Make envfile
+        uses: SpicyPizza/create-envfile@v2.0
+        with:
+          envkey_AZURE_SUBSCRIPTION_ID: ${{ vars.AZURE_SUBSCRIPTION_ID }}
+          envkey_AZURE_RESOURCE_GROUP: ${{ vars.AZURE_RESOURCE_GROUP }}
+          envkey_AZURE_APP_NAME: ${{ vars.AZURE_APP_NAME }}
+          envkey_AZURE_REGION: ${{ vars.AZURE_REGION }}
+      - name: Deploy to Azure
+        shell: bash
+        run: |
+          echo "Simulating deployment"
+        env:
+          FOD_APP_NAME: ${{ env.DEFAULT_APP_NAME }}
+
+  Functional-Test:
+    runs-on: ubuntu-latest
+    if: ${{ always() }}
+    needs: [ Deploy-App ]
+    steps:
+      - uses: actions/checkout@v4
+    # TBD
+
+  FoD-DAST-Scan:
+    runs-on: ubuntu-latest
+    if: ${{ (github.event_name == 'push') || (github.event_name == 'pull_request') || (github.event.inputs.runFoDDASTScan == 'true') }}
+    needs: [ Deploy-App ]
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+      - name: Fortify App and Release Name
+        id: fortify-app-and-rel-name
+        uses: ./.github/actions/fortify-app-and-release-name
+        with:
+          default_fortify_app_name: ${{ env.DEFAULT_APP_NAME }}
+          #default_fortify_release_name: ${{ github.ref_name }}
+          default_fortify_release_name: ${{ vars.FORTIFY_RELEASE_NAME }}
+          app_name_postfix: ${{ vars.FORTIFY_APP_NAME_POSTFIX }}
+      - name: FoD DAST scan
+        id: fod-dast-scan
+        uses: ./.github/actions/fod-dast-scan
+        with:
+          working_directory: ${{ env.BASE_DIR }}
+          fod_url: ${{ vars.FOD_URL }}
+          fod_api_url: ${{ vars.FOD_API_URL }}
+          fod_client_id: ${{ secrets.FOD_CLIENT_ID }}
+          fod_client_secret: ${{ secrets.FOD_CLIENT_SECRET }}
+          fod_app_name: ${{ steps.fortify-app-and-rel-name.outputs.app_name }}
+          fod_release_name: ${{ steps.fortify-app-and-rel-name.outputs.release_name }}
+          fod_parent_release_name: ${{ steps.fortify-app-and-rel-name.outputs.parent_release_name }}
+
+  Security-Gate:
+    runs-on: ubuntu-latest
+    if: ${{ always() }}
+    needs: [ Functional-Test, FoD-DAST-Scan ]
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+      - name: Fortify App and Release Name
+        id: fortify-app-and-rel-name
+        uses: ./.github/actions/fortify-app-and-release-name
+        with:
+          default_fortify_app_name: ${{ env.DEFAULT_APP_NAME }}
+          #default_fortify_release_name: ${{ github.ref_name }}
+          default_fortify_release_name: ${{ vars.FORTIFY_RELEASE_NAME }}
+          app_name_postfix: ${{ vars.FORTIFY_APP_NAME_POSTFIX }}
+      - name: Verify FoD Security Policy
+        uses: ./.github/actions/verify-fod-security-policy
+        with:
+          fod_api_url: ${{ vars.FOD_API_URL }}
+          fod_client_id: ${{ secrets.FOD_CLIENT_ID }}
+          fod_client_secret: ${{ secrets.FOD_CLIENT_SECRET }}
+          fod_app_name: ${{ steps.fortify-app-and-rel-name.outputs.app_name }}
+          fod_release_name: ${{ steps.fortify-app-and-rel-name.outputs.release_name }}
+
+  Release-To-Prod:
+    runs-on: ubuntu-latest
+    if: ${{ always() }}
+    needs: [ Security-Gate ]
+    steps:
+      - name: Check Out Source Code
+        uses: actions/checkout@v4
+    # TBD
