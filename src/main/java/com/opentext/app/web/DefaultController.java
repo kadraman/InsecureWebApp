@@ -184,4 +184,12 @@ public class DefaultController {
         return ResponseEntity.ok().body(retContent);
     }
 
+    /*@GetMapping("/error")
+    @ExceptionHandler(Exception.class)
+    public String errorPage(HttpServletRequest request, Model model, Exception ex) {
+        log.error("Request: " + request.getRequestURL() + " raised " + ex);
+        model.addAttribute("ex", ex);
+        return "error";
+    }*/
+
 }

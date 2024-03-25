@@ -54,10 +54,13 @@ public class WebSecurityConfiguration extends WebSecurityConfigurerAdapter {
                 .authorizeRequests()
                 .antMatchers("/admin/**").hasRole("ADMIN")
                 .antMatchers("/anonymous*").anonymous()
+                .antMatchers("/user/**").authenticated()
                 .antMatchers("/",
+                        "/.**/*",
                         "/products/**",
                         "/login*",
                         "/logout*",
+                        "/404*",
                         "/console/*",
                         "/favicon.ico",
                         "/js/**/*",
@@ -65,7 +68,6 @@ public class WebSecurityConfiguration extends WebSecurityConfigurerAdapter {
                         "/fonts/**/*",
                         "/img/**/*",
                         "/webjars/**/*").permitAll()
-                .anyRequest().authenticated()
                 .and()
                 .formLogin()
                 .loginPage("/login")
@@ -76,7 +78,9 @@ public class WebSecurityConfiguration extends WebSecurityConfigurerAdapter {
                 .logout()
                 .logoutRequestMatcher(new AntPathRequestMatcher("/logout"))
                 .logoutSuccessUrl("/login?logout=true")
-                .deleteCookies("JSESSIONID");
+                .deleteCookies("JSESSIONID")
+                .and()
+                .exceptionHandling().accessDeniedPage("/access-denied");
     }
 
     @Bean
