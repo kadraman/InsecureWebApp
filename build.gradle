@@ -1,0 +1,153 @@
+plugins {
+    id 'java'
+    id 'war'
+    id 'maven-publish'
+    id "org.springframework.boot" version "2.1.8.RELEASE"
+    id "com.microsoft.azure.azurewebapp" version "1.2.0"
+}
+
+// NOTE: some of these versions are deliberately insecure for demonstration
+ext {
+    springBootVersion = '2.1.8.RELEASE'
+    springSecurityVersion = '3.0.4.RELEASE'
+    log4jVersion = '2.4.13'
+    jacksonVersion = '2.13.0'
+    junitVersion = '4.12'
+    junitJupiterVersion = '5.7.0'
+    junitPlatformVersion = '1.7.1'
+    mockitoVersion = '4.11.0'
+}
+
+repositories {
+    mavenLocal()
+    maven {
+        url = uri('https://repo.maven.apache.org/maven2/')
+    }
+}
+
+dependencies {
+    implementation "org.springframework.boot:spring-boot-starter-actuator:${springBootVersion}"
+    implementation "org.springframework.boot:spring-boot-starter-web:${springBootVersion}"
+    implementation "org.springframework.boot:spring-boot-starter-security:${springBootVersion}"
+    implementation "org.springframework.security:spring-security-taglibs:5.2.8.RELEASE"
+    implementation "org.springframework.boot:spring-boot-starter-data-jdbc:${springBootVersion}"
+    implementation "org.springframework.boot:spring-boot-starter-log4j2:${log4jVersion}"
+    implementation "org.springframework.boot:spring-boot-starter-jdbc:${springBootVersion}"
+    modules {
+        module("org.springframework.boot:spring-boot-starter-logging") {
+            replacedBy("org.springframework.boot:spring-boot-starter-log4j2", "Use Log4j2 instead of Logback")
+        }
+    }
+    implementation "org.springframework.boot:spring-boot-devtools:${springBootVersion}"
+    implementation "org.springframework.boot:spring-boot-starter-tomcat:${springBootVersion}"
+    implementation "org.apache.tomcat.embed:tomcat-embed-jasper"
+    implementation 'javax.servlet:jstl:1.2'
+    implementation 'com.h2database:h2:1.4.197'
+    implementation 'org.webjars:lodash:4.17.4'
+    testImplementation "org.hibernate.validator:hibernate-validator:6.1.0.Final"
+    testImplementation("org.springframework.boot:spring-boot-starter-test:${springBootVersion}") {
+        exclude group: "com.vaadin.external.google", module:"android-json"
+    }
+    testImplementation "junit:junit:${junitVersion}"
+    testImplementation "org.junit.jupiter:junit-jupiter:${junitJupiterVersion}"
+    testImplementation "org.junit.jupiter:junit-jupiter-api:${junitJupiterVersion}"
+    testImplementation "org.junit.jupiter:junit-jupiter-params:${junitJupiterVersion}"
+    testImplementation "org.junit.platform:junit-platform-engine:${junitPlatformVersion}"
+    testRuntimeOnly "org.junit.jupiter:junit-jupiter-engine:${junitJupiterVersion}"
+    testRuntimeOnly "org.junit.vintage:junit-vintage-engine:${junitJupiterVersion}"
+    testRuntimeOnly "org.junit.platform:junit-platform-commons:${junitPlatformVersion}"
+    testRuntimeOnly "org.codehaus.groovy:groovy:3.0.8"
+}
+
+apply plugin: 'io.spring.dependency-management'
+
+configurations.all {
+    resolutionStrategy.cacheChangingModulesFor 0, 'seconds'
+    exclude module: 'spring-boot-starter-logging'
+}
+
+def props = new Properties()
+def propertiesFile = project.file('.env')
+if (!propertiesFile.exists()) {
+    props.setProperty('APP_NAME', 'FortifyDemoApp')
+    props.setProperty('APP_VER_NAME', '1.0')
+    Writer writer = new FileWriter(propertiesFile, false)
+    props.store(writer, "Change these variables to relevant values. Don't commit this file to source control.")
+    writer.close()
+}
+props.load(propertiesFile.newDataInputStream())
+
+project.archivesBaseName = 'FortifyDemoApp'
+group = 'com.opentext.app'
+version = ''
+description = 'An insecure Web application for use in Fortify demonstrations'
+sourceCompatibility = '1.8'
+
+sourceSets {
+    main {
+        java.srcDirs = ['src/main/java','src/iac']
+        resources.srcDirs= ['src/main/resources']
+    }
+    test {
+        java.srcDirs = ['src/test/java']
+	    resources.srcDirs = ['src/test/resources']	
+    } 
+}
+
+azurewebapp {
+    subscription = props.getProperty("AZURE_SUBSCRIPTION_ID") // e.g. '17d2722b-256e-47e5-84b8-5b01f509a42c'
+    resourceGroup = props.getProperty("AZURE_RESOURCE_GROUP") // e.g. 'fortifydemorg'
+    appName = props.getProperty("AZURE_APP_NAME") // e.g. 'fortifydemoapp'
+    pricingTier = 'B2' // or larger capacity
+    region = props.getProperty("AZURE_REGION") // e.g. 'eastus'
+    runtime {
+        //os = 'Windows'
+        os = 'Linux'
+        webContainer = 'Tomcat 9.0'
+        //webContainer = 'Java SE'
+        javaVersion = 'Java 1.8'
+    }
+    appSettings {
+        key1=value1
+    }
+    auth {
+        type = 'azure_cli' // support azure_cli, oauth2, device_code and service_principal
+    }
+}
+
+publishing {
+    publications {
+        maven(MavenPublication) {
+            from(components.java)
+        }
+    }
+}
+
+tasks.withType(JavaCompile) {
+    options.encoding = 'UTF-8'
+}
+
+test {
+    useJUnitPlatform()
+    reports {
+        junitXml.enabled = true
+        html.enabled = true
+    }
+}
+
+bootRun {
+    systemProperty "spring.profiles.active", "dev"
+}
+
+tasks.named('wrapper') {
+    distributionType = Wrapper.DistributionType.ALL
+}
+
+task writeClasspath() {
+    doLast() {
+        buildDir.mkdirs()
+        def files = configurations.compileClasspath.getFiles().sort()
+        new File(buildDir, "classpath.txt").text = files.collect { it.path }.join(';')
+        //files.forEach{ f -> print("$f.path;")}
+    }
+}

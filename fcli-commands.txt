@@ -1,0 +1,7 @@
+fcli fod session login
+env | grep FCLI
+fcli fod release list
+# sourceanalyzer –debug –verbose –logfile translate.log -b fortifydemoapp 
+scancentral package -o package.zip
+fcli fod sast-scan start -f package.zip --store curScan
+fcli fod sast-scan wait-for ::curScan::
