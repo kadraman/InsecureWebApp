@@ -17,9 +17,9 @@
         along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
-package com.microfocus.app.config;
+package com.opentext.app.config;
 
-import com.microfocus.app.FortifyDemoApp;
+import com.opentext.app.FortifyDemoApp;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.springframework.beans.factory.annotation.Value;
@@ -36,7 +36,7 @@ import java.util.Collections;
 @Configuration
 public class FaviconConfiguration {
 
-    private static final Logger log = LogManager.getLogger(FortifyDemoApp.class);
+    private static final Logger log = LogManager.getLogger(FaviconConfiguration.class);
 
     @Value("${server.servlet.context-path}")
     private String contextPath;

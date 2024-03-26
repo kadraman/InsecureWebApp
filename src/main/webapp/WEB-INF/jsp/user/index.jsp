@@ -65,7 +65,7 @@
 								</div>
 
 								<div class="col-md-12 mt-4">
-									<a class="btn btn-primary" href="/products">Shop Now</a>
+									<a class="btn btn-primary" href="/">Shop Now</a>
 									<a class="btn btn-primary" href="">View Profile</a>
 								</div>
 							</div>

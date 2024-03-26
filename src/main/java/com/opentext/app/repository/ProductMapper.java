@@ -17,9 +17,9 @@
         along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
-package com.microfocus.app.repository;
+package com.opentext.app.repository;
 
-import com.microfocus.app.entity.Product;
+import com.opentext.app.entity.Product;
 import org.springframework.jdbc.core.RowMapper;
 
 import java.sql.ResultSet;

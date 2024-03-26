@@ -2,7 +2,7 @@
 
 # Fortify Demo App
 
-This is a sample Java Web application that can be used for the demonstration of application
+This is a simple Java Web application that can be used for the demonstration of application
 security testing tools such as those provided by [Fortify by OpenText](https://www.microfocus.com/en-us/cyberres/application-security).
 It is a cut down "search" results/details page from a larger sample application [IWA-Java](https://github.com/fortify/IWA-Java) and is kept deliberately small for demos.
 
@@ -36,8 +36,8 @@ to create a `.env` file in the root directory with contents similar to the follo
 
 ```
 AZURE_SUBSCRIPTION_ID=17d2722b-256e-47e5-84b8-5b01f509a42c
-AZURE_RESOURCE_GROUP=fortifydemorg
-AZURE_APP_NAME=fortifydemoapp
+AZURE_RESOURCE_GROUP=fortify-demo-rg
+AZURE_APP_NAME=fortify-demo-app
 AZURE_REGION=eastus
 ```
 
@@ -45,7 +45,7 @@ Then you can run the following commands:
 
 ```
 az login [--tenant XXXX]
-az group create --name [YOUR_INITIALS]-fortifydemorg --location eastus
+az group create --name [YOUR_INITIALS]-fortify-demo-rg --location eastus
 gradlew azureWebAppDeploy
 ```
 

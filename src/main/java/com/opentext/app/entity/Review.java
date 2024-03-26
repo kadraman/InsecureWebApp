@@ -17,7 +17,7 @@
         along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
-package com.microfocus.app.entity;
+package com.opentext.app.entity;
 
 import java.util.Date;
 import java.util.Objects;

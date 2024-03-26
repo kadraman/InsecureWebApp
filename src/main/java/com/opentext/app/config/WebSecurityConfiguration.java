@@ -17,7 +17,7 @@
         along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
-package com.microfocus.app.config;
+package com.opentext.app.config;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Bean;
@@ -56,7 +56,6 @@ public class WebSecurityConfiguration extends WebSecurityConfigurerAdapter {
                 .antMatchers("/anonymous*").anonymous()
                 .antMatchers("/user/**").authenticated()
                 .antMatchers("/",
-                        "/.**/*",
                         "/products/**",
                         "/login*",
                         "/logout*",

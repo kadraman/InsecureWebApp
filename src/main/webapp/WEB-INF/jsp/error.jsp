@@ -42,12 +42,16 @@
                             <div class="col">
                                 <div class="collapse multi-collapse" id="errorDetails">
                                     <div class="card card-body">
-                                        <span><c:out value="${message}"></c:out></span>
+                                            Failed URL: ${url}
+                                            Exception:  ${exception.message}
+                                            <c:forEach items="${exception.stackTrace}" var="ste">
+                                                ${ste}
+                                            </c:forEach>
                                     </div>
                                 </div>
                             </div>
                         </div>
-                        <p><a href="/products" class="btn btn-md height-auto px-4 py-3 btn-primary">Back to Shop</a></p>
+                        <p><a href="/" class="btn btn-md height-auto px-4 py-3 btn-primary">Back to Shop</a></p>
                     </div>
                 </div>
 

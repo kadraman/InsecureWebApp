@@ -17,13 +17,13 @@
         along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
-package com.microfocus.app.web;
+package com.opentext.app.web;
 
-import com.microfocus.app.entity.Product;
-import com.microfocus.app.entity.Review;
-import com.microfocus.app.entity.SubscribeUserRequest;
-import com.microfocus.app.repository.ProductRepository;
-import com.microfocus.app.service.FileSystemService;
+import com.opentext.app.entity.Product;
+import com.opentext.app.entity.Review;
+import com.opentext.app.entity.SubscribeUserRequest;
+import com.opentext.app.repository.ProductRepository;
+import com.opentext.app.service.FileSystemService;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.springframework.core.io.Resource;
@@ -80,9 +80,9 @@ public class DefaultController {
     }
 
 
-    @GetMapping({"/", "/products"})
-    public String showProductsPage(Model model, @Param("keywords") String keywords, @Param("limit") Integer limit) {
-        log.debug("DefaultController:showProductsPage");
+    @GetMapping({"/"})
+    public String showHomePage(Model model, @Param("keywords") String keywords, @Param("limit") Integer limit) {
+        log.debug("DefaultController:showHomePage");
         log.debug("Searching for products using keywords=" + keywords);
 
         List<Product> products = new ArrayList<>();
@@ -109,7 +109,7 @@ public class DefaultController {
         log.debug("DefaultController:viewProduct");
 
         List<Product> products = productRepository.findById(productId);
-        if (products.size() > 0) {
+        if (!products.isEmpty()) {
             model.addAttribute("p", products.get(0));
             model.addAttribute("dateNow", new Date());
             // get any reviews
@@ -166,6 +166,14 @@ public class DefaultController {
                 .body(resource);
     }
 
+    @GetMapping("/products/xss")
+    @ResponseBody
+    public ResponseEntity<String> getKeywordsContent(@Param("keywords") String keywords) {
+        String retContent = "Product search using: " + keywords;
+        return ResponseEntity.ok().body(retContent);
+    }
+
+    // simple API
     @PostMapping(value = {"/api/subscribe-user"}, produces = {"application/json"}, consumes = {"application/json"})
     public ResponseEntity<String> subscribeUser(@RequestBody SubscribeUserRequest newUser) {
         log.debug("DefaultController:subscribeUser");
@@ -175,13 +183,6 @@ public class DefaultController {
             log.error("DefaultController::subscribeUser: error writing file: {}", e.getLocalizedMessage());
         }
         return ResponseEntity.status(HttpStatus.OK).build();
-    }
-
-    @GetMapping("/products/xss")
-    @ResponseBody
-    public ResponseEntity<String> getKeywordsContent(@Param("keywords") String keywords) {
-        String retContent = "Product search using: " + keywords;
-        return ResponseEntity.ok().body(retContent);
     }
 
     /*@GetMapping("/error")

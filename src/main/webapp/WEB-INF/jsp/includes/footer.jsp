@@ -7,11 +7,11 @@
 <footer class="site-footer mt-auto">
     <div class="row">
         <div class="col-md-3 footer-brand animated fadeInLeft">
-            <h4>IWA Pharmacy Direct</h4>
-            <p>IWA (Insecure Web App) Pharmacy Direct is a deliberately insecure web application for use in
+            <h4>FortifyDemoApp</h4>
+            <p>This is a deliberately insecure web application for use in
                 <a href="https://www.microfocus.com/en-us/cyberres/application-security" target="_blank">Fortify Application Security</a> demonstrations.</p>
             <p><a href="https://www.opentext.com/about/copyright-information" target="_blank">Copyright</a>
-                © 2024 OpenText Corporation. All Rights Reserved. <br/>Template by
+                &copy; 2024 OpenText Corporation. All Rights Reserved. <br/>Template by
                 <a href="https://colorlib.com" target="_blank" class="text-info">Colorlib</a>.</p>
         </div>
         <div class="col-md-4 footer-nav animated fadeInUp">
@@ -66,7 +66,7 @@
                                     <div tabindex="-1" role="document" aria-labelledby="confirmation-header" aria-describedby="confirmation-modal-body" class="modal-content">
                                         <header id="confirmation-modal-header" class="modal-header">
                                             <h5 class="modal-title">Newsletter Registration</h5>
-                                            <button type="button" aria-label="Close" class="close" data-dismiss="modal">×</button>
+                                            <button type="button" aria-label="Close" class="close" data-dismiss="modal">ï¿½</button>
                                         </header>
                                         <div id="confirmation-modal-body" class="modal-body">
                                             <div class="m-4 text-center">

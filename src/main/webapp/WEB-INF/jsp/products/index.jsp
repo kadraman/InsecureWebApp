@@ -27,7 +27,7 @@
 	<div class="bg-light py-3">
 		<div class="container">
 			<div class="row">
-				<div class="col-md-12 mb-0"><a href="/products">Shop</a> <span class="mx-2 mb-0">/</span> <strong><c:out value="${p.name}"></c:out></strong></div>
+				<div class="col-md-12 mb-0"><a href="/">Shop</a> <span class="mx-2 mb-0">/</span> <strong><c:out value="${p.name}"></c:out></strong></div>
 			</div>
 		</div>
 	</div>

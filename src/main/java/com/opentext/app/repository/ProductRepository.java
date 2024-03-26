@@ -17,10 +17,10 @@
         along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
-package com.microfocus.app.repository;
+package com.opentext.app.repository;
 
-import com.microfocus.app.entity.Product;
-import com.microfocus.app.entity.Review;
+import com.opentext.app.entity.Product;
+import com.opentext.app.entity.Review;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.stereotype.Repository;
