@@ -49,10 +49,11 @@ build
 # Fortify
 .fortify
 /vulnerabilities.txt
-/FortifyDemoApp.fpr
-/FortifyDemoApp.
-/FortifyDemoApp.mbs
+*.fpr
+*.mbs
+*.pdf
 package.zip
 
 # Misc
-bin
+debricked
+

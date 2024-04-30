@@ -8,22 +8,22 @@ param (
     [ValidateSet('classic','security','devops')]
     [string]$ScanPolicy = "classic",
     [Parameter(Mandatory=$false)]
-    [switch]$SkipPDF
+    [switch]$SkipPDF,
+    [Parameter(Mandatory=$false)]
+    [switch]$SkipSSC
 )
 
 # Import local environment specific settings
 $EnvSettings = $(ConvertFrom-StringData -StringData (Get-Content ".\.env" | Where-Object {-not ($_.StartsWith('#'))} | Out-String))
 $AppName = $EnvSettings['APP_NAME']
-$AppVersion = $EnvSettings['APP_VER_NAME']
+$AppVersion = $EnvSettings['APP_RELEASE_NAME']
+$SSCUrl = $EnvSettings['SSC_URL']
+$SSCAuthToken = $EnvSettings['SSC_AUTH_TOKEN'] # AnalysisUploadToken
+$JVMArgs = "-Xss256M"
+#$ScanSwitches = "-Dcom.fortify.sca.rules.enable_wi_correlation=true"
+$ScanSwitches = "-Dcom.fortify.sca.rules.enable_wi_correlation=true -Dcom.fortify.sca.Phase0HigherOrder.Languages=javascript,typescript -Dcom.fortify.sca.EnableDOMModeling=true -Dcom.fortify.sca.follow.imports=true -Dcom.fortify.sca.exclude.unimported.node.modules=true"
 
-$JVMArgs = ""
-#$JVMArgs = "-Xss256M"
-$ScanSwitches = ""
-#$ScanSwitches = "-Dcom.fortify.sca.rules.enable_wi_correlation=true -Dcom.fortify.sca.Phase0HigherOrder.Languages=javascript,typescript -Dcom.fortify.sca.EnableDOMModeling=true -Dcom.fortify.sca.follow.imports=true -Dcom.fortify.sca.exclude.unimported.node.modules=true"
-
-# Test we have Fortify installed successfully
 if ([string]::IsNullOrEmpty($AppName)) { throw "Application Name has not been set" }
-if ([string]::IsNullOrEmpty($AppVersion)) { throw "Application Version Name has not been set" }
 
 # Run the translation and scan
 
@@ -39,18 +39,29 @@ $ClassPath = Get-Content -Path $DependenciesFile
 
 Write-Host Running translation...
 & sourceanalyzer '-Dcom.fortify.sca.ProjectRoot=.fortify' $JVMArgs $ScanSwitches -b "$AppName" `
-    -jdk 11 -java-build-dir "build" -cp $ClassPath -debug -verbose `
+    -jdk 11 -java-build-dir "target/classes" -cp $ClassPath -debug -verbose `
     -exclude ".\src\main\resources\static\js\lib" -exclude ".\src\main\resources\static\css\lib" `
     -exclude ".\node_modules" -exclude "src/main/resources/schema.sql" -exclude "src/main/resources/data.sql" `
-    "src" "Dockerfile*" "*.bicep"
+    "src/main/java/**/*" "src/main/resources/**/*" "Dockerfile*"
 
 Write-Host Running scan...
 & sourceanalyzer '-Dcom.fortify.sca.ProjectRoot=.fortify' $JVMArgs $ScanSwitches -b "$AppName" `
-    -cp $ClassPath  -java-build-dir "build" -debug -verbose `
+    -cp $ClassPath  -java-build-dir "target/classes" -debug -verbose `
     -scan-policy $ScanPolicy `
     -build-project "$AppName" -build-version "$AppVersion" -build-label "SNAPSHOT" `
-    -scan 
-#    -f "$($AppName).fpr"
+    -scan -f "$($AppName).fpr"
 
+# summarise issue count by analyzer
+& fprutility -information -analyzerIssueCounts -project "$($AppName).fpr"
+
+if (-not $SkipPDF) {
+    Write-Host Generating PDF report...
+    & ReportGenerator '-Dcom.fortify.sca.ProjectRoot=.fortify' -user "Demo User" -format pdf -f "$($AppName).pdf" -source "$($AppName).fpr"
+}
+
+if (-not $SkipSSC) {
+    Write-Host Uploading results to SSC...
+    & fortifyclient uploadFPR -file "$($AppName).fpr" -url $SSCUrl -authtoken $SSCAuthToken -application "$AppName" -applicationVersion "$AppVersion"
+}
 
 Write-Host Done.

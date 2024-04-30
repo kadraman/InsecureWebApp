@@ -5,3 +5,12 @@ fcli fod release list
 scancentral package -o package.zip
 fcli fod sast-scan start -f package.zip --store curScan
 fcli fod sast-scan wait-for ::curScan::
+
+
+fcli ssc session login
+dir env:
+fcli ssc appversion list
+fcli sc-sast session login
+scancentral package -o package.zip
+fcli sc-sast scan start -p .\package.zip --sensor-version 23.2 --store curScan
+fcli sc-sast scan wait-for ::curScan::

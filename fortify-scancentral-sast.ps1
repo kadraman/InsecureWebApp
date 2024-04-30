@@ -6,7 +6,7 @@
 $EnvSettings = $(ConvertFrom-StringData -StringData (Get-Content (Join-Path "." -ChildPath ".env") | Where-Object {-not ($_.StartsWith('#'))} | Out-String))
 $AppName = $EnvSettings['APP_NAME']
 $AppVersion = $EnvSettings['APP_RELEASE_NAME']
-$SSCAuthToken = $EnvSettings['SSC_AUTH_TOKEN'] # CIToken
+$SSCAuthToken = $EnvSettings['SSC_AUTH_TOKEN'] # AnalysisUploadToken
 $ScanCentralCtrlUrl = $EnvSettings['SCANCENTRAL_CTRL_URL']
 $ScanCentralPoolId = $EnvSettings['SCANCENTRAL_POOL_ID'] # Not yet used
 $ScanCentralEmail = $EnvSettings['SCANCENTRAL_EMAIL']

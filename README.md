@@ -36,8 +36,8 @@ to create a `.env` file in the root directory with contents similar to the follo
 
 ```
 AZURE_SUBSCRIPTION_ID=17d2722b-256e-47e5-84b8-5b01f509a42c
-AZURE_RESOURCE_GROUP=fortify-demo-rg
-AZURE_APP_NAME=fortify-demo-app
+AZURE_RESOURCE_GROUP=fortifydemorg
+AZURE_APP_NAME=fortifydemoapp
 AZURE_REGION=eastus
 ```
 
@@ -45,7 +45,7 @@ Then you can run the following commands:
 
 ```
 az login [--tenant XXXX]
-az group create --name [YOUR_INITIALS]-fortify-demo-rg --location eastus
+az group create --name [YOUR_INITIALS]-fortifydemorg --location eastus
 gradlew azureWebAppDeploy
 ```
 
@@ -61,7 +61,42 @@ Remove Application and Infrastructure
 To clean up all the resources you can execute the following (from a Windows command prompt):
 
 ```
-az group delete --name [YOUR_INITIALS]-fortifydemo-rg
+az group delete --name [YOUR_INITIALS]-fortifydemorg
+```
+
+Run a Fortify scan:
+
+First clean up any existing data from a previous build and scan:
+
+```
+sourceanalyzer -b fortifydemoapp -clean
+```
+
+Next, translate the source files by prepending the sourceanalyzer command:
+
+```
+sourceanalyzer -b fortifydemoapp gradle build
+```
+
+Then, execute the scan on the translated files:
+
+```
+sourceanalyzer -b fortifydemoapp -scan -verbose -f fortifydemoapp.fpr
+```
+
+Finally, view the results in AuditWorkbench:
+
+```
+auditworkbench fortifydemoapp.fpr
+```
+
+You can also use ScanCentral by first creating a mobile build solution (mbs) and then uploading it:
+
+```
+sourceanalyzer -b fortifydemoapp.fpr -export-build-session fortifydemoapp.mbs
+scancentral -url $ScanCentralCtrlUrl start -upload -uptoken $SSCAuthToken `
+    -b fortifydemoapp.fpr -application FortifyDemoApp -version 1.0 -mbs fortifydemoapp.mbs `
+    -email $ScanCentralEmail -block -o -f fortifydemoapp.fpr
 ```
 
 ---
