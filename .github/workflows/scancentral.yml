@@ -29,7 +29,7 @@ on:
       runFortifySASTScan:
         description: 'Carry out SAST scan using Fortify'
         required: false
-        default: 'false'
+        default: 'true'
       runSonatypeScan:
         description: 'Carry out SCA scan using Sonatype Nexus IQ'
         required: false
@@ -112,14 +112,14 @@ jobs:
           default_fortify_release_name: ${{ github.ref_name }}
           app_name_postfix: ${{ vars.FORTIFY_APP_NAME_POSTFIX }}
       # Comment out below when working    
-      - name: Print App and Release Name
-        shell: bash
-        run: |
-          echo "SSC App Name: ${SSC_APP_NAME}"
-          echo "SSC App Version Name: ${SSC_APPVER_NAME}"
-        env:
-          SSC_APP_NAME: ${{ steps.fortify-app-and-rel-name.outputs.app_name }}
-          SSC_APPVER_NAME: ${{ steps.fortify-app-and-rel-name.outputs.release_name }}
+      #- name: Print App and Release Name
+      #  shell: bash
+      #  run: |
+      #    echo "SSC App Name: ${SSC_APP_NAME}"
+      #    echo "SSC App Version Name: ${SSC_APPVER_NAME}"
+      #  env:
+      #    SSC_APP_NAME: ${{ steps.fortify-app-and-rel-name.outputs.app_name }}
+      #    SSC_APPVER_NAME: ${{ steps.fortify-app-and-rel-name.outputs.release_name }}
       - name: Run ScanCentral SAST Scan
         uses: fortify/github-action@v1
         with:
