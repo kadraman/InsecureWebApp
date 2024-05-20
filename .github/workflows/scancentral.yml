@@ -29,7 +29,7 @@ on:
       runFortifySASTScan:
         description: 'Carry out SAST scan using Fortify'
         required: false
-        default: 'false'
+        default: 'true'
       runSonatypeScan:
         description: 'Carry out SCA scan using Sonatype Nexus IQ'
         required: false
@@ -82,23 +82,10 @@ jobs:
           java-version: '11'
       # TODO: Sonatype Nexus IQ scan
 
-  Quality-Gate:
-    runs-on: ubuntu-latest
-    if: ${{ always() }}
-    needs: [ Build-And-Unit-Test ]
-    steps:
-      - name: Checkout
-        uses: actions/checkout@v4
-      # Setup JDK 11 on host
-      - uses: actions/setup-java@v4
-        with:
-          distribution: 'temurin'
-          java-version: '11'
-      # TBD
-
   Fortify-SAST-Scan:
     runs-on: ubuntu-latest
     if: ${{ (github.event_name == 'push') || (github.event_name == 'pull_request') || (github.event.inputs.runFortifySASTScan == 'true') }}
+    needs: [ Build-And-Unit-Test ]
     steps:
       - name: Checkout
         uses: actions/checkout@v4
@@ -139,10 +126,24 @@ jobs:
           #DO_EXPORT: true
           # TOOL_DEFINITIONS: https://ftfy.mycompany.com/tool-definitions/v1/tool-definitions.yaml.zip
 
+  Quality-Gate:
+    runs-on: ubuntu-latest
+    if: ${{ always() }}
+    needs: [ Build-And-Unit-Test, Sonatype-SCA, Fortify-SAST-Scan ]
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+      # Setup JDK 11 on host
+      - uses: actions/setup-java@v4
+        with:
+          distribution: 'temurin'
+          java-version: '11'
+      # TBD
+
   Deploy-App:
     runs-on: ubuntu-latest
     if: ${{ (github.event_name == 'push') || (github.event_name == 'pull_request') || (github.event.inputs.deployApp == 'true') }}
-    needs: [ Build-And-Unit-Test, Sonatype-SCA, Fortify-SAST-Scan ]
+    needs: [ Quality-Gate ]
     steps:
       - uses: actions/checkout@v4
       - name: Make envfile
@@ -157,7 +158,7 @@ jobs:
         run: |
           echo "Simulating deployment"
         env:
-          FOD_APP_NAME: ${{ env.DEFAULT_APP_NAME }}
+          FORTIFY_APP_NAME: ${{ env.DEFAULT_APP_NAME }}
 
   Functional-Test:
     runs-on: ubuntu-latest
@@ -170,6 +171,7 @@ jobs:
   Fortify-DAST-Scan:
     runs-on: ubuntu-latest
     if: ${{ (github.event.inputs.runFortifyDASTScan == 'true') }}
+    needs: [ Functional-Test ]
     steps:
       - name: Checkout
         uses: actions/checkout@v4
@@ -190,7 +192,7 @@ jobs:
   Security-Gate:
     runs-on: ubuntu-latest
     if: ${{ always() }}
-    needs: [ Fortify-SAST-Scan,Fortify-DAST-Scan ]
+    needs: [ Functional-Test, Fortify-DAST-Scan ]
     steps:
       - name: Checkout
         uses: actions/checkout@v4
