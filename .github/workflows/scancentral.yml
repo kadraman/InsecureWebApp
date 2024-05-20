@@ -46,7 +46,7 @@ env:
 
 jobs:
 
-  Build-And-Test:
+  Build-And-Unit-Test:
     runs-on: ubuntu-latest
     steps:
       - name: Checkout
@@ -81,7 +81,7 @@ jobs:
   Quality-Gate:
     runs-on: ubuntu-latest
     if: ${{ always() }}
-    needs: [ Build-And-Test ]
+    needs: [ Build-And-Unit-Test, Sonatype-SCA ]
     steps:
       - name: Checkout
         uses: actions/checkout@v4
@@ -95,6 +95,7 @@ jobs:
   Fortify-SAST-Scan:
     runs-on: ubuntu-latest
     if: ${{ (github.event_name == 'push') || (github.event_name == 'pull_request') || (github.event.inputs.runFortifySASTScan == 'true') }}
+    needs: [ Quality-Gate ]
     steps:
       - name: Checkout
         uses: actions/checkout@v4
@@ -135,9 +136,31 @@ jobs:
           #DO_EXPORT: true
           # TOOL_DEFINITIONS: https://ftfy.mycompany.com/tool-definitions/v1/tool-definitions.yaml.zip
 
+  Deploy-App:
+    runs-on: ubuntu-latest
+    if: ${{ (github.event_name == 'push') || (github.event_name == 'pull_request') || (github.event.inputs.deployApp == 'true') }}
+    needs: [ Quality-Gate ]
+    steps:
+      - uses: actions/checkout@v4
+      - name: Make envfile
+        uses: SpicyPizza/create-envfile@v2.0
+        with:
+          envkey_AZURE_SUBSCRIPTION_ID: ${{ vars.AZURE_SUBSCRIPTION_ID }}
+          envkey_AZURE_RESOURCE_GROUP: ${{ vars.AZURE_RESOURCE_GROUP }}
+          envkey_AZURE_APP_NAME: ${{ vars.AZURE_APP_NAME }}
+          envkey_AZURE_REGION: ${{ vars.AZURE_REGION }}
+      - name: Deploy to Azure
+        shell: bash
+        run: |
+          echo "Simulating deployment"
+        env:
+          FOD_APP_NAME: ${{ env.DEFAULT_APP_NAME }}
+      # TBD 
+
   Fortify-DAST-Scan:
     runs-on: ubuntu-latest
     if: ${{ (github.event.inputs.runFortifyDASTScan == 'true') }}
+    needs: [ Deploy-App ]
     steps:
       - name: Checkout
         uses: actions/checkout@v4
@@ -158,7 +181,7 @@ jobs:
   Security-Gate:
     runs-on: ubuntu-latest
     if: ${{ always() }}
-    needs: [ Fortify-SAST-Scan,Fortify-DAST-Scan ]
+    needs: [ Fortify-SAST-Scan, Fortify-DAST-Scan ]
     steps:
       - name: Checkout
         uses: actions/checkout@v4
@@ -176,11 +199,11 @@ jobs:
           app_name_postfix: ${{ vars.FORTIFY_APP_NAME_POSTFIX }}
       # TBD
 
-  Release-Gate:
+  Release-To-Prod:
     runs-on: ubuntu-latest
     if: ${{ always() }}
     needs: [ Quality-Gate, Security-Gate ]
     steps:
-      - name: Checkout
+      - name: Check Out Source Code
         uses: actions/checkout@v4
-      # TBD
+    # TBD
