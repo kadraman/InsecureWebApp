@@ -103,7 +103,6 @@ runs:
       shell: bash
       run: |
         fcli fod oss-scan start --release "${FOD_RELEASE_NAME}" -f $PACKAGE_FILE --store curScan --session github-actions
-        sleep 10
         echo "fod_scan_id=$(fcli util var get ::curScan::)" >> $GITHUB_OUTPUT
         fcli fod oss-scan wait-for ::curScan:: --session github-actions
       env:
