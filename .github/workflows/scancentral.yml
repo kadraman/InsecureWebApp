@@ -38,6 +38,10 @@ on:
         description: 'Carry out DAST scan using Fortify'
         required: false
         default: 'false'
+      deployApp:
+        description: 'Deploy App to Azure'
+        required: false
+        default: 'true'            
 
 # Global environment variables
 env:
@@ -67,7 +71,7 @@ jobs:
 
   Sonatype-SCA:
     runs-on: ubuntu-latest
-    if: ${{ (github.event_name == 'push') || (github.event_name == 'pull_request') || (github.event.inputs.runSonatypeScan == 'true') }}
+    if: ${{ (github.event.inputs.runSonatypeScan == 'true') }}
     steps:
       - name: Checkout
         uses: actions/checkout@v4
@@ -94,7 +98,7 @@ jobs:
 
   Fortify-SAST-Scan:
     runs-on: ubuntu-latest
-    if: ${{ (github.event_name == 'push') || (github.event_name == 'pull_request') || (github.event.inputs.runFortifySASTScan == 'true') }}
+    if: ${{ (github.event.inputs.runFortifySASTScan == 'true') }}
     needs: [ Quality-Gate ]
     steps:
       - name: Checkout
@@ -138,7 +142,7 @@ jobs:
 
   Deploy-App:
     runs-on: ubuntu-latest
-    if: ${{ (github.event_name == 'push') || (github.event_name == 'pull_request') || (github.event.inputs.deployApp == 'true') }}
+    if: ${{ (github.event.inputs.deployApp == 'true') }}
     needs: [ Quality-Gate ]
     steps:
       - uses: actions/checkout@v4
