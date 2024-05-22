@@ -46,7 +46,7 @@ runs:
   steps:
     # Java is required to run the various Fortify utilities.
     # Setup JDK 11 on host
-    - uses: actions/setup-java@v3
+    - uses: actions/setup-java@v4
       with:
         distribution: 'temurin'
         java-version: '11'
@@ -57,21 +57,16 @@ runs:
         gradle-version: ${{ inputs.gradle_version }}
     # Install Fortify tools
     - name: Setup Fortify tools
-      uses: fortify/github-action/setup@v1.2.0
+      uses: fortify/github-action/setup@v1
       with:
         export-path: true
         fcli: latest
-        sc-client: latest
-        fod-uploader: skip
         vuln-exporter: latest
-        bugtracker-utility: skip
     # Login to Fortify on Demand fcli session
     - name: Login fcli
       working-directory: ${{ env.BASE_DIR }}
       shell: bash
       run: |
-        scancentral --version
-        fcli --version
         fcli fod session login --url $FOD_API_URI --client-id $FOD_CLIENT_ID --client-secret $FOD_CLIENT_SECRET --session github-actions
       env:
         FOD_API_URI: ${{ inputs.fod_api_url }}
@@ -101,7 +96,7 @@ runs:
         FOD_CLIENT_SECRET: ${{ inputs.fod_client_secret }}
         # EXTRA_FOD_LOGIN_OPTS: --socket-timeout=60s
         FOD_RELEASE: ${{ format('{0}:{1}', inputs.fod_app_name, inputs.fod_release_name) }}
-        # EXTRA_PACKAGE_OPTS: -oss
+        EXTRA_PACKAGE_OPTS: -oss
         DO_WAIT: true
         DO_EXPORT: true
         # TOOL_DEFINITIONS: https://ftfy.mycompany.com/tool-definitions/v1/tool-definitions.yaml.zip

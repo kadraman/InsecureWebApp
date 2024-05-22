@@ -24,8 +24,11 @@ outputs:
 runs:
   using: "composite"
   steps:
-    - name: Check Out Source Code
-      uses: actions/checkout@v3.3.0
+    - name: Checkout
+      uses: actions/checkout@v4
+      with:
+        # Fetch at least the immediate parents so that if this is a pull request then we can checkout the head.
+        fetch-depth: 2
     - name: Set Fortify App Name
       id: fortify-app-name
       shell: bash
@@ -53,7 +56,7 @@ runs:
         echo "parent_release_name=${PARENT_BRANCH}" >> $GITHUB_OUTPUT
       env:
         CURRENT_RELEASE: ${{ inputs.default_fortify_release_name }}
-        PARENT_BRANCH: "1.0" # hardcoded for now until we find a consistent way of calculating it
+        PARENT_BRANCH: "main" # hardcoded for now until we find a consistent way of calculating it
     #- name: Get branch names.
     #  id: branch-names
     #  uses: tj-actions/branch-names@v8

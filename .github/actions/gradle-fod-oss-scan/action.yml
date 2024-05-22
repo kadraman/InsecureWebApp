@@ -42,7 +42,7 @@ runs:
   steps:
     # Java is required to run the various Fortify utilities.
     # Setup JDK 11 on host
-    - uses: actions/setup-java@v3
+    - uses: actions/setup-java@v4
       with:
         distribution: 'temurin'
         java-version: '11'
@@ -53,20 +53,17 @@ runs:
         gradle-version: ${{ inputs.gradle_version }}
     # Install Fortify tools
     - name: Setup Fortify tools
-      uses: fortify/github-action/setup@v1.2.0
+      uses: fortify/github-action/setup@v1
       with:
         export-path: true
         fcli: latest
-        sc-client: skip
-        fod-uploader: skip
+        debricked-cli: latest
         vuln-exporter: latest
-        bugtracker-utility: skip
     # Login to Fortify on Demand fcli session
     - name: Login fcli
       working-directory: ${{ env.BASE_DIR }}
       shell: bash
       run: |
-        fcli --version
         fcli fod session login --url $FOD_API_URI --client-id $FOD_CLIENT_ID --client-secret $FOD_CLIENT_SECRET --session github-actions
       env:
         FOD_API_URI: ${{ inputs.fod_api_url }}
@@ -92,9 +89,7 @@ runs:
     - name: Create dependencies lock file + package
       shell: bash
       run: |
-        rm -f package.zip
-        curl -L https://github.com/debricked/cli/releases/latest/download/cli_linux_x86_64.tar.gz | tar -xz debricked
-        ./debricked resolve
+        debricked resolve
         zip package *.lock
     # Start Fortify on Demand OSS scan and wait until results complete.
     - name: Perform FoD OSS scan
