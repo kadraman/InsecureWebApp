@@ -46,9 +46,9 @@ runs:
       id: verify-security-policy
       shell: bash
       run: |
-        fcli fod action run release-summary --release "${FOD_APP_NAME}:${FOD_RELEASE_NAME}" >> $GITHUB_STEP_SUMMARY
-        fcli fod action run check-policy --release "${FOD_APP_NAME}:${FOD_RELEASE_NAME}"
-      env:
+        fcli fod action run release-summary --release "${FOD_APP_NAME}:${FOD_RELEASE_NAME}" --session github-actions >> $GITHUB_STEP_SUMMARY
+        fcli fod action run check-policy --release "${FOD_APP_NAME}:${FOD_RELEASE_NAME}" --session github-actions
+      env: 
         FOD_APP_NAME: ${{ inputs.fod_app_name }}
         FOD_RELEASE_NAME: ${{ inputs.fod_release_name }}
     # Logout/Close Fortify on Demand fcli session
