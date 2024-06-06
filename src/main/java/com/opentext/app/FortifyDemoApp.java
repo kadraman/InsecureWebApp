@@ -37,6 +37,7 @@ public class FortifyDemoApp extends SpringBootServletInitializer {
     }
 
     public static void main(String[] args) {
+        log.debug("Arguments: {}", args.toString());
         SpringApplication.run(FortifyDemoApp.class);
     }
 }
