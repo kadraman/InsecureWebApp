@@ -35,14 +35,20 @@ FoD:
 
 ```
 fcli fod session login
-fcli fod sast-scan start --release "APP:RELEASE" -f .\package.zip --store curScan
+env | grep FCLI (Unix)
+dir env: (PowerShell)
+scancentral package
+fcli fod sast-scan start --release "APP:RELEASE" -f fortifypackage.zip --store curScan
 fcli fod sast-scan wait-for ::curScan::
 ```
 
-ScanCentrl SAST:
+ScanCentral SAST:
 
 ```
 fcli sc-sast session login
-fcli sc-sast scan start =p .\package.zip --sensor-version 23.3 --store curScan
+env | grep FCLI (Unix)
+dir env: (PowerShell)
+scancentral package
+fcli sc-sast scan start -p fortifypackage.zip --sensor-version 23.3 --store curScan
 fcli sc-sast scan wait-for ::curScan::
 ```
