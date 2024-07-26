@@ -10,6 +10,7 @@
     <link rel="stylesheet" href="{{ url_for('static', filename='css/lib/fontawesome.all.css') }}">
     <link rel="stylesheet" href="{{ url_for('static', filename='css/lib/icomoon/style.css') }}">
     <link rel="stylesheet" href="{{ url_for('static', filename='css/app.css') }}">
+    <link rel="shortcut icon" type="image/ico" href="{{ url_for('static', filename='favicon.ico') }}"/>
 </head>
 
 <body>
@@ -22,7 +23,7 @@
                 <div class="d-flex align-items-center justify-content-between">
                     <div class="logo">
                         <div class="site-logo">
-                            <a class="navbar-brand js-logo-clone" href="href="{{ url_for('index')}}">">
+                            <a class="navbar-brand js-logo-clone" href="href="{{ url_for('index')}}">
                                 <img src="{{ url_for('static', filename='img/logo.png') }}" alt="IWA Pharmacy Direct">
                             </a>
                         </div>
@@ -93,41 +94,37 @@
                         <ul>
                             <li>
                                 <div class="has-children">
-                                    <sec:authorize access="isAnonymous()">
-                                        <a href="/login" class="icons-menu d-inline-block">
-                                            <span class="icon-account_circle"></span>
-                                            <span class="my-account-text">My Account</span>
-                                        </a>
-                                        <ul class="dropdown">
-                                            <li>
-                                                <a href="/login">
-                                                    <i class="fas fa-sign-in-alt fa-fw"></i> Login
-                                                </a>
-                                            </li>
-                                        </ul>
-                                    </sec:authorize>
-                                    <sec:authorize access="isAuthenticated()">
+                                    {% if g.user %}
                                         <a href="/user" class="icons-menu d-inline-block">
                                             <span class="icon-account_circle"></span>
-                                            <span class="my-account-text"><sec:authentication property="name"/></span>
+                                            <span class="my-account-text">{{ g.user['username'] }}</span>
                                         </a>
                                         <ul class="dropdown">
                                             <li>
                                                 <a th:href="/user"><i class="fas fa-home fa-fw"></i> Home </a>
                                             </li>
-                                            <sec:authorize access="hasRole('ROLE_ADMIN')">
-                                                <li>
-                                                    <a th:href="/admin"><i class="fas fa-tools fa-fw"></i> Site Administration </a>
-                                                </li>
-                                                <li sec:authorize="hasRole('ROLE_ADMIN')">
-                                                    <a th:href="/console" target="_blank"><i class="fas fa-database fa-fw"></i> Database Console</a>
-                                                </li>
-                                            </sec:authorize>
                                             <li>
-                                                <a class="nav-link" href="/logout"><i class="fas fa-sign-out-alt fa-fw"></i> Logout </a>
+                                                <a class="nav-link" href="{{ url_for('auth.logout') }}"><i class="fas fa-sign-out-alt fa-fw"></i> Logout </a>
                                             </li>
                                         </ul>
-                                    </sec:authorize>
+                                    {% else %}
+                                        <a href="{{ url_for('auth.login') }}" class="icons-menu d-inline-block">
+                                            <span class="icon-account_circle"></span>
+                                            <span class="my-account-text">My Account</span>
+                                        </a>
+                                        <ul class="dropdown">
+                                            <li>
+                                                <a href="{{ url_for('auth.login') }}">
+                                                    <i class="fas fa-sign-in-alt fa-fw"></i> Login
+                                                </a>
+                                            </li>
+                                            <li>
+                                                <a href="{{ url_for('auth.register') }}">
+                                                    <i class="fas fa-user-plus fa-fw"></i> Register
+                                                </a>
+                                            </li>
+                                        </ul>
+                                    {% endif %}
                                 </div>
                             </li>
                             <li>
@@ -237,7 +234,12 @@
 
         <script type="text/javascript" src="{{ url_for('static', filename='js/lib/jquery.min.js') }}"></script>
 		<script type="text/javascript" src="{{ url_for('static', filename='js/lib/bootstrap.bundle.min.js') }}"></script>
+        <script type="text/javascript" src="{{ url_for('static', filename='js/lib/owl.carousel.min.js') }}"></script>
+        <script type="text/javascript" src="{{ url_for('static', filename='js/lib/popper.min.js') }}"></script>
+        <!--script type="text/javascript" src="{{ url_for('static', filename='js/lib/moment.min.js') }}"></script-->
 		<script type="text/javascript" src="{{ url_for('static', filename='js/app.js') }}"></script>
+
+        {% block scripts %} {% endblock %}
 
     </div>
 

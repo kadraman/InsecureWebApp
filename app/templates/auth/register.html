@@ -1,0 +1,109 @@
+{% extends 'base.html' %}
+
+{% block header %}
+  <h1>{% block title %}Register{% endblock %}</h1>
+{% endblock %}
+
+{% block content %}
+<div class="site-section">
+
+    <div class="container">
+
+        <form id="register-form" class="form-horizontal needs-validation form-register" autocomplete="off" method="post"><input type="hidden" name="_csrf" value="4c5dc820-d678-4338-be51-dc576db07b54"/>
+
+            <h1 class="h3 mb-3 font-weight-normal">Enter your registration details</h1>
+
+            <div class="form-group row">
+                <div id="check-username" class="col-md-12">
+                    <label for="username" class="text-black">Username <span class="text-danger">*</span></label>
+                    <div class="input-group">
+                        <input type="text" class="form-control" id="username" name="username" value="" aria-describedby="usernameHelpBlock">
+                        <div class="input-group-prepend">
+                            <button class="btn btn-outline-secondary" type="button" id="check-username-button">Check Username</button>
+                        </div>
+                    </div>
+                    <small id="usernameHelpBlock" class="form-text text-muted">
+                        Must be 4-20 characters long, containing letters and numbers, and not spaces, special characters, or emojis.
+                    </small>
+                </div>
+                <div class="col-md-12">
+                    
+                    <div id="username-taken" class="d-none">
+                        <p class="alert alert-danger"></p>
+                    </div>
+                    <div id="username-available" class="d-none">
+                        <p class="alert alert-success"></p>
+                    </div>
+                </div>
+            </div>
+
+            <div class="form-group row">
+                <div class="col-md-6">
+                    <label for="firstName" class="text-black">First Name <span class="text-danger"></span></label>
+                    <input type="text" class="form-control" id="firstName" name="firstName" value="">
+                    
+                </div>
+                <div class="col-md-6">
+                    <label for="lastName" class="text-black">Last Name <span class="text-danger"></span></label>
+                    <input type="text" class="form-control" id="lastName" name="lastName" value="">
+                    
+                </div>
+            </div>
+
+            <div class="form-group row">
+                <div class="col-md-6">
+                    <label for="email" class="text-black">Email <span class="text-danger"></span></label>
+                    <input type="text" class="form-control" id="email" name="email" value="" aria-describedby="emailHelpBlock">
+                    <small id="emailHelpBlock" class="form-text text-muted">
+                        A valid email address.
+                    </small>
+                    
+                </div>
+                <div class="col-md-6">
+                    <label for="phone" class="text-black">Phone <span class="text-danger"></span></label>
+                    <input type="text" class="form-control" id="phone" name="phone" value="" aria-describedby="phoneHelpBlock">
+                    <small id="phoneHelpBlock" class="form-text text-muted">
+                        Mobile phone number including country code, e.g. +1707123456.
+                    </small>
+                    
+                </div>
+            </div>
+
+            <div class="form-group row">
+                <div class="col-md-6">
+                    <label for="password" class="text-black">Password <span class="text-danger">*</span></label>
+                    <input type="password" class="form-control" id="password" name="password" value="" aria-describedby="passwordHelpBlock">
+                    <small id="passwordHelpBlock" class="form-text text-muted">
+                        Must be 8-20 characters long, containing letters, numbers and special characters.
+                    </small>
+                    
+                </div>
+                <div class="col-md-6">
+                    <label for="confirmPassword" class="text-black">Confirm Password <span class="text-danger">*</span></label>
+                    <input type="password" class="form-control" id="confirmPassword" name="confirmPassword" value="" aria-describedby="confirmPasswordHelpBlock">
+                    <small id="confirmPasswordHelpBlock" class="form-text text-muted">
+                        Confirm your password.
+                    </small>
+                    
+                </div>
+            </div>
+
+            <div class="form-group row mt-4">
+                <div class="col-md-12">
+                    <button id="register-btn" type="submit" class="btn btn-primary">Register</button>
+                </div>
+            </div>
+        </form>
+
+    </div>
+
+</div>
+
+  <!--form method="post">
+    <label for="username">Username</label>
+    <input name="username" id="username" required>
+    <label for="password">Password</label>
+    <input type="password" name="password" id="password" required>
+    <input type="submit" value="Register">
+  </form-->
+{% endblock %}

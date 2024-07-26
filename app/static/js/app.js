@@ -100,12 +100,61 @@ jQuery(document).ready(function($) {
     // animate out any auto dismiss alerts
     var autoDismiss = function() {
         $(".auto-dismiss").each(function (i, obj) {
-            $(this).fadeTo(2000, 500).slideUp(500, function () {
-                $(this).slideUp(500);
+            let self = this;
+            setTimeout(function() {
+                $(self).fadeTo(2000, 500).slideUp(500, function () {
+                    $(self).slideUp(500);
+                })
             });
         });
     }
     autoDismiss();
+
+    /*var searchShow = function() {
+        // alert();
+        var searchWrap = $('.search-wrap');
+        $('.js-search-open').on('click', function(e) {
+            e.preventDefault();
+            searchWrap.addClass('active');
+            setTimeout(function() {
+                searchWrap.find('.form-control').focus();
+            }, 300);
+        });
+        $('.js-search-close').on('click', function(e) {
+            e.preventDefault();
+            searchWrap.removeClass('active');
+        })
+    };
+    searchShow();*/
+
+    var slider = function() {
+        $('.nonloop-block-3').owlCarousel({
+            center: false,
+            items: 1,
+            loop: true,
+            smartSpeed: 700,
+            stagePadding: 15,
+            margin: 20,
+            autoplay: true,
+            nav: true,
+            navText: ['<span class="icon-arrow_back">', '<span class="icon-arrow_forward">'],
+            responsive:{
+                600:{
+                    margin: 20,
+                    items: 2
+                },
+                1000:{
+                    margin: 20,
+                    items: 3
+                },
+                1200:{
+                    margin: 20,
+                    items: 3
+                }
+            }
+        });
+    };
+    //slider();
 
 });
 
