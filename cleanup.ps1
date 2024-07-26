@@ -12,5 +12,6 @@ Remove-Item "$($AppName)*.pdf" -ErrorAction SilentlyContinue
 Remove-Item "fod.zip" -ErrorAction SilentlyContinue
 Remove-Item "*Package.zip" -ErrorAction SilentlyContinue
 Remove-Item "*.debricked*" -ErrorAction SilentlyContinue
+Remove-Item -Force -Recurse "instance"
 
 Write-Host "Done."
