@@ -125,7 +125,6 @@ jobs:
         id: python-fod-sast-scan
         uses: fortify-presales/github-actions/python-fod-sast-scan@main
         with:
-          working_directory: app
           fod_url: ${{ vars.FOD_URL }}
           fod_api_url: ${{ vars.FOD_API_URL }}
           fod_client_id: ${{ secrets.FOD_CLIENT_ID }}

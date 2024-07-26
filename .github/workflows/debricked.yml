@@ -53,7 +53,7 @@ jobs:
       - name: Download Debricked CLI
         run: curl -L https://github.com/debricked/cli/releases/latest/download/cli_linux_x86_64.tar.gz | tar -xz debricked
       - name: Run Debricked scan  
-        run: ./debricked scan --fingerprint --callgraph --prefer-npm -r "${APP_NAME}" --access-token="${DEBRICKED_TOKEN}"  -e "*/**.lock" -e "**/build/classes/test/**" -e "**/target/classes/test-classes/**" .
+        run: ./debricked scan -r "${APP_NAME}" --access-token="${DEBRICKED_TOKEN}"  -e "*/**.lock" -e "**/build/classes/test/**" -e "**/target/classes/test-classes/**" .
         env:
           APP_NAME: ${{ env.DEFAULT_APP_NAME }}
           DEBRICKED_TOKEN: ${{ secrets.DEBRICKED_TOKEN }}
