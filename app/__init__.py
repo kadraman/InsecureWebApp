@@ -41,11 +41,11 @@ def create_app(test_config=None):
 
     # apply the blueprints to the app
     from . import auth
-    #from . import products
+    from . import products
     from . import insecure
 
     app.register_blueprint(auth.bp)
-    #app.register_blueprint(products.bp)
+    app.register_blueprint(products.bp)
     app.register_blueprint(insecure.bp)
 
     # make url_for('index') == url_for('shop.index')

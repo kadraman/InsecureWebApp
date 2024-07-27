@@ -8,9 +8,10 @@
 <div class="site-section">
     <div class="container h-100">
 
-        <div class="row align-items-center">
-            
-            
+        <div class="row justify-content-center align-items-center">
+          {% for message in get_flashed_messages() %}
+          <div class="flash">{{ message }}</div>
+          {% endfor %}
         </div>
 
         <div class="row align-items-center">

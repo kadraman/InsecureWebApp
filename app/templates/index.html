@@ -21,7 +21,7 @@
                     {% if not g.user %}
                         <a href="{{ url_for('auth.register') }}" class="btn p-2 btn-outline-info"> Register </a>
                     {% endif %}
-                  <a href="/shop'" class="btn p-2 btn-outline-success">Shop Now</a>
+                  <a href="{{ url_for('products.index') }}" class="btn p-2 btn-outline-success">Shop Now</a>
                 </p>
               </div>
             </div>

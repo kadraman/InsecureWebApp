@@ -9,6 +9,12 @@
 
     <div class="container">
 
+        <div class="row justify-content-center align-items-center">
+            {% for message in get_flashed_messages() %}
+            <div class="flash">{{ message }}</div>
+            {% endfor %}
+        </div>
+
         <form id="register-form" class="form-horizontal needs-validation form-register" autocomplete="off" method="post"><input type="hidden" name="_csrf" value="4c5dc820-d678-4338-be51-dc576db07b54"/>
 
             <h1 class="h3 mb-3 font-weight-normal">Enter your registration details</h1>

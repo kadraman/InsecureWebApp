@@ -23,7 +23,7 @@
                 <div class="d-flex align-items-center justify-content-between">
                     <div class="logo">
                         <div class="site-logo">
-                            <a class="navbar-brand js-logo-clone" href="href="{{ url_for('index')}}">
+                            <a class="navbar-brand js-logo-clone" href="{{ url_for('index') }}}">
                                 <img src="{{ url_for('static', filename='img/logo.png') }}" alt="IWA Pharmacy Direct">
                             </a>
                         </div>
@@ -32,10 +32,10 @@
                         <nav class="site-navigation text-right text-md-center" role="navigation">
                             <ul class="site-menu js-clone-nav d-none d-lg-block">
                                 <li class="has-children">
-                                    <a href="/">Shop</a>
+                                    <a href="{{ url_for('products.index') }}">Shop</a>
                                     <ul class="dropdown">
                                         <li class="has-children">
-                                            <a href="/">Health &amp; wellbeing</a>
+                                            <a href="{{ url_for('products.index') }}">Health &amp; wellbeing</a>
                                             <ul class="dropdown">
                                                 <li><a href="#">First aid</a></li>
                                                 <li><a href="#">Health conditions</a></li>
@@ -43,7 +43,7 @@
                                             </ul>
                                         </li>
                                         <li class="has-children">
-                                            <a href="/">Medicines &amp; treatments</a>
+                                            <a href="{{ url_for('products.index') }}">Medicines &amp; treatments</a>
                                             <ul class="dropdown">
                                                 <li><a href="#">Allergy &amp; hayfever</a></li>
                                                 <li><a href="#">Children's medicines</a></li>
@@ -52,7 +52,7 @@
                                             </ul>
                                         </li>
                                         <li class="has-children">
-                                            <a href="/">Vitamins &amp; supplements</a>
+                                            <a href="{{ url_for('products.index') }}">Vitamins &amp; supplements</a>
                                             <ul class="dropdown">
                                                 <li><a href="#">Everyday vitamins &amp; supplements</a></li>
                                                 <li><a href="#">Children's vitamins &amp; supplements</a></li>
@@ -60,8 +60,8 @@
                                                 <li><a href="#">Womens supplements</a></li>
                                             </ul>
                                         </li>
-                                        <li><a href="/">Weight management</a></li>
-                                        <li><a href="/">Toiletries</a></li>
+                                        <li><a href="{{ url_for('products.index') }}">Weight management</a></li>
+                                        <li><a href="{{ url_for('products.index') }}">Toiletries</a></li>
                                     </ul>
                                 </li>
                                 <li class="has-children">
