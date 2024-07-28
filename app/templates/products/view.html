@@ -1,8 +1,18 @@
 {% extends 'base.html' %}
 
-{% block title %} FortifyDemoApp :: Product {% endblock %}
+{% block title %} FortifyDemoApp :: {{ product.name }} {% endblock %}
 
 {% block content %}
+<!-- page title -->
+<div class="bg-light py-3">
+    <div class="container">
+        <div class="row">
+            <div class="col-md-12 mb-0"><a href="{{ url_for('products.index') }}">Shop</a> <span class="mx-2 mb-0">/</span> <strong>{{ product.name }}</strong></div>
+        </div>
+    </div>
+</div>
+
+<!-- content -->
 <div class="site-section-sm">
 
     <div class="container">
@@ -11,21 +21,18 @@
 
             <div class="col-md-5 mr-auto">
                 <div class="border text-center">
-                    <c:choose>
-                        <c:when test="${not empty p.image}">
-                            <img src="<c:url value="/img/products/${p.image}"/>" alt="Image" class="img-fluid p-5">
-                        </c:when>
-                        <c:otherwise>
-                            <img src="<c:url value="/img/awaiting-image-sm.png"/>" alt="Awaiting Image" class="img-fluid p-5">
-                        </c:otherwise>
-                    </c:choose>
+                    {% if product.image %}
+                        <img src="{{ url_for('static', filename='img/products/' + product['image']) }}" alt="Image" class="img-fluid p-5">
+                    {% else %}
+                        <img src="{{ url_for('static', filename='img/products/awaiting-image-sm.png') }}" alt="Image" class="img-fluid p-5">
+                    {% endif %}
                 </div>
                 <div class="mt-4">
                     <h5>Product Information</h5>
                     <table class="table table-sm table-borderless">
                         <tr>
                             <th scope="row">Code:</th>
-                            <td><c:out value="${p.code}" /></td>
+                            <td>{{ product.code }}</td>
                         </tr>
                         <tr>
                             <th scope="row">Manufacturer:</th>
@@ -37,11 +44,11 @@
                         </tr>
                         <tr>
                             <th scope="row">Date First Available:</th>
-                            <td><fmt:formatDate value="${dateNow}" pattern="dd MMM yyyy"></fmt:formatDate></td>
+                            <td>{{ product.date_created }}</td>
                         </tr>
                         <tr>
                             <td colspan="2">
-                                <a href="<c:url value="/products/${p.id}/downloadfile/datasheet.pdf"/>">
+                                <a href="/products/{{ product.id }}/downloadfile/datasheet.pdf"/>
                                     <i class="fas fa-download fa-fw"></i> Download Datasheet
                                 </a>
                             </td>
@@ -52,50 +59,42 @@
             <div class="col-md-6 item-entry">
                 <h2 class="text-black"><c:out value="${p.name}" /></h2>
                 <span class="product-rating">
-                    <c:forEach begin="1" end="${p.rating}">
+                    {% for _ in range(1, product.rating+1) %}
                         <i class="fas fa-star" style="color: cornflowerblue"> </i>
-                    </c:forEach>
-                        <c:if test="${p.rating lt 5}">
-                            <c:set var="start" value="${p.rating+1}"></c:set>
-                            <c:forEach begin="${start}" end="5">
-                                <i class="fas fa-star" style="color: gray"> </i>
-                            </c:forEach>
-                        </c:if>
-                    <span class="product-reviews pl-2"><a href="#reviews-start">Customer Reviews</a>&nbsp(<span id="review-count"><c:out value="${reviewCount}" /></span>)</span>
+                    {% endfor %}
+                    {% for _ in range(product.rating, 5) %}
+                        <i class="fas fa-star" style="color: gray"> </i>
+                    {% endfor %}    
+                    <span class="product-reviews pl-2"><a href="#reviews-start">Customer Reviews</a>&nbsp(<span id="review-count">{{ reviews|length }})</span>
                 </span>
 
                 <h6 class="mt-2">Summary</h6>
-                <p><c:out value="${p.summary}" /></p>
+                <p>{{ product.summary }}</p>
                 <h6>Description</h6>
-                <p><c:out value="${p.description}" /></p>
+                <p>{{ product.description }}</p>
 
                 <h5 class="price pt-2 pb-4 item-price">
-                    <c:choose>
-                        <c:when test="${p.onSale}">
-                            <del>
-                                <span>
-                                    <fmt:formatNumber value="${p.price}" type="currency" />
-                                </span>
-                            </del>
+                    {% if product.on_sale %}
+                        <del>
                             <span>
-                                &ndash;<fmt:formatNumber value="${p.salePrice}" type="currency" />
+                                {{ "${:,.2f}".format(product.price) }}
                             </span>
-                        </c:when>
-                        <c:otherwise>
-                            <span>
-                                    <fmt:formatNumber value="${p.price}" type="currency" />
-                            </span>
-                        </c:otherwise>
-                    </c:choose>
-                    <c:choose>
-                        <c:when test="${p.inStock}">
-                            <span class="badge badge-success">In Stock</span>
-                        </c:when>
-                        <c:otherwise>
-                            <span class="badge badge-danger">Out of Stock</span>
-                            <c:out value="In stock in ${p.timeToStock} days"></c:out>
-                        </c:otherwise>
-                    </c:choose>
+                        </del>
+                        <span>&ndash;</span>
+                        <span>
+                            {{ "${:,.2f}".format(product.sale_price) }}
+                        </span>
+                    {% else %}
+                        <span>
+                            {{ "${:,.2f}".format(product.price) }}
+                        </span>
+                    {% endif %}
+                    {% if product.in_stock %}
+                        <span class="badge badge-success">In Stock</span>
+                    {% else %}
+                        <span class="badge badge-danger">Out of Stock</span>
+                        <span>In stock in {{ product.to_to_stock }} days"><span>
+                    {% endif %}
                 </h5>
                 <div class="cart-add">
                     <div class="mb-4">
@@ -110,14 +109,11 @@
                         </div>
                     </div>
                     <p>
-                        <c:choose>
-                            <c:when test="${p.inStock}">
-                                <a id="add-to-cart" href="#" onclick="return false;" class="buy-now btn btn-sm height-auto px-4 py-3 btn-primary">Add To Cart</a>
-                            </c:when>
-                            <c:otherwise>
-                                <a id="add-to-cart" href="#" onclick="return false;" class="disabled buy-now btn btn-sm height-auto px-4 py-3 btn-primary">Add To Cart</a>
-                            </c:otherwise>
-                        </c:choose>
+                        {% if product.in_stock %}
+                            <a id="add-to-cart" href="#" onclick="return false;" class="buy-now btn btn-sm height-auto px-4 py-3 btn-primary">Add To Cart</a>
+                        {% else %}
+                            <a id="add-to-cart" href="#" onclick="return false;" class="disabled buy-now btn btn-sm height-auto px-4 py-3 btn-primary">Add To Cart</a>
+                        {% endif %}
                     </p>
                 </div>
 
@@ -128,12 +124,12 @@
         <span id="reviews-start"></span>
         <div class="product-reviews rows">
             <h4>Customer Reviews</h4>
-            <c:forEach items="${reviews}" var="r">
+            {% for r in reviews %}
                 <div class="col-sm-12 item mb-4">
-                    <h6 class='text-dark pt-2'>Review by <em><c:out value="${r.username}" /></em> on <c:out value="${r.reviewDate}" /></h6>
-                <p><c:out value="${r.comment}" /></p>
+                    <h6 class='text-dark pt-2'>Review by <em>{{ r.username }}</em> on {{ r.review_date.strftime('%d %B, %Y') }}</h6>
+                    <p>{{ r.comment }}</p>
                 </div>
-            </c:forEach>
+            {% endfor %}
         </div>
 
     </div>

@@ -1,4 +1,5 @@
 import functools
+import os
 
 from flask import Blueprint, make_response
 from flask import flash
@@ -13,6 +14,8 @@ from jinja2 import Template as Jinja2_Template
 from jinja2 import Environment, DictLoader
 
 bp = Blueprint("insecure", __name__, url_prefix="/insecure")
+
+INITCMD="setup.bat"
 
 """
 Some additional insecure examples not related to the functionality of the application.
@@ -37,6 +40,12 @@ def load_file():
     response.mimetype = "text/plain"
     return response
 
+@bp.route("/command_injection", methods = ["GET"])
+def command_injection():
+    home = os.getenv('APPHOME')
+    cmd = home.join(INITCMD)
+    os.system(cmd);
+    
 @bp.route("/template_with_filedata", methods=['POST'])
 def process_request(request):
     # Load the template

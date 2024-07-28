@@ -13,17 +13,14 @@ from .db import get_db
 bp = Blueprint("products", __name__, url_prefix="/products")
 
 
-def get_product(id, check_author=True):
-    """Get a product and its author by id.
+def get_product(id):
+    """Get a product by id.
 
-    Checks that the id exists and optionally that the current user is
-    the author.
+    Checks that the id exists.
 
     :param id: id of product to get
-    :param check_author: require the current user to be the author
-    :return: the product with author information
+    :return: the product information
     :raise 404: if a product with the given id doesn't exist
-    :raise 403: if the current user isn't the author
     """
     product = (
         get_db()
@@ -39,28 +36,55 @@ def get_product(id, check_author=True):
     if product is None:
         abort(404, f"product id {id} doesn't exist.")
 
-    #if check_author and product["author_id"] != g.user["id"]:
-    #    abort(403)
-
     return product
 
+def get_reviews(id):
+    """Get a product's reviews.
+
+    Checks that the id exists.
+
+    :param id: id of product to get
+    :return: the review information
+    :raise 404: if a product with the given id doesn't exist
+    """
+    db = get_db()
+    reviews = db.execute(
+        "SELECT r.user_id, r.review_date, r.comment, u.username"
+        " FROM reviews r, users u"
+        " INNER JOIN reviews ON r.user_id = u.id AND"
+        " (r.product_id = ? OR r.product_id IS null)",
+        (id,),
+    ).fetchall()
+
+    #if product is None:
+    #    abort(404, f"product id {id} doesn't exist.")
+
+    return reviews
 
 @bp.route("/")
 def index():
+    keywords = request.args.get('keywords')
+    if (keywords):
+        print("Searching for products with keywords: {} ".format(keywords))
+    else:
+        keywords=""    
+
     """Show all the products, ordered by name."""
     db = get_db()
     products = db.execute(
         "SELECT *"
         " FROM products p"
+        " WHERE name LIKE '%%" + keywords + "%%'"
         " ORDER BY name"
     ).fetchall()
     return render_template("products/index.html", products=products)
 
 @bp.route("/<int:id>/view")
 def view(id):
-    """Show an individual product"""
+    """View an individual product and its reviews"""
     product = get_product(id)
-    return render_template("products/view.html", product=product)
+    reviews = get_reviews(id)
+    return render_template("products/view.html", product=product, reviews=reviews)
 
 @bp.route("/create", methods=("GET", "POST"))
 @login_required

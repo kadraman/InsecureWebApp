@@ -123,7 +123,7 @@ VALUES (10, 'SWA723-A375-00412', 'Kanlab Blue', 5,
         9.95, 0, 7, 1);
 INSERT INTO reviews (id, product_id, user_id, review_date, comment, rating, visible)
 VALUES (1, 1, 2,
-        CURRENT_TIME, 'This is an example review of Solodox 750. It is very good.', 5, 1);
+        CURRENT_TIMESTAMP, 'This is an example review of Solodox 750. It is very good.', 5, 1);
 INSERT INTO reviews (id, product_id, user_id, review_date, comment, rating, visible)
 VALUES (2, 2, 3,
         CURRENT_TIMESTAMP, 'Arrived on time and works well but the instructions are very limited and not explained well.', 4, 1);
