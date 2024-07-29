@@ -1,3 +1,4 @@
+import os
 from flask import Blueprint
 from flask import flash
 from flask import g
@@ -63,7 +64,10 @@ def get_reviews(id):
 
 @bp.route("/")
 def index():
-    keywords = request.args.get('keywords')
+    if (os.environ.get('FORTIFY_IF_DJANGO')):
+        keywords = request.GET['keywords', '']
+    else:    
+        keywords = request.args.get('keywords')
     if (keywords):
         print("Searching for products with keywords: {} ".format(keywords))
     else:

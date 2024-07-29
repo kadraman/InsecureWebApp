@@ -14,8 +14,7 @@ You can the run the application locally using the following:
 ```
 python -m venv .venv
 .venv\Scripts\Activate.ps1
-cd app
-pip install -r requirements.txt
+pip install -r app\requirements.txt
 flask run
 ```
 

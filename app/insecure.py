@@ -21,20 +21,20 @@ INITCMD="setup.bat"
 Some additional insecure examples not related to the functionality of the application.
 """
 
-@bp.route("/xss", methods=("GET", "POST"))
+@bp.route("/xss", methods = ["POST"])
 def xss():
-    if request.method == "POST":
-        username = request.form["username"]
-        password = request.form["password"]
-    if request.method == "GET":
-        username = request.args.get('username')    
-        password = request.args.get('password')    
-
-    return "username: %s; password: %s" % username, password
+    if (os.environ.get('FORTIFY_IF_DJANGO')):
+        content = request.POST['content', '']
+    else:    
+        content = request.form.get('content') 
+    return render_template("insecure/xss.html", content=content)
 
 @bp.route("/load_file", methods = ["GET"])
 def load_file():
-    filename = request.args.get('filename') 
+    if (os.environ.get('FORTIFY_IF_DJANGO')):
+        filename = filename.GET['content', '']
+    else:    
+        filename = request.args.get('filename') 
     contents = source(filename)
     response = make_response(contents, 200)
     response.mimetype = "text/plain"
@@ -42,36 +42,34 @@ def load_file():
 
 @bp.route("/command_injection", methods = ["GET"])
 def command_injection():
+    if (os.environ.get('FORTIFY_IF_DJANGO')):
+        arguments = request.GET['arguments', '']
+    else:    
+        arguments = request.args.get('arguments') 
     home = os.getenv('APPHOME')
-    cmd = home.join(INITCMD)
+    cmd = home.join(INITCMD).join(arguments)
     os.system(cmd);
     
-@bp.route("/template_with_filedata", methods=['POST'])
-def process_request(request):
-    # Load the template
-    template = request.GET['template']
+@bp.route("/template_injection", methods=['POST'])
+def template_injection():
+    if (os.environ.get('FORTIFY_IF_DJANGO')):
+        template = request.POST['content', '']
+        filename = request.POST['content', '']
+    else:    
+        template = request.form.get('template') 
+        filename = request.form.get('filename') 
     t = Jinja2_Template(template)
-    name = source(request.GET['name'])
-    # Render the template with the context data
+    name = source(filename)
     html = t.render(name=name)
     return html
 
-def robotstxt():
+@bp.route("/set_headers")
+def set_headers():
     resp = make_response('')
+    resp.headers.set("Access-Control-Allow-Origin", "*")
     resp.headers.set('content-type', 'text/plain')
     return resp
     
-"""
-@bp.route("/template", methods=['POST'])
-def process_request():
-    # Load the template
-    template = request.form['template']
-    t = Jinja2_Template(template)
-    name = source(request.form['name'])
-    # Render the template with the context data
-    html = t.render(name=name)
-    return html
-"""
 
 def source(script_path):
     with open(script_path, 'r') as script_file:
