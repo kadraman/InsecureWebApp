@@ -2,7 +2,7 @@
 # Create GitHub Action Repository Variables for your version of the application:
 #   FOD_BASE_URL should be FoD BASE URL for your tenant (e.g. https://ams.fortify.com)
 #   FOD_API_URL should be FoD API URL for your tenant (e.g. https://api.ams,fortify.com)
-#   FOD_PARENT_RELEASE_NAME is the FoD release name corresponding to the parent branch of any newly created branch, this is typically "main" or "dev"
+#   FOD_PARENT_RELEASE_NAME is the FoD release name corresponding to the parent branch of any newly created branch, this is typically "main" or "develop"
 # Create GitHub Action Secrets for your version of the application:
 #   FOD_CLIENT_ID should be an API Key obtained from your FoD tenant.
 #   FOD_CLIENT_SECRET should be the secret for the API Key obtained for your FoD tenant.
@@ -21,6 +21,7 @@ on:
       - 'bin/**'
       - 'data/**'
       - 'etc/**'
+      - 'tests/**'
       - 'README.md'
       - 'LICENSE'
     branches:
@@ -40,13 +41,14 @@ on:
         required: false
         default: 'false'
       deployApp:
-        description: 'Deploy App to Azure'
+        description: 'Deploy App'
         required: false
         default: 'true'        
 
 # Global environment variables
 env:
   DEFAULT_APP_NAME: "FortifyDemoApp"
+  DEFAULT_PYTHON_VERSION: "3.12.3"
 
 jobs:
 
@@ -59,27 +61,27 @@ jobs:
         with:
           # Fetch at least the immediate parents so that if this is a pull request then we can checkout the head.
           fetch-depth: 2
-      # Setup JDK 11 on host
-      - uses: actions/setup-java@v4
+      - name: Set up Python
+        uses: actions/setup-python@v5
         with:
-          distribution: 'temurin'
-          java-version: '11'
-      - name: Setup Gradle
-        uses: gradle/actions/setup-gradle@v3
-        with:
-          gradle-version: 7.3
-      # Build / Test with Gradle
-      - name: Build with Gradle
-        run: ./gradlew clean build test
-           # Publish test results
-      - name: Publish Test Results
-        uses: EnricoMi/publish-unit-test-result-action@v2
-        if: always()
-        with:
-          files: |
-            build/test-results/**/*.xml
-            build/test-results/**/*.trx
-            build/test-results/**/*.json     
+          python-version: ${{ env.DEFAULT_PYTHON_VERSION }} 
+      - name: Install dependencies
+        working-directory: app
+        run: pip install -r requirements.txt
+      #- uses: pavelzw/pytest-action@v2
+      #  with:
+      #    emoji: true
+      #    verbose: true
+      #    job-summary: true        
+      # Publish test results
+      #- name: Publish Test Results
+      #  uses: EnricoMi/publish-unit-test-result-action@v2
+      #  if: always()
+      #  with:
+      #    files: |
+      #      build/test-results/**/*.xml
+      #      build/test-results/**/*.trx
+      #      build/test-results/**/*.json     
 
   Quality-Gate:
     runs-on: ubuntu-latest
@@ -105,16 +107,24 @@ jobs:
           fetch-depth: 2
       - name: Fortify App and Release Name
         id: fortify-app-and-rel-name
-        uses: ./.github/actions/fortify-app-and-release-name
+        uses: fortify-presales/github-actions/fortify-app-and-release-name@main
         with:
           default_fortify_app_name: ${{ env.DEFAULT_APP_NAME }}
           default_fortify_release_name: ${{ github.ref_name }}
           app_name_postfix: ${{ vars.FORTIFY_APP_NAME_POSTFIX }}
-      - name: Gradle FoD SAST scan
-        id: gradle-fod-sast-scan
-        uses: ./.github/actions/gradle-fod-sast-scan
+      # Uncomment below to debug FoD App/Release names   
+      #- name: Print App and Release Name
+      #  shell: bash
+      #  run: |
+      #    echo "FoD App Name: ${FOD_APP_NAME}"
+      #    echo "FoD Release Name: ${FOD_RELEASE_NAME}"
+      #  env:
+      #    FOD_APP_NAME: ${{ steps.fortify-app-and-rel-name.outputs.app_name }}
+      #    FOD_RELEASE_NAME: ${{ steps.fortify-app-and-rel-name.outputs.release_name }}          
+      - name: Python FoD SAST scan
+        id: python-fod-sast-scan
+        uses: fortify-presales/github-actions/python-fod-sast-scan@main
         with:
-          working_directory: ${{ env.BASE_DIR }}
           fod_url: ${{ vars.FOD_URL }}
           fod_api_url: ${{ vars.FOD_API_URL }}
           fod_client_id: ${{ secrets.FOD_CLIENT_ID }}
@@ -133,14 +143,7 @@ jobs:
         with:
           # Fetch at least the immediate parents so that if this is a pull request then we can checkout the head.
           fetch-depth: 2
-      - name: Make envfile
-        uses: SpicyPizza/create-envfile@v2.0
-        with:
-          envkey_AZURE_SUBSCRIPTION_ID: ${{ vars.AZURE_SUBSCRIPTION_ID }}
-          envkey_AZURE_RESOURCE_GROUP: ${{ vars.AZURE_RESOURCE_GROUP }}
-          envkey_AZURE_APP_NAME: ${{ vars.AZURE_APP_NAME }}
-          envkey_AZURE_REGION: ${{ vars.AZURE_REGION }}
-      - name: Deploy to Azure
+      - name: Deploy App
         shell: bash
         run: |
           echo "Simulating deployment"
@@ -172,23 +175,26 @@ jobs:
           fetch-depth: 2
       - name: Fortify App and Release Name
         id: fortify-app-and-rel-name
-        uses: ./.github/actions/fortify-app-and-release-name
+        uses: fortify-presales/github-actions/fortify-app-and-release-name@main
         with:
           default_fortify_app_name: ${{ env.DEFAULT_APP_NAME }}
           default_fortify_release_name: ${{ github.ref_name }}
           app_name_postfix: ${{ vars.FORTIFY_APP_NAME_POSTFIX }}
-      - name: FoD DAST scan
-        id: fod-dast-scan
-        uses: ./.github/actions/fod-dast-scan
-        with:
-          working_directory: ${{ env.BASE_DIR }}
-          fod_url: ${{ vars.FOD_URL }}
-          fod_api_url: ${{ vars.FOD_API_URL }}
-          fod_client_id: ${{ secrets.FOD_CLIENT_ID }}
-          fod_client_secret: ${{ secrets.FOD_CLIENT_SECRET }}
-          fod_app_name: ${{ steps.fortify-app-and-rel-name.outputs.app_name }}
-          fod_release_name: ${{ steps.fortify-app-and-rel-name.outputs.release_name }}
-          fod_parent_release_name: ${{ steps.fortify-app-and-rel-name.outputs.parent_release_name }}
+      #- name: FoD DAST scan
+      #  id: fod-dast-scan
+      #  uses: fortify-presales/github-actions/fod-dast-scan@main
+      #  with:
+      #    working_directory: ${{ env.BASE_DIR }}
+      #    fod_url: ${{ vars.FOD_URL }}
+      #    fod_api_url: ${{ vars.FOD_API_URL }}
+      #    fod_client_id: ${{ secrets.FOD_CLIENT_ID }}
+      #    fod_client_secret: ${{ secrets.FOD_CLIENT_SECRET }}
+      #    fod_app_name: ${{ steps.fortify-app-and-rel-name.outputs.app_name }}
+      #    # For DAST we are choosing to create a new release each time using GitHub Run Number
+      #    #fod_release_name: ${{ steps.fortify-app-and-rel-name.outputs.release_name }}
+      #    fod_release_name: ${{ format('{0}#{1}', steps.fortify-app-and-rel-name.outputs.release_name, github.run_number) }}
+      #    #fod_parent_release_name: ${{ steps.fortify-app-and-rel-name.outputs.parent_release_name }}
+      #    fod_parent_release_name: "dast-web-base"
 
   Security-Gate:
     runs-on: ubuntu-latest
@@ -202,13 +208,13 @@ jobs:
           fetch-depth: 2
       - name: Fortify App and Release Name
         id: fortify-app-and-rel-name
-        uses: ./.github/actions/fortify-app-and-release-name
+        uses: fortify-presales/github-actions/fortify-app-and-release-name@main
         with:
           default_fortify_app_name: ${{ env.DEFAULT_APP_NAME }}
           default_fortify_release_name: ${{ github.ref_name }}
           app_name_postfix: ${{ vars.FORTIFY_APP_NAME_POSTFIX }}
       - name: Verify FoD Security Policy
-        uses: ./.github/actions/verify-fod-security-policy
+        uses: fortify-presales/github-actions/verify-fod-security-policy@main
         with:
           fod_api_url: ${{ vars.FOD_API_URL }}
           fod_client_id: ${{ secrets.FOD_CLIENT_ID }}
@@ -218,7 +224,6 @@ jobs:
 
   Release-To-Prod:
     runs-on: ubuntu-latest
-    if: ${{ always() }}
     needs: [ Quality-Gate, Security-Gate ]
     steps:
       - name: Checkout

@@ -8,7 +8,7 @@ on:
   # Triggers the workflow on push or pull request events but only for the main and dev branches
   push:
     paths:
-      - 'build.gradle'
+      - '**/requirements.txt'
     branches:
       - '**'        # matches every branch
   pull_request:
@@ -25,7 +25,6 @@ on:
 # Global environment variables
 env:
   DEFAULT_APP_NAME: "FortifyDemoApp"
-  GRADLE_VERSION: "7.3"
 
 jobs:
 
@@ -44,21 +43,17 @@ jobs:
         with:
           distribution: 'temurin'
           java-version: '11'
-      # Install appropriate version of Gradle
-      - name: Setup Gradle
-        uses: gradle/actions/setup-gradle@v3
-        with:
-          gradle-version: ${{ env.GRADLE_VERSION }}
-      # Install Fortify/Debricked tools
+      # Install Fortify (if required)
       - name: Setup Fortify tools
         uses: fortify/github-action/setup@v1.2.2
         with:
           export-path: true
           fcli: latest
-          debricked-cli: latest
-      - name: Run debricked scan
-        shell: bash
-        run: |
-          debricked scan --callgraph -r "${DEFAULT_APP_NAME}" --access-token="${DEBRICKED_TOKEN}" -e "*/**.lock" -e "**/build/classes/test/**" -e "**/target/classes/test-classes/**" .
+      # Run debricked scan    
+      - name: Download Debricked CLI
+        run: curl -L https://github.com/debricked/cli/releases/latest/download/cli_linux_x86_64.tar.gz | tar -xz debricked
+      - name: Run Debricked scan  
+        run: ./debricked scan -r "${APP_NAME}" --access-token="${DEBRICKED_TOKEN}"  -e "*/**.lock" -e "**/build/classes/test/**" -e "**/target/classes/test-classes/**" .
         env:
+          APP_NAME: ${{ env.DEFAULT_APP_NAME }}
           DEBRICKED_TOKEN: ${{ secrets.DEBRICKED_TOKEN }}

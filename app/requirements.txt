@@ -1,0 +1,7 @@
+Flask==2.3.3
+Werkzeug==2.3.8
+python-docx==1.0.1
+python-dotenv==1.0.0
+requests==2.30.0
+cryptography==3.3.1
+PyYAML==5.1.2
