@@ -1,5 +1,5 @@
 import os
-from flask import Blueprint
+from flask import Blueprint, send_file, send_from_directory
 from flask import flash
 from flask import g
 from flask import redirect
@@ -39,6 +39,7 @@ def get_product(id):
 
     return product
 
+
 def get_reviews(id):
     """Get a product's reviews.
 
@@ -62,6 +63,7 @@ def get_reviews(id):
 
     return reviews
 
+
 @bp.route("/")
 def index():
     if (os.environ.get('FORTIFY_IF_DJANGO')):
@@ -83,12 +85,30 @@ def index():
     ).fetchall()
     return render_template("products/index.html", products=products)
 
+
+@bp.route('/download/<path:filename>', methods=['GET', 'POST'])
+def download(filename):
+    if (os.environ.get('FORTIFY_IF_DJANGO')):
+        filename2 = request.GET['filename', '']
+    else:    
+        filename2 = request.args.get('filename')
+    """Download an artifact related to the product"""
+    if not filename:
+        return 404
+    site_root = os.path.realpath(os.path.dirname(__file__))    
+    return send_file(os.path.join(site_root, "static", "data", filename2))
+
+
 @bp.route("/<int:id>/view")
 def view(id):
     """View an individual product and its reviews"""
     product = get_product(id)
     reviews = get_reviews(id)
     return render_template("products/view.html", product=product, reviews=reviews)
+
+
+"""The below are not yet used"""
+
 
 @bp.route("/create", methods=("GET", "POST"))
 @login_required

@@ -1,4 +1,3 @@
-import functools
 import os
 
 from flask import Blueprint, make_response
@@ -21,13 +20,13 @@ INITCMD="setup.bat"
 Some additional insecure examples not related to the functionality of the application.
 """
 
-@bp.route("/xss", methods = ["POST"])
+@bp.route("/xss", methods = ["GET"])
 def xss():
     if (os.environ.get('FORTIFY_IF_DJANGO')):
-        content = request.POST['content', '']
+        input = request.GET['input', '']
     else:    
-        content = request.form.get('content') 
-    return render_template("insecure/xss.html", content=content)
+        user_input = request.args.get('input') 
+    return render_template("insecure/xss.html", input=user_input)
 
 @bp.route("/load_file", methods = ["GET"])
 def load_file():
@@ -63,13 +62,21 @@ def template_injection():
     html = t.render(name=name)
     return html
 
-@bp.route("/set_headers")
-def set_headers():
-    resp = make_response('')
-    resp.headers.set("Access-Control-Allow-Origin", "*")
-    resp.headers.set('content-type', 'text/plain')
-    return resp
-    
+@bp.route("/insecure_headers", methods=['POST'])
+def insecure_headers():
+    response = make_response('')
+    response.headers.add("Access-Control-Allow-Origin", "*")
+    return response
+
+@bp.route("/insecure_cookies", methods=['POST'])
+def insecure_cookies():
+    if (os.environ.get('FORTIFY_IF_DJANGO')):
+        email = request.POST['email', '']
+    else:    
+        email = request.form.get('email') 
+    response = make_response('')
+    response.set_cookie("emailCookie", email)
+    return response   
 
 def source(script_path):
     with open(script_path, 'r') as script_file:

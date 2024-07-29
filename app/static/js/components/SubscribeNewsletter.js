@@ -45,13 +45,13 @@ $.fn.SubscribeNewsletter = function (options) {
         let data = JSON.stringify(
             {
                 id: subscriberId,
-                firstName: "",
-                lastName: "",
-                email: email
+                name: "",
+                email: email,
+                role: ""
             }
         )
         return await $.ajax({
-            url: '/api/subscribe-user',
+            url: '/auth/subscribe-user',
             type: 'POST',
             contentType: 'application/json',
             data: data

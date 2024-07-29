@@ -1,6 +1,6 @@
 import os
 import random
-from flask import Flask, render_template, request, Response
+from flask import Flask, json, render_template, request, Response
 from docx import Document
 from werkzeug.utils import secure_filename
 
@@ -36,8 +36,11 @@ def create_app(test_config=None):
 
     # register the database commands
     from . import db
-
     db.init_app(app)
+
+    # set email subscribers file
+    site_root = os.path.realpath(os.path.dirname(__file__))    
+    app.config['SUBSCRIBERS_FILENAME'] = os.path.join(site_root, "static", "data", "email-db.json")
 
     # apply the blueprints to the app
     from . import auth

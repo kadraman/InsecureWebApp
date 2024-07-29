@@ -71,3 +71,4 @@ package.zip
 debricked
 bin
 debricked.fingerprints.txt
+app/static/data/email-db.json

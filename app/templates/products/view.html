@@ -48,7 +48,7 @@
                         </tr>
                         <tr>
                             <td colspan="2">
-                                <a href="/products/{{ product.id }}/downloadfile/datasheet.pdf"/>
+                                <a href="{{ url_for('products.download', filename=product['code']+'/datasheet.pdf') }}">
                                     <i class="fas fa-download fa-fw"></i> Download Datasheet
                                 </a>
                             </td>

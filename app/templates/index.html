@@ -131,21 +131,5 @@
 {% endblock %}
 
 {% block scripts %}
-<script type="text/javascript" src="{{ url_for('static', filename='js/components/SubscribeNewsletter.js') }}"></script>
-<!--script type="text/javascript" src="/js/components/CartCount.js"></-->
-
-<script>
-    /*<![CDATA[*/
-    var userId = null;
-    var jwtToken = null;
-    /*]]>*/
-    (function ($) {
-        $(document).ready(function () {
-            $('#subscribe-newsletter').SubscribeNewsletter();
-            //$('#shopping-cart-count').CartCount();
-            //$('#unread-message-count').UnreadMessageCount();
-        });
-    })(jQuery);
-</script>
 
 {% endblock %}

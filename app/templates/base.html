@@ -236,8 +236,23 @@
 		<script type="text/javascript" src="{{ url_for('static', filename='js/lib/bootstrap.bundle.min.js') }}"></script>
         <script type="text/javascript" src="{{ url_for('static', filename='js/lib/owl.carousel.min.js') }}"></script>
         <script type="text/javascript" src="{{ url_for('static', filename='js/lib/popper.min.js') }}"></script>
-        <!--script type="text/javascript" src="{{ url_for('static', filename='js/lib/moment.min.js') }}"></script-->
+        <script type="text/javascript" src="{{ url_for('static', filename='js/lib/moment.min.js') }}"></script>
 		<script type="text/javascript" src="{{ url_for('static', filename='js/app.js') }}"></script>
+        <script type="text/javascript" src="{{ url_for('static', filename='js/components/SubscribeNewsletter.js') }}"></script>
+        <!--script type="text/javascript" src="{{ url_for('static', filename='js/components/CartCount.js') }}"></script-->
+
+        <script>
+            /*<![CDATA[*/
+            var userId = null;
+            var jwtToken = null;
+            /*]]>*/
+            (function ($) {
+                $(document).ready(function () {
+                    $('#subscribe-newsletter').SubscribeNewsletter();
+                    //$('#shopping-cart-count').CartCount();
+                });
+            })(jQuery);
+        </script>
 
         {% block scripts %} {% endblock %}
 
