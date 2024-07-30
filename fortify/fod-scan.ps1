@@ -15,8 +15,8 @@ param (
 
 # Import local environment specific settings
 $EnvSettings = $(ConvertFrom-StringData -StringData (Get-Content ".\.env" | Where-Object {-not ($_.StartsWith('#'))} | Out-String))
-$AppName = $EnvSettings['APP_NAME']
-$AppVersion = $EnvSettings['APP_RELEASE_NAME']
+$AppName = $EnvSettings['FOD_APP_NAME']
+$AppVersion = $EnvSettings['FOD_APP_REL_NAME']
 $FoDApiUri = $EnvSettings['FOD_API_URI']
 $FoDClientId = $EnvSettings['FOD_CLIENT_ID']
 $FoDClientSecret = $EnvSettings['FOD_CLIENT_SECRET']

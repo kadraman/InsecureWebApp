@@ -4,14 +4,13 @@
 
 # Import local environment specific settings
 $EnvSettings = $(ConvertFrom-StringData -StringData (Get-Content (Join-Path "." -ChildPath ".env") | Where-Object {-not ($_.StartsWith('#'))} | Out-String))
-$AppName = $EnvSettings['APP_NAME']
-$AppVersion = $EnvSettings['APP_RELEASE_NAME']
+$AppName = $EnvSettings['SSC_APP_NAME']
+$AppVersion = $EnvSettings['SSC_APP_VER_NAME']
 $SSCAuthToken = $EnvSettings['SSC_AUTH_TOKEN'] # AnalysisUploadToken
 $ScanCentralCtrlUrl = $EnvSettings['SCANCENTRAL_CTRL_URL']
 $ScanCentralPoolId = $EnvSettings['SCANCENTRAL_POOL_ID'] # Not yet used
 $ScanCentralEmail = $EnvSettings['SCANCENTRAL_EMAIL']
 
-$ScanSwitches = ""
 $BuildVersion = $(git log --format="%H" -n 1)
 $BuildLabel = "fortifydemoapp-cli"
 $ScanArgs = @(
@@ -38,7 +37,7 @@ if (Test-Path $PackageName) {
 
 # Package, upload and run the scan and import results into SSC
 Write-Host Invoking ScanCentral SAST ...
-& scancentral -url $ScanCentralCtrlUrl start -upload -uptoken $SSCAuthToken -bt gradle -bc "clean build -x test" -sp $PackageName `
+& scancentral -url $ScanCentralCtrlUrl start -upload -uptoken $SSCAuthToken -bt none --python-virtual-env .venv  -sp $PackageName `
     -application "$AppName" -version $AppVersion -email $ScanCentralEmail -block -o -f "$($AppName).fpr"  `
     -sargs "$($ScanArgs)"
 

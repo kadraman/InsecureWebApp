@@ -1,5 +1,5 @@
 import os
-from flask import Blueprint, send_file, send_from_directory
+from flask import Blueprint, Response, send_file, send_from_directory
 from flask import flash
 from flask import g
 from flask import redirect
@@ -9,10 +9,9 @@ from flask import url_for
 from werkzeug.exceptions import abort
 
 from .auth import login_required
-from .db import get_db
+from .db import get_db, init_db
 
 bp = Blueprint("products", __name__, url_prefix="/products")
-
 
 def get_product(id):
     """Get a product by id.
