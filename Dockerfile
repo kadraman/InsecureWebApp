@@ -1,23 +1,12 @@
-FROM eclipse-temurin:11-jdk-alpine
+# syntax=docker/dockerfile:1
 
-LABEL maintainer="klee2@opentext.com"
+FROM python:3.12-slim-buster
 
-RUN apk add --update bash bash-completion curl iputils-ping
+WORKDIR /python-docker
 
-# Add a volume pointing to /tmp
-VOLUME /tmp
+COPY requirements.txt requirements.txt
+RUN pip3 install -r requirements.txt
 
-# Make port 8088 available to the world outside this container
-EXPOSE 8088
+COPY . .
 
-# The application's jar file
-ARG JAR_FILE=build/libs/FortifyDemoApp.jar
-
-# Copy the application's jar to the container
-COPY ${JAR_FILE} app.jar
-
-# JAVA_OPTS to be passed in
-ENV JAVA_OPTS="-Xmx512m -Xss256k"
-
-# Run the jar file
-ENTRYPOINT ["java","-jar","/app.jar"]
+CMD [ "python3", "-m" , "flask", "run", "--host=0.0.0.0"]

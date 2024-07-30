@@ -3,8 +3,9 @@
 # Fortify Demo App
 
 This is a simple Python Flask web application that can be used for the demonstration of application
-security testing tools such as those provided by [Fortify by OpenText](https://www.microfocus.com/en-us/cyberres/application-security).
-It is a cut down "search" results/details page from a larger sample application [IWA-Java](https://github.com/fortify/IWA-Java) and is kept deliberately small for demos.
+security testing tools - such as those provided by [Fortify by OpenText](https://www.microfocus.com/en-us/cyberres/application-security).
+It is a cut down "search" results/details page from a larger sample application [IWA-Java](https://github.com/fortify/IWA-Java) 
+and is kept deliberately small for demos.
 
 Run Application (locally)
 -------------------------
@@ -43,10 +44,10 @@ To create the required infrastructure and deploy the application you can execute
 
 ```
 az login
-az webapp up --runtime PYTHON:3.12 --location eastus --name _YOUR_APP_NAME__ --sku B1 --logs
+az webapp up --runtime PYTHON:3.12 --location eastus --name _YOUR_APP_NAME_ --sku B1 --logs
 ```
 
-Replace `eastus` with your own desired region and `B1` with desired app service plan.
+Replace `_YOUR_APP_NAME_` with the (unique) name you wish to use for the webapp, `eastus` with your own desired region and `B1` with desired app service plan.
 
 You will need to create a custom startup script for the application using the resource_group and app_name from above:
 
@@ -54,16 +55,42 @@ You will need to create a custom startup script for the application using the re
 az webapp config set --resource-group _YOUR_RESOURCE_GROUP_ --name _YOUR_APP_NAME_ --startup-file startup.txt
 ```
 
-You should now be able to navigate to the website and use the URL `http://your_website_name.azurewebsites.net/init-db`
+You should now be able to navigate to the website and use the URL `http://_YOUR_APP_NAME_.azurewebsites.net/init-db`
 to populate the database.
-
-Remove Application and Infrastructure
--------------------------------------
 
 To clean up all the resources you can execute the following (from a Windows command prompt):
 
 ```
 az group delete --name [resource_group_created_from_above] --no-wait
+```
+
+Scan Application (with Fortify)
+-------------------------------
+
+To carry out a Fortify Static Code Analyzer local scan, run the following:
+
+```
+sourceanalyzer -b fortifydemoapp -clean
+sourceanalyzer -b fortifydemoapp -python-path ".venv/Lib/site-packages/" -exclude ".venv" "app"
+sourceanalyzer -b fortifydemoapp -scan
+```
+
+To carry out a Fortify ScanCentral SAST scan, run the following:
+
+```
+scancentral -url _YOUR_SCANCENTRAL_CTRL_URL_ start -upload -uptoken _YOUR_SSC_AUTH_TOKEN_ -bt none --python-virtual-env .venv
+    -sp package.zip -application "FortifyDemoApp" -version "main" -email _YOUR_EMAIL_ -block -o -f "FortifyDemoApp.fpr"
+```
+
+To carry ouy a Fortify on Demand scan, run the following:
+
+```
+env | grep FCLI (Unix)
+dir env: (PowerShell)
+fcli fod session login
+scancentral package -o package.zip -bt none --python-virtual-env .venv
+fcli fod sast-scan start --release "FortifyDemoApp:main" -f package.zip --store curScan
+fcli fod sast-scan wait-for ::curScan::
 ```
 
 ---
