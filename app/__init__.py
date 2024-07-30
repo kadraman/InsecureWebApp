@@ -1,6 +1,6 @@
 import os
 import random
-from flask import Flask, json, render_template, request, Response
+from flask import Flask, json, redirect, render_template, request, Response, url_for
 from docx import Document
 from werkzeug.utils import secure_filename
 
@@ -30,8 +30,10 @@ def create_app(test_config=None):
     except OSError:
         pass
 
+    # initial route
     @app.route('/')
     def index():
+        print("[index] Rendering home page.")
         return render_template('index.html')
 
     # register the database commands
@@ -51,10 +53,11 @@ def create_app(test_config=None):
     app.register_blueprint(products.bp)
     app.register_blueprint(insecure.bp)
 
-    # make url_for('index') == url_for('shop.index')
-    # in another app, you might define a separate main index here with
-    # app.route, while giving the blog blueprint a url_prefix, but for
-    # the tutorial the blog will be the main index
-    #app.add_url_rule("/", endpoint="index")
+    # initialize/reset all the product and user data
+    @app.route("/init-db")
+    def init_db():
+        print("[init_db] Initializing database.")
+        db.init_db()
+        return redirect(url_for("products.index"))
 
     return app

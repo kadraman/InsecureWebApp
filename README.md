@@ -15,8 +15,9 @@ You can the run the application locally using the following:
 python -m venv .venv
 .venv\Scripts\Activate.ps1      [Windows]
 .venv/Scripts/activate          [Linux/UNIX]
-pip install -r app\requirements.txt
-flask run
+pip install -r requirements.txt
+run.bat                         [Windows]
+ruh.sh                          [Linux/UNIX]
 ```
 
 The application should then be available at the URL `http://localhost:5000`. If it fails to start,
@@ -31,6 +32,39 @@ functional in this version of the app:
 - you can login/logout (user credentials are: user1@localhost.com/password or admin@localhost.com/password)
 
 These have been "enabled" because they all have potential security issues that can be found by Fortify.
+
+Deploy Application (Azure)
+--------------------------
+
+If you want to run the application in the cloud you can deploy it to Microsoft Azure along with its required
+infrastructure by using the Azure DevOps CLI.
+
+To create the required infrastructure and deploy the application you can execute the following (from a Windows command prompt):
+
+```
+az login
+az webapp up --runtime PYTHON:3.12 --location eastus --name _YOUR_APP_NAME__ --sku B1 --logs
+```
+
+Replace `eastus` with your own desired region and `B1` with desired app service plan.
+
+You will need to create a custom startup script for the application using the resource_group and app_name from above:
+
+```
+az webapp config set --resource-group _YOUR_RESOURCE_GROUP_ --name _YOUR_APP_NAME_ --startup-file startup.txt
+```
+
+You should now be able to navigate to the website and use the URL `http://your_website_name.azurewebsites.net/init-db`
+to populate the database.
+
+Remove Application and Infrastructure
+-------------------------------------
+
+To clean up all the resources you can execute the following (from a Windows command prompt):
+
+```
+az group delete --name [resource_group_created_from_above] --no-wait
+```
 
 ---
 

@@ -3,29 +3,16 @@ Fortify Local Scan
 
 ```
 sourceanalyzer -b fortifydemoapp -clean
-sourceanalyzer -b fortifydemoapp .\gradlew clean build
-sourceanalyzer -b fortifydemoapp -scan --scan-policy devops
+sourceanalyzer -b fortifydemoapp -python-path ".venv/Lib/site-packages/" -exclude ".venv" "app"
+sourceanalyzer -b fortifydemoapp -scan
 ```
-
-or
-
-```
-.\fortify-sast.ps1
-```
-
 
 Fortify ScanCentral SAST Scan
 ==============================
 
 ```
-scancentral package -o package.zip
-scancentral ...
-```
-
-or
-
-```
-.\fortify-scancentral-sast-ps1
+scancentral -url _YOUR_SCANCENTRAL_CTRL_UTL start -upload -uptoken _YOUR_SSC_AUTH_TOKEN_ -bt none --python-virtual-env .venv
+    -sp package.zip -application "FortifyDemoApp" -version "main" -email _YOUR_EMAIL_ -block -o -f "FortifyDemoApp.fpr"
 ```
 
 Fortify Command Line (fcli)
@@ -34,21 +21,21 @@ Fortify Command Line (fcli)
 FoD:
 
 ```
-fcli fod session login
 env | grep FCLI (Unix)
 dir env: (PowerShell)
-scancentral package
-fcli fod sast-scan start --release "APP:RELEASE" -f fortifypackage.zip --store curScan
+fcli fod session login
+scancentral package -o package.zip -bt none --python-virtual-env .venv
+fcli fod sast-scan start --release "FortifyDemoApp:main" -f package.zip --store curScan
 fcli fod sast-scan wait-for ::curScan::
 ```
 
 ScanCentral SAST:
 
 ```
-fcli sc-sast session login
 env | grep FCLI (Unix)
 dir env: (PowerShell)
-scancentral package
-fcli sc-sast scan start -p fortifypackage.zip --sensor-version 23.3 --store curScan
+fcli sc-sast session login
+scancentral package -o package.zip -bt none --python-virtual-env .venv
+fcli sc-sast scan start -p package.zip --sensor-version 23.3 --store curScan
 fcli sc-sast scan wait-for ::curScan::
 ```
