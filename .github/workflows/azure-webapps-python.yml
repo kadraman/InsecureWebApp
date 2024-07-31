@@ -25,6 +25,14 @@ env:
 
 on:
   push:
+    paths-ignore:
+        - '.github/**/**'
+        - 'bin/**'
+        - 'data/**'
+        - 'etc/**'
+        - 'tests/**'
+        - 'README.md'
+        - 'LICENSE'
     branches: [ $default-branch ]
   workflow_dispatch:
 
