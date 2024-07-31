@@ -1,3 +1,4 @@
+import logging
 import os
 
 from flask import Blueprint, make_response
@@ -12,9 +13,12 @@ from flask import url_for
 from jinja2 import Template as Jinja2_Template
 from jinja2 import Environment, DictLoader
 
+logger = logging.getLogger(__name__)
+
 bp = Blueprint("insecure", __name__, url_prefix="/insecure")
 
-INITCMD="setup.bat"
+INITCMD = "setup.bat"
+
 
 """
 Some additional insecure examples not related to the functionality of the application.
@@ -46,6 +50,7 @@ def command_injection():
     else:    
         arguments = request.args.get('arguments') 
     home = os.getenv('APPHOME')
+    logger.debug("Using home directory: {home}")
     cmd = home.join(INITCMD).join(arguments)
     os.system(cmd);
     
@@ -77,6 +82,7 @@ def insecure_cookies():
     response = make_response('')
     response.set_cookie("emailCookie", email)
     return response   
+
 
 def source(script_path):
     with open(script_path, 'r') as script_file:

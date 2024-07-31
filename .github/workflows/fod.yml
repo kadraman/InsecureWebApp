@@ -48,7 +48,8 @@ on:
 # Global environment variables
 env:
   DEFAULT_APP_NAME: "FortifyDemoApp"
-  DEFAULT_PYTHON_VERSION: "3.12.3"
+  AZURE_WEBAPP_NAME: fortifydemoapp
+  PYTHON_VERSION: "3.12.3"
 
 jobs:
 
@@ -64,9 +65,13 @@ jobs:
       - name: Set up Python
         uses: actions/setup-python@v5
         with:
-          python-version: ${{ env.DEFAULT_PYTHON_VERSION }} 
+          python-version: ${{ env.PYTHON_VERSION }}
+          cache: 'pip'
+      - name: Create and start virtual environment
+        run: |
+          python -m venv venv
+          source venv/bin/activate          
       - name: Install dependencies
-        working-directory: app
         run: pip install -r requirements.txt
       #- uses: pavelzw/pytest-action@v2
       #  with:
@@ -81,7 +86,14 @@ jobs:
       #    files: |
       #      build/test-results/**/*.xml
       #      build/test-results/**/*.trx
-      #      build/test-results/**/*.json     
+      #      build/test-results/**/*.json
+      - name: Upload artifact for deployment jobs
+        uses: actions/upload-artifact@v3
+        with:
+          name: python-app
+          path: |
+            .
+            !venv/     
 
   Quality-Gate:
     runs-on: ubuntu-latest
@@ -93,8 +105,7 @@ jobs:
         with:
           # Fetch at least the immediate parents so that if this is a pull request then we can checkout the head.
           fetch-depth: 2
-
-    # TBD
+      # TBD
 
   FoD-SAST-Scan:
     runs-on: ubuntu-latest
@@ -134,22 +145,26 @@ jobs:
           fod_parent_release_name: ${{ steps.fortify-app-and-rel-name.outputs.parent_release_name }}
 
   Deploy-App:
+    permissions:
+      contents: none
     runs-on: ubuntu-latest
-    if: ${{ (github.event_name == 'push') || (github.event_name == 'pull_request') || (github.event.inputs.deployApp == 'true') }}
     needs: [ Build-And-Unit-Test, FoD-SAST-Scan ]
+    environment:
+      name: 'Development'
+      url: ${{ steps.deploy-to-webapp.outputs.webapp-url }}
+    if: ${{ success() && github.ref_name == github.event.repository.default_branch }}
     steps:
-      - name: Checkout
-        uses: actions/checkout@v4
+      - name: Download artifact from build job
+        uses: actions/download-artifact@v3
         with:
-          # Fetch at least the immediate parents so that if this is a pull request then we can checkout the head.
-          fetch-depth: 2
-      - name: Deploy App
-        shell: bash
-        run: |
-          echo "Simulating deployment"
-        env:
-          FOD_APP_NAME: ${{ env.DEFAULT_APP_NAME }}
-      # TBD 
+          name: python-app
+          path: .
+      - name: 'Deploy to Azure Web App'
+        id: deploy-to-webapp
+        uses: azure/webapps-deploy@v2
+        with:
+          app-name: ${{ env.AZURE_WEBAPP_NAME }}
+          publish-profile: ${{ secrets.AZURE_WEBAPP_PUBLISH_PROFILE }}     
 
   Functional-Test:
     runs-on: ubuntu-latest
@@ -161,11 +176,11 @@ jobs:
         with:
           # Fetch at least the immediate parents so that if this is a pull request then we can checkout the head.
           fetch-depth: 2
-    # TBD
+      # TBD
 
   FoD-DAST-Scan:
     runs-on: ubuntu-latest
-    if: ${{ (github.event_name == 'push') || (github.event_name == 'pull_request') || (github.event.inputs.runFoDDASTScan == 'true') }}
+    if: ${{ success() && github.ref_name == github.event.repository.default_branch }}
     needs: [ Deploy-App ]
     steps:
       - name: Checkout
@@ -180,20 +195,19 @@ jobs:
           default_fortify_app_name: ${{ env.DEFAULT_APP_NAME }}
           default_fortify_release_name: ${{ github.ref_name }}
           app_name_postfix: ${{ vars.FORTIFY_APP_NAME_POSTFIX }}
-      #- name: FoD DAST scan
-      #  id: fod-dast-scan
-      #  uses: fortify-presales/github-actions/fod-dast-scan@main
-      #  with:
-      #    working_directory: ${{ env.BASE_DIR }}
-      #    fod_url: ${{ vars.FOD_URL }}
-      #    fod_api_url: ${{ vars.FOD_API_URL }}
-      #    fod_client_id: ${{ secrets.FOD_CLIENT_ID }}
-      #    fod_client_secret: ${{ secrets.FOD_CLIENT_SECRET }}
-      #    fod_app_name: ${{ steps.fortify-app-and-rel-name.outputs.app_name }}
-      #    # For DAST we are choosing to create a new release each time using GitHub Run Number
-      #    #fod_release_name: ${{ steps.fortify-app-and-rel-name.outputs.release_name }}
+      - name: FoD DAST scan
+        id: fod-dast-scan
+        uses: fortify-presales/github-actions/fod-dast-scan@main
+        with:
+          working_directory: ${{ env.BASE_DIR }}
+          fod_url: ${{ vars.FOD_URL }}
+          fod_api_url: ${{ vars.FOD_API_URL }}
+          fod_client_id: ${{ secrets.FOD_CLIENT_ID }}
+          fod_client_secret: ${{ secrets.FOD_CLIENT_SECRET }}
+          fod_app_name: ${{ steps.fortify-app-and-rel-name.outputs.app_name }}
+          fod_release_name: ${{ steps.fortify-app-and-rel-name.outputs.release_name }}
       #    fod_release_name: ${{ format('{0}#{1}', steps.fortify-app-and-rel-name.outputs.release_name, github.run_number) }}
-      #    #fod_parent_release_name: ${{ steps.fortify-app-and-rel-name.outputs.parent_release_name }}
+          fod_parent_release_name: ${{ steps.fortify-app-and-rel-name.outputs.parent_release_name }}
       #    fod_parent_release_name: "dast-web-base"
 
   Security-Gate:
@@ -231,4 +245,4 @@ jobs:
         with:
           # Fetch at least the immediate parents so that if this is a pull request then we can checkout the head.
           fetch-depth: 2
-    # TBD
+      # TBD

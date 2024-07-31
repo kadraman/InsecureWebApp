@@ -4,12 +4,16 @@
 <head>
 	<meta charset="utf-8"/>
 	<meta http-equiv="X-UA-Compatible" content="IE=edge"/>
-	<meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+	<meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no"/>
 	<title>{% block title %} {% endblock %}</title>
-    <link rel="stylesheet" href="{{ url_for('static', filename='css/lib/bootstrap.min.css') }}">
-    <link rel="stylesheet" href="{{ url_for('static', filename='css/lib/fontawesome.all.css') }}">
-    <link rel="stylesheet" href="{{ url_for('static', filename='css/lib/icomoon/style.css') }}">
-    <link rel="stylesheet" href="{{ url_for('static', filename='css/app.css') }}">
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/lib/bootstrap.min.css') }}"/>
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/lib/fontawesome.all.css') }}"/>
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/lib/icomoon/style.css') }}"/>
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/lib/owl.carousel/owl.carousel.min.css') }}"/>
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/lib/owl.carousel/owl.theme.default.min.css') }}"/>
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/lib/star-rating.min.css') }}"/>
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/lib/star-rating-theme.min.css') }}"/>
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/app.css') }}"/>
     <link rel="shortcut icon" type="image/ico" href="{{ url_for('static', filename='favicon.ico') }}"/>
 </head>
 
@@ -161,7 +165,7 @@
                 <div class="col-md-4 footer-nav animated fadeInUp">
                     <div class="row">
                         <div class="col-md-6">
-                            <h4>Menu ?</h4>
+                            <h4>Menu -</h4>
                             <ul class="pages">
                                 <li><a href="/">Shop</a></li>
                                 <li><a href="#">Prescriptions</a></li>
@@ -210,7 +214,7 @@
                                             <div tabindex="-1" role="document" aria-labelledby="confirmation-header" aria-describedby="confirmation-modal-body" class="modal-content">
                                                 <header id="confirmation-modal-header" class="modal-header">
                                                     <h5 class="modal-title">Newsletter Registration</h5>
-                                                    <button type="button" aria-label="Close" class="close" data-dismiss="modal">�</button>
+                                                    <button type="button" aria-label="Close" class="close" data-dismiss="modal">x</button>
                                                 </header>
                                                 <div id="confirmation-modal-body" class="modal-body">
                                                     <div class="m-4 text-center">
@@ -239,7 +243,7 @@
         <script type="text/javascript" src="{{ url_for('static', filename='js/lib/moment.min.js') }}"></script>
 		<script type="text/javascript" src="{{ url_for('static', filename='js/app.js') }}"></script>
         <script type="text/javascript" src="{{ url_for('static', filename='js/components/SubscribeNewsletter.js') }}"></script>
-        <!--script type="text/javascript" src="{{ url_for('static', filename='js/components/CartCount.js') }}"></script-->
+        <script type="text/javascript" src="{{ url_for('static', filename='js/components/CartCount.js') }}"></script>
 
         <script>
             /*<![CDATA[*/
@@ -249,7 +253,7 @@
             (function ($) {
                 $(document).ready(function () {
                     $('#subscribe-newsletter').SubscribeNewsletter();
-                    //$('#shopping-cart-count').CartCount();
+                    $('#shopping-cart-count').CartCount();
                 });
             })(jQuery);
         </script>

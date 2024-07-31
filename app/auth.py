@@ -1,4 +1,5 @@
 import functools
+import logging
 import os
 
 from flask import Blueprint, Response, json
@@ -14,6 +15,8 @@ from werkzeug.security import generate_password_hash
 from flask import current_app
 
 from .db import get_db
+
+logger = logging.getLogger(__name__)
 
 bp = Blueprint("auth", __name__, url_prefix="/auth")
 
@@ -89,7 +92,7 @@ def login():
     if request.method == "POST":
         username = request.form["username"]
         password = request.form["password"]
-        print("logging in user {}:{}", username, password)
+        logger.info(f"Logging in user {username}:{password}")
         db = get_db()
         error = None
         user = db.execute(
@@ -123,7 +126,6 @@ def logout():
 def subscribe_user():
     """Subscribe a user to the newsletter by writing to the JSON file"""
     if (os.environ.get('FORTIFY_IF_DJANGO')):
-        print("in here")
         id = request.POST['id', '']
         name = request.POST['name', '']
         email = request.POST['email', '']
@@ -134,7 +136,7 @@ def subscribe_user():
         name = content['name']
         email = content['email']
         role = content['role']
-    print(f"[DEBUG] Registering user: {id},{name},{email},{role}")
+    logger.debug(f"Registering user: {id},{name},{email},{role}")
     with open(current_app.config['SUBSCRIBERS_FILENAME'], mode='a+', encoding='utf-8') as f:
         try: 
             entries = json.load(f)

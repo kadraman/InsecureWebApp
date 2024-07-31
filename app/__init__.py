@@ -1,11 +1,16 @@
+import logging
 import os
 import random
 from flask import Flask, json, redirect, render_template, request, Response, url_for
+from flask_cors import CORS
 from docx import Document
 from werkzeug.utils import secure_filename
 
 from jinja2 import Template as Jinja2_Template
 from jinja2 import Environment, DictLoader
+
+logger = logging.getLogger(__name__)
+
 
 def create_app(test_config=None):
     """Create and configure an instance of the Flask application."""
@@ -30,15 +35,28 @@ def create_app(test_config=None):
     except OSError:
         pass
 
+    # enabled CORS on api routes
+    cors = CORS(app, resources={r"/api/*": {"origins": "*"}})
+
     # initial route
     @app.route('/')
     def index():
-        print("[index] Rendering home page.")
+        logger.info("[index] Rendering home page.")
         return render_template('index.html')
 
+    # route to reset the database
+    @app.route("/reset-db")
+    def reset_db():
+        logger.info("[reset_db] Re-initializing database.")
+        db.init_db()
+        return redirect(url_for("products.index"))
+    
     # register the database commands
     from . import db
     db.init_app(app)
+    # create and populate the database for demo
+    with app.app_context():
+        db.init_db()
 
     # set email subscribers file
     site_root = os.path.realpath(os.path.dirname(__file__))    
@@ -46,18 +64,13 @@ def create_app(test_config=None):
 
     # apply the blueprints to the app
     from . import auth
+    from . import api
     from . import products
     from . import insecure
 
     app.register_blueprint(auth.bp)
+    app.register_blueprint(api.bp)
     app.register_blueprint(products.bp)
     app.register_blueprint(insecure.bp)
-
-    # initialize/reset all the product and user data
-    @app.route("/init-db")
-    def init_db():
-        print("[init_db] Initializing database.")
-        db.init_db()
-        return redirect(url_for("products.index"))
 
     return app

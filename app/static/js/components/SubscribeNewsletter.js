@@ -15,10 +15,10 @@ $.fn.SubscribeNewsletter = function (options) {
                 _saveEmail($email.val()).then(response => {
                     _showConfirmationText("Thank you your email address has been registered.", $email.val(), "text-success");
                 }).catch(error => {
-                    _showConfirmationText("Error registering address:", $email.val(), "text-danger");
+                    _showConfirmationText("Error registering email address:", $email.val(), "text-danger");
                 });
             } else {
-                _showConfirmationText("Invalid address:", $email.val(), "text-danger");
+                _showConfirmationText("Invalid email address:", $email.val(), "text-danger");
             }
         });
     });
@@ -27,10 +27,11 @@ $.fn.SubscribeNewsletter = function (options) {
         const confirmationH5 = document.createElement("h4");
         confirmationH5.classList.add(cssClass);
         if (cssClass === 'text-danger') {
-            confirmationH5.innerHTML = text + "<br/><br/><h5>" + email + "</h5><br/>Please supply a valid email address";
+            confirmationH5.innerHTML = text + "<br/><br/><h5>" + email + "</h5>";
+            console.error("ERROR: " + text)
         } else {
             confirmationH5.innerHTML = text
-            console.error("ERROR: Failed to register email = " + email);
+            console.log(text);
         }
         const confirmationDiv = document.createElement("div");
         confirmationDiv.classList.add("m-4", "text-center");
@@ -47,15 +48,15 @@ $.fn.SubscribeNewsletter = function (options) {
                 id: subscriberId,
                 name: "",
                 email: email,
-                role: ""
+                role: "ROLE_GUEST"
             }
         )
         return await $.ajax({
-            url: '/auth/subscribe-user',
+            url: '/api/subscribe-user',
             type: 'POST',
             contentType: 'application/json',
             data: data
-        }).then();
+        })
     }
 
     function _validateEmail(email) {

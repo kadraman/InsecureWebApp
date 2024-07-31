@@ -1,3 +1,4 @@
+import logging
 import os
 from flask import Blueprint, Response, send_file, send_from_directory
 from flask import flash
@@ -11,7 +12,10 @@ from werkzeug.exceptions import abort
 from .auth import login_required
 from .db import get_db, init_db
 
+logger = logging.getLogger(__name__)
+
 bp = Blueprint("products", __name__, url_prefix="/products")
+
 
 def get_product(id):
     """Get a product by id.
@@ -70,7 +74,7 @@ def index():
     else:    
         keywords = request.args.get('keywords')
     if (keywords):
-        print("Searching for products with keywords: {} ".format(keywords))
+        logger.info(f"Searching for products with keywords: {keywords}")
     else:
         keywords=""    
 
