@@ -120,29 +120,3 @@ def logout():
     """Clear the current session, including the stored user id."""
     session.clear()
     return redirect(url_for("index"))
-
-
-@bp.route("/subscribe-user", methods=['POST'])
-def subscribe_user():
-    """Subscribe a user to the newsletter by writing to the JSON file"""
-    if (os.environ.get('FORTIFY_IF_DJANGO')):
-        id = request.POST['id', '']
-        name = request.POST['name', '']
-        email = request.POST['email', '']
-        role = request.POST['role', 'ROLE_GUEST']
-    else:    
-        content = request.get_json('id')
-        id = content['id']
-        name = content['name']
-        email = content['email']
-        role = content['role']
-    logger.debug(f"Registering user: {id},{name},{email},{role}")
-    with open(current_app.config['SUBSCRIBERS_FILENAME'], mode='a+', encoding='utf-8') as f:
-        try: 
-            entries = json.load(f)
-        except ValueError: 
-            entries = []
-        entry = {'id': id, 'name': name, 'email': email, 'role' : role}
-        entries.append(entry)
-        json.dump(entries, f)
-    return Response(status=200)

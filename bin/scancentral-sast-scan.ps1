@@ -37,7 +37,7 @@ if (Test-Path $PackageName) {
 
 # Package, upload and run the scan and import results into SSC
 Write-Host Invoking ScanCentral SAST ...
-& scancentral -url $ScanCentralCtrlUrl start -upload -uptoken $SSCAuthToken -bt none --python-virtual-env .venv  -sp $PackageName `
+& scancentral -url $ScanCentralCtrlUrl start -upload -uptoken $SSCAuthToken -bt none --python-virtual-env .venv -oss -sp $PackageName `
     -application "$AppName" -version $AppVersion -email $ScanCentralEmail -block -o -f "$($AppName).fpr"  `
     -sargs "$($ScanArgs)"
 

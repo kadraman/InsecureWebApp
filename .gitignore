@@ -71,3 +71,4 @@ package.zip
 debricked
 debricked.fingerprints.txt
 app/static/data/email-db.json
+requirements.txt.pip.debricked.lock

@@ -48,19 +48,21 @@ sourceanalyzer -b fortifydemoapp -scan
 To carry out a Fortify ScanCentral SAST scan, run the following:
 
 ```
-scancentral -url _YOUR_SCANCENTRAL_CTRL_URL_ start -upload -uptoken _YOUR_SSC_AUTH_TOKEN_ -bt none --python-virtual-env .venv
-    -sp package.zip -application "FortifyDemoApp" -version "main" -email _YOUR_EMAIL_ -block -o -f "FortifyDemoApp.fpr"
+fcli ssc session login
+scancentral package -o package.zip -bt none --python-virtual-env .venv -oss
+fcli ssc sast-scan start --release "FortifyDemoApp:main" -f package.zip --store curScan
+fcli ssc sast-scan wait-for ::curScan::
+fcli ssc action run appversion-summary --av "FortifyDemoApp:main" -fs "Security Auditor View" -f summary.md
 ```
 
-To carry ouy a Fortify on Demand scan, run the following:
+To carry out a Fortify on Demand scan, run the following:
 
 ```
-env | grep FCLI (Unix)
-dir env: (PowerShell)
 fcli fod session login
-scancentral package -o package.zip -bt none --python-virtual-env .venv
+scancentral package -o package.zip -bt none --python-virtual-env .venv -oss
 fcli fod sast-scan start --release "FortifyDemoApp:main" -f package.zip --store curScan
 fcli fod sast-scan wait-for ::curScan::
+fcli fod action run release-summary --rel "FortifyDemoApp:main" -f summary.md
 ```
 
 ---

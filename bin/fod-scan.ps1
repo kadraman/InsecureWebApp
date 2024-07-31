@@ -29,7 +29,7 @@ if ([string]::IsNullOrEmpty($FoDClientSecret)) { throw "FoD Client Secret has no
 
 # Run the translation and scan
 
-& scancentral package -o fortifypackage.zip -bt none --python-virtual-env .venv
+& scancentral package -o fortifypackage.zip -bt none --python-virtual-env .venv -oss
 & fcli fod session login --url $FoDApiUri --client-id $FoDClientId --client-secret $FoDClientSecret --session fcli-local
 & fcli fod sast-scan start --release "$($AppName):$($AppVersion)" -f fortifypackage.zip --store curScan --session fcli-local
 & fcli fod sast-scan wait-for ::curScan:: --session fcli-local
