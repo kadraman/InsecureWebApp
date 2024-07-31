@@ -61,7 +61,7 @@ build/
 
 # Fortify
 .fortify
-/vulnerabilities.txt
+vulnerabilities.txt
 *.fpr
 *.mbs
 *.pdf
@@ -69,6 +69,5 @@ package.zip
 
 # Misc
 debricked
-bin
 debricked.fingerprints.txt
 app/static/data/email-db.json

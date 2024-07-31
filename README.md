@@ -44,7 +44,8 @@ To create the required infrastructure and deploy the application you can execute
 
 ```
 az login
-az webapp up --runtime PYTHON:3.12 --location eastus --name _YOUR_APP_NAME_ --sku B1 --logs
+az webapp up --runtime PYTHON:3.12 --location eastus --name _YOUR_APP_NAME_ --sku B1
+az webapp config set --resource-group _YOUR_RESOURCE_GROUP_ --name _YOUR_APP_NAME_ --startup-file startup.txt
 ```
 
 Replace `_YOUR_APP_NAME_` with the (unique) name you wish to use for the webapp, `eastus` with your own desired region and `B1` with desired app service plan.
