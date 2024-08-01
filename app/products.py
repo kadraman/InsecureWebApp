@@ -55,8 +55,8 @@ def get_reviews(id):
     db = get_db()
     reviews = db.execute(
         "SELECT r.user_id, r.review_date, r.comment, u.username"
-        " FROM reviews r, users u"
-        " INNER JOIN reviews ON r.user_id = u.id AND"
+        " FROM reviews r"
+        " JOIN users u ON r.user_id = u.id AND"
         " (r.product_id = ? OR r.product_id IS null)",
         (id,),
     ).fetchall()

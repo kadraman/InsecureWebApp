@@ -124,6 +124,9 @@
         <span id="reviews-start"></span>
         <div class="product-reviews rows">
             <h4>Customer Reviews</h4>
+            {% if not reviews %}
+                <p>There are no reviews.</p>
+            {% endif %}
             {% for r in reviews %}
                 <div class="col-sm-12 item mb-4">
                     <h6 class='text-dark pt-2'>Review by <em>{{ r.username }}</em> on {{ r.review_date.strftime('%d %B, %Y') }}</h6>

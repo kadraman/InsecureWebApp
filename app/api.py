@@ -39,3 +39,23 @@ def subscribe_user():
         r = Response(json.dumps({'message': 'Successfully registered user'}), mimetype='application/json')
         r.status_code = 200
     return r
+
+@bp.route("/new-products", methods=['GET'])
+@cross_origin()
+def new_products():
+    if (os.environ.get('FORTIFY_IF_DJANGO')):
+        limit = request.GET['limit', 3]
+    else:    
+        limit = request.args.get('limit', 3)  
+
+    """Get 'limit' products, ordered by name."""
+    db = get_db()
+    products = db.execute(
+        "SELECT *"
+        " FROM products p"
+        " ORDER BY name"
+        " LIMIT ?", (limit,)
+    ).fetchall()
+    r = Response(json.dumps([dict(ix) for ix in products]), mimetype='application/json')
+    r.status_code = 200
+    return r
