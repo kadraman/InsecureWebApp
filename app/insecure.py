@@ -25,30 +25,21 @@ Some additional insecure examples not related to the functionality of the applic
 """
 
 @bp.route("/xss", methods = ["GET"])
-def xss():
-    if (os.environ.get('FORTIFY_IF_DJANGO')):
-        input = request.GET['input', '']
-    else:    
-        user_input = request.args.get('input') 
+def xss():   
+    user_input = request.args.get('input') 
     return render_template("insecure/xss.html", input=user_input)
 
 @bp.route("/load_file", methods = ["GET"])
-def load_file():
-    if (os.environ.get('FORTIFY_IF_DJANGO')):
-        filename = filename.GET['content', '']
-    else:    
-        filename = request.args.get('filename') 
+def load_file(): 
+    filename = request.args.get('filename') 
     contents = source(filename)
     response = make_response(contents, 200)
     response.mimetype = "text/plain"
     return response
 
 @bp.route("/command_injection", methods = ["GET"])
-def command_injection():
-    if (os.environ.get('FORTIFY_IF_DJANGO')):
-        arguments = request.GET['arguments', '']
-    else:    
-        arguments = request.args.get('arguments') 
+def command_injection():   
+    arguments = request.args.get('arguments') 
     home = os.getenv('APPHOME')
     logger.debug("Using home directory: {home}")
     cmd = home.join(INITCMD).join(arguments)
@@ -56,12 +47,8 @@ def command_injection():
     
 @bp.route("/template_injection", methods=['POST'])
 def template_injection():
-    if (os.environ.get('FORTIFY_IF_DJANGO')):
-        template = request.POST['content', '']
-        filename = request.POST['content', '']
-    else:    
-        template = request.form.get('template') 
-        filename = request.form.get('filename') 
+    template = request.form.get('template') 
+    filename = request.form.get('filename') 
     t = Jinja2_Template(template)
     name = source(filename)
     html = t.render(name=name)
@@ -75,10 +62,7 @@ def insecure_headers():
 
 @bp.route("/insecure_cookies", methods=['POST'])
 def insecure_cookies():
-    if (os.environ.get('FORTIFY_IF_DJANGO')):
-        email = request.POST['email', '']
-    else:    
-        email = request.form.get('email') 
+    email = request.form.get('email') 
     response = make_response('')
     response.set_cookie("emailCookie", email)
     return response   

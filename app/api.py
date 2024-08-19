@@ -15,18 +15,12 @@ bp = Blueprint("api", __name__, url_prefix="/api")
 @bp.route("/subscribe-user", methods=['POST'])
 @cross_origin()
 def subscribe_user():
-    """Subscribe a user to the newsletter by writing to the JSON file"""
-    if (os.environ.get('FORTIFY_IF_DJANGO')):
-        id = request.POST['id', '']
-        name = request.POST['name', '']
-        email = request.POST['email', '']
-        role = request.POST['role', 'ROLE_GUEST']
-    else:    
-        content = request.get_json('id')
-        id = content['id']
-        name = content['name']
-        email = content['email']
-        role = content['role']
+    """Subscribe a user to the newsletter by writing to the JSON file"""    
+    content = request.json
+    id = content.get('id')
+    name = content.get('name')
+    email = content.get('email')
+    role = content.get('role')
     logger.debug(f"Registering user: {id},{name},{email},{role}")
     with open(current_app.config['SUBSCRIBERS_FILENAME'], mode='a+', encoding='utf-8') as f:
         try: 
@@ -42,11 +36,8 @@ def subscribe_user():
 
 @bp.route("/new-products", methods=['GET'])
 @cross_origin()
-def new_products():
-    if (os.environ.get('FORTIFY_IF_DJANGO')):
-        limit = request.GET['limit', 3]
-    else:    
-        limit = request.args.get('limit', 3)  
+def new_products():  
+    limit = request.args.get('limit', 3)  
 
     """Get 'limit' products, ordered by name."""
     db = get_db()

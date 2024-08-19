@@ -68,11 +68,8 @@ def get_reviews(id):
 
 
 @bp.route("/")
-def index():
-    if (os.environ.get('FORTIFY_IF_DJANGO')):
-        keywords = request.GET['keywords', '']
-    else:    
-        keywords = request.args.get('keywords')
+def index():  
+    keywords = request.args.get('keywords')
     if (keywords):
         logger.info(f"Searching for products with keywords: {keywords}")
     else:
@@ -90,11 +87,8 @@ def index():
 
 
 @bp.route('/download/<path:filename>', methods=['GET', 'POST'])
-def download(filename):
-    if (os.environ.get('FORTIFY_IF_DJANGO')):
-        filename2 = request.GET['filename', '']
-    else:    
-        filename2 = request.args.get('filename')
+def download(filename):  
+    filename2 = request.args.get('filename')
     """Download an artifact related to the product"""
     if not filename:
         return 404
