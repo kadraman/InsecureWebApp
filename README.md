@@ -12,13 +12,22 @@ Run Application (locally)
 
 You can the run the application locally using the following:
 
+Windows:
+
 ```
 python -m venv .venv
-.venv\Scripts\Activate.ps1      [Windows]
-. .venv/Scripts/activate        [Linux/UNIX]
+.venv\Scripts\Activate.ps1
 pip install -r requirements.txt
-run.bat                         [Windows]
-ruh.sh                          [Linux/UNIX]
+run.bat
+```
+
+Linux/UNIX:
+
+```
+python3 -m venv .venv           
+. .venv/bin/activate
+pip install -r requirements.txt
+ruh.sh
 ```
 
 The application should then be available at the URL `http://localhost:5000`. If it fails to start,
