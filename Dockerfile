@@ -1,12 +1,17 @@
-# syntax=docker/dockerfile:1
+FROM python:3.12-slim-bookworm
 
-FROM python:3.12-slim-buster
+# set work directory
+WORKDIR /usr/src/app
 
-WORKDIR /python-docker
+# set environment variables
+ENV PYTHONDONTWRITEBYTECODE 1
+ENV PYTHONUNBUFFERED 1
 
-COPY requirements.txt requirements.txt
-RUN pip3 install -r requirements.txt
+# install dependencies
+COPY requirements.txt /usr/src/app/requirements.txt
+RUN pip3 install --no-cache-dir --upgrade -r requirements.txt
 
-COPY . .
+# copy project
+COPY . /usr/src/app/
 
-CMD [ "python3", "-m" , "flask", "run", "--host=0.0.0.0"]
+CMD ["gunicorn", "--bind", "0.0.0.0:8080", "wsgi:app"]

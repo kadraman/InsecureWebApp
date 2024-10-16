@@ -3,9 +3,17 @@
 # Fortify Demo App
 
 This is a simple Python Flask web application that can be used for the demonstration of application
-security testing tools - such as those provided by [Fortify by OpenText](https://www.microfocus.com/en-us/cyberres/application-security).
-It is a cut down "search" results/details page from a larger sample application [IWA-Java](https://github.com/fortify/IWA-Java) 
-and is kept deliberately small for demos.
+security testing tools - such as those provided by [Fortify by OpenText](https://www.microfocus.com/en-us/cyberres/application-security). It is a cut down "search" results/details page from a larger sample application [IWA-Java](https://github.com/fortify/IWA-Java) and is kept deliberately small for demos.
+
+Pre-requisities
+---------------
+
+ - Windows or Linux machine with Python 3.12 or later
+ - [Pip package manager](https://pypi.org/project/pip/)
+ - Local Fortify Static Code Analyzer installation 
+ - Local Docker installation
+ - [Debricked CLI](https://docs.debricked.com/tools-and-integrations/cli/debricked-cli)
+ - [Fortify CLI](https://github.com/fortify/fcli)
 
 Run Application (locally)
 -------------------------
@@ -18,7 +26,7 @@ Windows:
 python -m venv .venv
 .venv\Scripts\Activate.ps1
 pip install -r requirements.txt
-run.bat
+.\run.bat
 ```
 
 Linux/UNIX:
@@ -27,12 +35,34 @@ Linux/UNIX:
 python3 -m venv .venv           
 . .venv/bin/activate
 pip install -r requirements.txt
-ruh.sh
+./run.sh
 ```
 
 The application should then be available at the URL `http://localhost:5000`. If it fails to start,
-make sure you have no other applications running on port 5000. There are only a few features that are
-functional in this version of the app:
+make sure you have no other applications running on port 5000. 
+
+Run Application (as Docker container)
+-------------------------------------
+
+You also can build a Docker image for the application using the following:
+
+```
+docker build -t fortifydemoapp:latest .
+```
+
+Then run the container using a command similar to the following:
+
+```
+docker run -dp 8080:8080 fortifydemoapp:latest
+```
+
+The application will then be available at the URL `http://localhost:8080`. If it fails to start,
+make sure you have no other applications running on port 5000.
+
+Using the Application
+---------------------
+
+There are only a few features that are functional in this version of the app:
 
 - you can navigate to the "Shop"
 - you can type in some keywords in the Shop search box, e.g. "alphadex" to filter results
