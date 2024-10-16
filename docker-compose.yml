@@ -1,5 +1,5 @@
 services:
-  demoapp:
+  app:
     image: fortifydemoapp:latest
     restart: always
     ports:
