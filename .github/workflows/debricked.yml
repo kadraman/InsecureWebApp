@@ -24,7 +24,7 @@ on:
 
 # Global environment variables
 env:
-  DEFAULT_APP_NAME: "FortifyDemoApp"
+  DEFAULT_APP_NAME: "IWA-Python"
 
 jobs:
 

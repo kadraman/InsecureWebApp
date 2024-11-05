@@ -1,6 +1,6 @@
 services:
   app:
-    image: fortifydemoapp:latest
+    image: iwapy:latest
     restart: always
     ports:
       - "8080:8080"
@@ -17,7 +17,7 @@ services:
       - ./data/certbot/conf:/etc/letsencrypt
       - ./data/certbot/www:/var/www/certbot
     networks:
-      - demoapp-net
+      - iwapy-net
     command: "/bin/sh -c 'while :; do sleep 6h & wait $${!}; nginx -s reload; done & nginx -g \"daemon off;\"'"
   certbot:
     image: certbot/certbot
@@ -26,7 +26,7 @@ services:
       - ./data/certbot/conf:/etc/letsencrypt
       - ./data/certbot/www:/var/www/certbot
     networks:
-      - demoapp-net
+      - iwapy-net
     entrypoint: "/bin/sh -c 'trap exit TERM; while :; do certbot renew; sleep 12h & wait $${!}; done;'"
 networks:
-  demoapp-net:
+  iwapy-net:

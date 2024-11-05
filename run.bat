@@ -1,6 +1,6 @@
 @echo off
-set FLASK_APP=app
+set FLASK_APP=iwa
 set FLASK_ENV=development
 set FLASK_DEBUG=1
-REM flask --app app init-db
-flask --app app run --host 0.0.0.0
+REM flask --app iwa init-db
+flask --app iwa run --host 0.0.0.0

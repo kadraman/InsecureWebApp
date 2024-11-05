@@ -47,8 +47,8 @@ on:
 
 # Global environment variables
 env:
-  DEFAULT_APP_NAME: "FortifyDemoApp"
-  AZURE_WEBAPP_NAME: fortifydemoapp
+  DEFAULT_APP_NAME: "IWA-Python"
+  AZURE_WEBAPP_NAME: demoapp
   PYTHON_VERSION: "3.12.3"
 
 jobs:
@@ -116,6 +116,17 @@ jobs:
         with:
           # Fetch at least the immediate parents so that if this is a pull request then we can checkout the head.
           fetch-depth: 2
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: ${{ env.PYTHON_VERSION }}
+          cache: 'pip'
+      - name: Create and start virtual environment
+        run: |
+          python -m venv venv
+          source venv/bin/activate          
+      - name: Install dependencies
+        run: pip install -r requirements.txt
       - name: Fortify App and Release Name
         id: fortify-app-and-rel-name
         uses: fortify-presales/github-actions/fortify-app-and-release-name@main
@@ -124,25 +135,35 @@ jobs:
           default_fortify_release_name: ${{ github.ref_name }}
           app_name_postfix: ${{ vars.FORTIFY_APP_NAME_POSTFIX }}
       # Uncomment below to debug FoD App/Release names   
-      #- name: Print App and Release Name
-      #  shell: bash
-      #  run: |
-      #    echo "FoD App Name: ${FOD_APP_NAME}"
-      #    echo "FoD Release Name: ${FOD_RELEASE_NAME}"
-      #  env:
-      #    FOD_APP_NAME: ${{ steps.fortify-app-and-rel-name.outputs.app_name }}
-      #    FOD_RELEASE_NAME: ${{ steps.fortify-app-and-rel-name.outputs.release_name }}          
-      - name: Python FoD SAST scan
-        id: python-fod-sast-scan
-        uses: fortify-presales/github-actions/python-fod-sast-scan@main
-        with:
-          fod_url: ${{ vars.FOD_URL }}
-          fod_api_url: ${{ vars.FOD_API_URL }}
-          fod_client_id: ${{ secrets.FOD_CLIENT_ID }}
-          fod_client_secret: ${{ secrets.FOD_CLIENT_SECRET }}
-          fod_app_name: ${{ steps.fortify-app-and-rel-name.outputs.app_name }}
-          fod_release_name: ${{ steps.fortify-app-and-rel-name.outputs.release_name }}
-          fod_parent_release_name: ${{ steps.fortify-app-and-rel-name.outputs.parent_release_name }}
+      - name: Print App and Release Name
+        shell: bash
+        run: |
+          echo "FoD App Name: ${FOD_APP_NAME}"
+          echo "FoD Release Name: ${FOD_RELEASE_NAME}"
+        env:
+          FOD_APP_NAME: ${{ steps.fortify-app-and-rel-name.outputs.app_name }}
+          FOD_RELEASE_NAME: ${{ steps.fortify-app-and-rel-name.outputs.release_name }}          
+      #
+      # See: https://github.com/marketplace/actions/fortify-ast-scan
+      #
+      - name: Run FoD SAST Scan
+        uses: fortify/github-action/fod-sast-scan@v1
+        env:
+          FOD_URL: ${{ vars.FOD_URL }}
+          FOD_CLIENT_ID: ${{ secrets.FOD_CLIENT_ID }}
+          FOD_CLIENT_SECRET: ${{ secrets.FOD_CLIENT_SECRET }}
+          # FOD_LOGIN_EXTRA_OPTS: --socket-timeout=60s
+          FOD_RELEASE: ${{ format('{0}:{1}', steps.fortify-app-and-rel-name.outputs.app_name, steps.fortify-app-and-rel-name.outputs.release_name) }}
+          #FOD_RELEASE: ${{ steps.fortify-app-and-rel-name.outputs.release_id  }}
+          PACKAGE_EXTRA_OPTS: -bt none --python-virtual-env .venv -oss
+          DO_SETUP: true
+          SETUP_EXTRA_OPTS: ${{ format('--sdlc-status Development --copy-from {0}', vars.FOD_PARENT_RELEASE_ID) }}
+          DO_WAIT: true
+          DO_JOB_SUMMARY: true
+          #DO_POLICY_CHECK: true
+          DO_PR_COMMENT: true
+          DO_EXPORT: true
+          # TOOL_DEFINITIONS: https://ftfy.mycompany.com/tool-definitions/v1/tool-definitions.yaml.zip
 
   Deploy-App:
     permissions:
