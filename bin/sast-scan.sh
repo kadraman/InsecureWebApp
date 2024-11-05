@@ -50,8 +50,8 @@ fi
 # Run the translation and scan
 #
 echo Running translation...
-sourceanalyzer $ScanSwitches $JVMArgs -b "$AppName" -python-path ".venv/Lib/site-packages/" \
-	-exclude ".venv" -exclude "**/requirements.txt" "app"
+sourceanalyzer $ScanSwitches $JVMArgs -b "$AppName" -python-path ".venv/lib/python3.12/site-packages/" \
+	-exclude ".venv" -exclude "**/requirements.txt" "iwa"
 
 echo Running scan...
 sourceanalyzer $ScanSwitches $JVMArgs -b "$AppName" -debug -verbose \

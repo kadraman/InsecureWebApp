@@ -27,7 +27,7 @@ if ([string]::IsNullOrEmpty($AppName)) { throw "Application Name has not been se
 # Run the translation and scan
 
 Write-Host Running translation...
-& sourceanalyzer $ScanSwitches $JVMArgs -b "$AppName" -python-path ".venv/Lib/site-packages/" -exclude ".venv" "app"
+& sourceanalyzer $ScanSwitches $JVMArgs -b "$AppName" -python-path ".venv/lib/site-packages/" -exclude ".venv" "iwa"
 
 Write-Host Running scan...
 & sourceanalyzer $ScanSwitches $JVMArgs -b "$AppName" -debug -verbose `
@@ -35,7 +35,7 @@ Write-Host Running scan...
     -scan -f "$($AppName).fpr"
 
 # summarise issue count by analyzer
-& fprutility -information -analyzerIssueCounts -project "$($AppName).fpr"
+& fprtility -information -analyzerIssueCounts -project "$($AppName).fpr"
 
 if (-not $SkipPDF) {
     Write-Host Generating PDF report...

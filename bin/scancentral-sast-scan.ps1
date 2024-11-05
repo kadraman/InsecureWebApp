@@ -12,7 +12,7 @@ $ScanCentralPoolId = $EnvSettings['SCANCENTRAL_POOL_ID'] # Not yet used
 $ScanCentralEmail = $EnvSettings['SCANCENTRAL_EMAIL']
 
 $BuildVersion = $(git log --format="%H" -n 1)
-$BuildLabel = "fortifydemoapp-cli"
+$BuildLabel = "iwa-python-cli"
 $ScanArgs = @(
     "-build-project",
     "'$AppName'",
