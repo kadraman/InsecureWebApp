@@ -48,7 +48,7 @@ on:
 # Global environment variables
 env:
   DEFAULT_APP_NAME: "IWA-Python"
-  AZURE_WEBAPP_NAME: demoapp
+  AZURE_WEBAPP_NAME: fortifydemoapp
   PYTHON_VERSION: "3.12.3"
 
 jobs:
@@ -155,7 +155,7 @@ jobs:
           # FOD_LOGIN_EXTRA_OPTS: --socket-timeout=60s
           FOD_RELEASE: ${{ format('{0}:{1}', steps.fortify-app-and-rel-name.outputs.app_name, steps.fortify-app-and-rel-name.outputs.release_name) }}
           #FOD_RELEASE: ${{ steps.fortify-app-and-rel-name.outputs.release_id  }}
-          PACKAGE_EXTRA_OPTS: -bt none --python-virtual-env .venv -oss
+          PACKAGE_EXTRA_OPTS: -bt none --python-virtual-env venv -oss
           DO_SETUP: true
           SETUP_EXTRA_OPTS: ${{ format('--sdlc-status Development --copy-from {0}', vars.FOD_PARENT_RELEASE_ID) }}
           DO_WAIT: true
