@@ -163,7 +163,7 @@ jobs:
           PACKAGE_EXTRA_OPTS: --python-version 3 --python-requirements requirements.txt -oss
           DO_SETUP: true
           #SETUP_EXTRA_OPTS: ${{ format('--sdlc-status Development --copy-from {0}', vars.FOD_PARENT_RELEASE_ID) }}
-          SETUP_EXTRA_OPTS: ${{ format('--sdlc-status Development --app-owner {0} --assessment-type "{1}"'), vars.FOD_DEFAULT_OWNER, vars.FOD_DEFAULT_ASSESSMENT_TYPE }}
+          SETUP_EXTRA_OPTS: ${{ format('--sdlc-status Development --app-owner {0} --assessment-type "{1}"', vars.FOD_DEFAULT_OWNER, vars.FOD_DEFAULT_ASSESSMENT_TYPE) }}
           DO_WAIT: true
           DO_JOB_SUMMARY: true
           #DO_POLICY_CHECK: true
