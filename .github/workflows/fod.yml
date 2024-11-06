@@ -161,7 +161,8 @@ jobs:
           #PACKAGE_EXTRA_OPTS: ${{ format('-bt none -pyv {0} -oss', env.VIRTUAL_ENV) }}
           PACKAGE_EXTRA_OPTS: --python-version 3 --python-requirements requirements.txt -oss
           DO_SETUP: true
-          SETUP_EXTRA_OPTS: ${{ format('--sdlc-status Development --copy-from {0}', vars.FOD_PARENT_RELEASE_ID) }}
+          #SETUP_EXTRA_OPTS: ${{ format('--sdlc-status Development --copy-from {0}', vars.FOD_PARENT_RELEASE_ID) }}
+          SETUP_EXTRA_OPTS: --sdlc-status Development
           DO_WAIT: true
           DO_JOB_SUMMARY: true
           #DO_POLICY_CHECK: true
