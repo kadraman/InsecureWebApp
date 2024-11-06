@@ -3,6 +3,7 @@
 #   FOD_BASE_URL should be FoD BASE URL for your tenant (e.g. https://ams.fortify.com)
 #   FOD_API_URL should be FoD API URL for your tenant (e.g. https://api.ams,fortify.com)
 #   FOD_PARENT_RELEASE_NAME is the FoD release name corresponding to the parent branch of any newly created branch, this is typically "main" or "develop"
+#   FOD_DEFAULT_OWNER is the user if of the Application Owner (only needed if an application does not already exist)
 # Create GitHub Action Secrets for your version of the application:
 #   FOD_CLIENT_ID should be an API Key obtained from your FoD tenant.
 #   FOD_CLIENT_SECRET should be the secret for the API Key obtained for your FoD tenant.
@@ -162,7 +163,7 @@ jobs:
           PACKAGE_EXTRA_OPTS: --python-version 3 --python-requirements requirements.txt -oss
           DO_SETUP: true
           #SETUP_EXTRA_OPTS: ${{ format('--sdlc-status Development --copy-from {0}', vars.FOD_PARENT_RELEASE_ID) }}
-          SETUP_EXTRA_OPTS: --sdlc-status Development --owner klee2
+          SETUP_EXTRA_OPTS: ${{ format('--sdlc-status Development --app-owner {0}, vars.FOD_DEFAULT_OWNER) }}
           DO_WAIT: true
           DO_JOB_SUMMARY: true
           #DO_POLICY_CHECK: true
