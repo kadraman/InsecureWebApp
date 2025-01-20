@@ -48,7 +48,7 @@ on:
 
 # Global environment variables
 env:
-  DEFAULT_APP_NAME: "IWA-Python"
+  DEFAULT_APP_NAME: "InsecureWebApp"
   AZURE_WEBAPP_NAME: fortifydemoapp
   PYTHON_VERSION: "3.12.3"
 

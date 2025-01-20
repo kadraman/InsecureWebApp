@@ -24,7 +24,7 @@ on:
 
 # Global environment variables
 env:
-  DEFAULT_APP_NAME: "IWA-Python"
+  DEFAULT_APP_NAME: "InsecureWebApp"
 
 jobs:
 

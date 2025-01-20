@@ -5,7 +5,7 @@ from flask import Blueprint, Response, json, request
 from flask_cors import cross_origin
 from flask import current_app
 
-from .db import get_db
+from ..repository.db import get_db
 
 logger = logging.getLogger(__name__)
 

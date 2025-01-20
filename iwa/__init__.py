@@ -52,7 +52,7 @@ def create_app(test_config=None):
         return redirect(url_for("products.index"))
     
     # register the database commands
-    from . import db
+    from .repository import db
     db.init_app(app)
     # create and populate the database for demo
     with app.app_context():
@@ -63,14 +63,14 @@ def create_app(test_config=None):
     app.config['SUBSCRIBERS_FILENAME'] = os.path.join(site_root, "static", "data", "email-db.json")
 
     # apply the blueprints to the app
-    from . import auth
-    from . import api
-    from . import products
-    from . import insecure
+    from .routes import AuthRoutes
+    from .routes import ApiRoutes
+    from .routes import ProductRoutes
+    from .routes import InsecureRoutes
 
-    app.register_blueprint(auth.bp)
-    app.register_blueprint(api.bp)
-    app.register_blueprint(products.bp)
-    app.register_blueprint(insecure.bp)
+    app.register_blueprint(AuthRoutes.bp)
+    app.register_blueprint(ApiRoutes.bp)
+    app.register_blueprint(ProductRoutes.bp)
+    app.register_blueprint(InsecureRoutes.bp)
 
     return app

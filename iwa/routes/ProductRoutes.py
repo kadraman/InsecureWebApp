@@ -9,63 +9,14 @@ from flask import request
 from flask import url_for
 from werkzeug.exceptions import abort
 
-from .auth import login_required
-from .db import get_db, init_db
+from iwa.repository.ProductRepository import get_product, get_products, get_reviews
+from .AuthRoutes import login_required
+from ..repository.db import get_db
+from ..models.Product import Product
 
 logger = logging.getLogger(__name__)
 
 bp = Blueprint("products", __name__, url_prefix="/products")
-
-
-def get_product(id):
-    """Get a product by id.
-
-    Checks that the id exists.
-
-    :param id: id of product to get
-    :return: the product information
-    :raise 404: if a product with the given id doesn't exist
-    """
-    product = (
-        get_db()
-        .execute(
-            "SELECT *"
-            " FROM products p"
-            " WHERE p.id = ?",
-            (id,),
-        )
-        .fetchone()
-    )
-
-    if product is None:
-        abort(404, f"product id {id} doesn't exist.")
-
-    return product
-
-
-def get_reviews(id):
-    """Get a product's reviews.
-
-    Checks that the id exists.
-
-    :param id: id of product to get
-    :return: the review information
-    :raise 404: if a product with the given id doesn't exist
-    """
-    db = get_db()
-    reviews = db.execute(
-        "SELECT r.user_id, r.review_date, r.comment, u.username"
-        " FROM reviews r"
-        " JOIN users u ON r.user_id = u.id AND"
-        " (r.product_id = ? OR r.product_id IS null)",
-        (id,),
-    ).fetchall()
-
-    #if product is None:
-    #    abort(404, f"product id {id} doesn't exist.")
-
-    return reviews
-
 
 @bp.route("/")
 def index():  
@@ -76,13 +27,8 @@ def index():
         keywords=""    
 
     """Show all the products, ordered by name."""
-    db = get_db()
-    products = db.execute(
-        "SELECT *"
-        " FROM products p"
-        " WHERE name LIKE '%%" + keywords + "%%'"
-        " ORDER BY name"
-    ).fetchall()
+    products = get_products(keywords)
+    
     return render_template("products/index.html", products=products)
 
 
