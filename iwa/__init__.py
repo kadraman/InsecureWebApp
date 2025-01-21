@@ -11,7 +11,6 @@ from jinja2 import Environment, DictLoader
 
 logger = logging.getLogger(__name__)
 
-
 def create_app(test_config=None):
     """Create and configure an instance of the Flask application."""
     app = Flask(__name__, instance_relative_config=True)
@@ -29,6 +28,10 @@ def create_app(test_config=None):
         # load the test config if passed in
         app.config.update(test_config)
 
+    # set default Flask log level to INFO
+    logger.setLevel(logging.INFO)
+    app.logger.setLevel(logging.INFO)
+
     # ensure the instance folder exists
     try:
         os.makedirs(app.instance_path)
@@ -43,6 +46,12 @@ def create_app(test_config=None):
     def index():
         logger.info("[index] Rendering home page.")
         return render_template('index.html')
+    
+    # user dahboard
+    @app.route('/dashboard')
+    def dashboard():
+        logger.info("[dashboard] Rendering user dashboard.")
+        return render_template('dashboard.html')
 
     # route to reset the database
     @app.route("/reset-db")

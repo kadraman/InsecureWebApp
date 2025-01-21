@@ -20,7 +20,9 @@ CREATE TABLE users (
   zip TEXT,
   country TEXT,
   role TEXT,
-  enabled BOOLEAN DEFAULT 1 NOT NULL
+  enabled BOOLEAN DEFAULT 1 NOT NULL,
+  otp_enabled BOOLEAN DEFAULT 0 NOT NULL,
+  otp_secret TEXT
 );
 
 CREATE TABLE products (
@@ -59,9 +61,9 @@ VALUES (1, 'admin@localhost.com', 'pbkdf2:sha256:600000$rvTTezuLMV6UMiNg$662c8f8
 INSERT INTO users (id, username, password, first_name, last_name, email, phone, address, city, state, zip, country, date_created, role, enabled)
 VALUES (2, 'user1@localhost.com', 'pbkdf2:sha256:600000$J4OXxAF9HPp7X9yd$60364d73a428573c0987bc051c00f5e50cd6ba8a5aff51f65e88052c86db86d2',
         'Sam', 'Shopper', 'user1@localhost.com', '+44808123456', '1 Somewhere Street', 'London', 'Greater London', 'SW1', 'United Kingdom', CURRENT_TIMESTAMP, 'ROLE_USER', 1);
-INSERT INTO users (id, username, password, first_name, last_name, email, phone, address, city, state, zip, country, date_created, role, enabled)
+INSERT INTO users (id, username, password, first_name, last_name, email, phone, address, city, state, zip, country, date_created, role, enabled, otp_enabled, otp_secret)
 VALUES (3, 'user2@localhost.com', 'pbkdf2:sha256:600000$J4OXxAF9HPp7X9yd$60364d73a428573c0987bc051c00f5e50cd6ba8a5aff51f65e88052c86db86d2',
-        'Sarah', 'Shopper', 'user2@localhost.com', '+44808123456', '1 Somewhere Street', 'London', 'Greater London', 'SW1', 'United Kingdom', CURRENT_TIMESTAMP, 'ROLE_USER', 1);
+        'Sarah', 'Shopper', 'user2@localhost.com', '+44808123456', '1 Somewhere Street', 'London', 'Greater London', 'SW1', 'United Kingdom', CURRENT_TIMESTAMP, 'ROLE_USER', 1, 1, 'BASE32SECRET1234');
 INSERT INTO products (id, code, name, rating, summary, description, image, price, in_stock, time_to_stock, available)
 VALUES (1, 'SWA234-A568-00010', 'Solodox 750', 4,
         'Lorem ipsum dolor sit amet, consectetur adipiscing elit. Proin pharetra enim erat, sed tempor mauris viverra in. Donec ante diam, rhoncus dapibus efficitur ut, sagittis a elit. Integer non ante felis. Curabitur nec lectus ut velit bibendum euismod. Nulla mattis convallis neque ac euismod. Ut vel mattis lorem, nec tempus nibh. Vivamus tincidunt enim a risus placerat viverra. Curabitur diam sapien, posuere dignissim accumsan sed, tempus sit amet diam. Aliquam tincidunt vitae quam non rutrum. Nunc id sollicitudin neque, at posuere metus. Sed interdum ex erat, et ornare purus bibendum id. Suspendisse sagittis est dui. Donec vestibulum elit at arcu feugiat porttitor.',

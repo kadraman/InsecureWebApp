@@ -88,7 +88,7 @@
                                     </ul>
                                 </li>
                                 <li>
-                                    <a href="#">Advice</a>
+                                    <a href="{{ url_for('insecure.xss') }}">Advice</a>
                                 </li>
                             </ul>
                         </nav>
@@ -175,9 +175,9 @@
                         </div>
                         <div class="col-md-6">
                             <ul class="list">
-                                <li><a href="#">About Us</a></li>
-                                <li><a href="#">Contacts</a></li>
-                                <li><a href="#">Terms & Condition</a></li>
+                                <li><a href="{{ url_for('insecure.load_file') }}">About Us</a></li>
+                                <li><a href="{{ url_for('insecure.command_injection') }}">Contacts</a></li>
+                                <li><a href="{{ url_for('insecure.template_injection') }}">Terms & Condition</a></li>
                                 <li><a href="#">Privacy Policy</a></li>
                             </ul>
                         </div>

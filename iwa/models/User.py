@@ -17,3 +17,5 @@ class User:
     country: str
     role: str
     enable: bool
+    otp_enabled: bool
+    otp_secret: str
