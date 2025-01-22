@@ -126,19 +126,23 @@ def login():
 @bp.route("/enable_2fa", methods=("GET", "POST"))
 @login_required
 def enable_2fa():
+
     if g.user['otp_enabled']:
         # 2FA is already enabled
         secret = g.user['otp_secret']
     else:
         # Generate and store a secret for the user  
+        user_id: int = session["user_id"]
         secret = pyotp.random_base32()
         db = get_db()
         error = None
         db.execute(
             "UPDATE users SET otp_enabled=?, otp_secret=? WHERE id=?",
-            (1, secret, g.user['id']),
+            (1, secret, user_id),
         )
-  
+        db.commit()
+        load_logged_in_user()
+
     # Generate a QR code for the user to scan
     totp = pyotp.TOTP(secret)
     qr_url = totp.provisioning_uri(g.user['username'], issuer_name="InsecureWebApp")
@@ -188,7 +192,7 @@ def verify_2fa():
 
         flash(error)
 
-    return render_template("auth/verify_2fa.html")
+    return render_template("auth/verify_2fa.html", otp_secret=g.user['otp_secret'])
 
 @bp.route("/logout")
 def logout():

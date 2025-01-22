@@ -81,14 +81,14 @@
                                     <a href="#">Services</a>
                                     <ul class="dropdown">
                                         <li>
-                                            <a href="#">Flu vaccinations</a>
-                                            <a href="#">Stop smoking</a>
+                                            <a href="{{ url_for('insecure.xss1') }}">Flu vaccinations</a>
+                                            <a href="{{ url_for('insecure.xss2') }}">Stop smoking</a>
                                             <a href="#">Travel vaccinations</a>
                                         </li>
                                     </ul>
                                 </li>
                                 <li>
-                                    <a href="{{ url_for('insecure.xss') }}">Advice</a>
+                                    <a href="#">Advice</a>
                                 </li>
                             </ul>
                         </nav>
@@ -99,13 +99,13 @@
                             <li>
                                 <div class="has-children">
                                     {% if g.user %}
-                                        <a href="/user" class="icons-menu d-inline-block">
+                                        <a href="{{ url_for('dashboard') }}" class="icons-menu d-inline-block">
                                             <span class="icon-account_circle"></span>
                                             <span class="my-account-text">{{ g.user['username'] }}</span>
                                         </a>
                                         <ul class="dropdown">
                                             <li>
-                                                <a th:href="/user"><i class="fas fa-home fa-fw"></i> Home </a>
+                                                <a href="{{ url_for('dashboard') }}"><i class="fas fa-home fa-fw"></i> Home </a>
                                             </li>
                                             <li>
                                                 <a class="nav-link" href="{{ url_for('auth.logout') }}"><i class="fas fa-sign-out-alt fa-fw"></i> Logout </a>
@@ -157,9 +157,11 @@
                 <div class="col-md-3 footer-brand animated fadeInLeft">
                     <h4>InsecureWebApp</h4>
                     <p>This is a deliberately insecure web application for use in
-                        <a href="https://www.opentext.com/products/application-security" target="_blank">OpenText Application Security</a> demonstrations.</p>
+                        <a href="https://www.opentext.com/products/application-security" target="_blank">OpenText Application Security</a> demonstrations.
+                        Please do not use in Production environments.
+                    </p>
                     <p><a href="https://www.opentext.com/about/copyright-information" target="_blank">Copyright</a>
-                        &copy; 2025 OpenText Corporation. All Rights Reserved. <br/>Template by
+                        &copy; 2025 <a href="https://www.opentext.com/">OpenText Corporation</a>. All Rights Reserved. <br/>Template by
                         <a href="https://colorlib.com" target="_blank" class="text-info">Colorlib</a>.</p>
                 </div>
                 <div class="col-md-4 footer-nav animated fadeInUp">

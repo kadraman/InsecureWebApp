@@ -16,12 +16,12 @@
     <div class="site-section-sm">
 
         <div class="container">
-
+            
             {% if request.args.get('keywords') %}
                 <div class="row pt-2">
                     <div class="col-md-12 text-center">
                         <h2>Searching for:
-                            <span class="bg-light text-dark"><span id="search-keywords">{{ request.args.get('keywords') }}</span>
+                            <span class="bg-light text-dark"><span id="search-keywords">{{ request.args.get('keywords') | safe }}</span>
                         </h2>
                     </div>
                 </div>

@@ -51,7 +51,7 @@ def create_app(test_config=None):
     @app.route('/dashboard')
     def dashboard():
         logger.info("[dashboard] Rendering user dashboard.")
-        return render_template('dashboard.html')
+        return render_template('dashboard.html', messagesLink="")
 
     # route to reset the database
     @app.route("/reset-db")

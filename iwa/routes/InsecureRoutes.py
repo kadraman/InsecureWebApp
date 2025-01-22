@@ -1,7 +1,7 @@
 import logging
 import os
 
-from flask import Blueprint, make_response
+from flask import Blueprint, make_response, render_template_string
 from flask import flash
 from flask import g
 from flask import redirect
@@ -24,10 +24,15 @@ INITCMD = "setup.bat"
 Some additional insecure examples not related to the functionality of the application.
 """
 
-@bp.route("/xss", methods = ["GET"])
-def xss():   
+@bp.route("/xss1", methods = ["GET"])
+def xss1():   
     user_input = request.args.get('input') 
-    return render_template("insecure/xss.html", input=user_input)
+    return render_template("insecure/xss.jinja", input=user_input)
+
+@bp.route("/xss2", methods = ["GET"])
+def xss2():   
+    user_input = request.args.get('input') 
+    return render_template_string("<div><h1>XSS Example</h1><p>User Input: %s</p></div>" % user_input)
 
 @bp.route("/load_file", methods = ["GET"])
 def load_file(): 
