@@ -1,9 +1,9 @@
-[![Fortify on Demand](https://github.com/fortify-presales/IWA-Python/actions/workflows/fod.yml/badge.svg)](https://github.com/fortify-presales/IWA-Python/actions/workflows/fod.yml) [![Debricked](https://github.com/fortify-presales/IWA-Python/actions/workflows/debricked.yml/badge.svg)](https://github.com/fortify-presales/IWA-Python/actions/workflows/debricked.yml)
+[![Fortify on Demand](https://github.com/fortify-presales/InsecureWebApp/actions/workflows/fod.yml/badge.svg)](https://github.com/fortify-presales/InsecureWebApp/actions/workflows/fod.yml) [![Debricked](https://github.com/fortify-presales/InsecureWebApp/actions/workflows/debricked.yml/badge.svg)](https://github.com/fortify-presales/InsecureWebApp/actions/workflows/debricked.yml)
 
-# Fortify Demo App
+# InsecureWebApp
 
 This is a simple Python Flask web application that can be used for the demonstration of application
-security testing tools - such as those provided by [Fortify by OpenText](https://www.microfocus.com/en-us/cyberres/application-security). 
+security testing tools - such as [OpenText Application Security](https://www.opentext.com/products/application-security). 
 It is a cut down "search" results/details page from a larger sample application [IWA-Java](https://github.com/fortify/IWA-Java) and is kept deliberately small for demos.
 
 Pre-requisities
@@ -70,12 +70,16 @@ There are only a few features that are functional in this version of the app:
 - you can click on any search result to navigate to a details page
 - you can download a datasheet PDF from a details page
 - you can subscribe to the newsletter by entering an email address in the input field of the footer
-- you can login/logout (user credentials are: user1@localhost.com/password or admin@localhost.com/password)
 
 These have been "enabled" because they all have potential security issues that can be found by Fortify.
 
-Scan Application (with Fortify)
--------------------------------
+You can login/logout (user credentials are: user1@localhost.com/password or admin@localhost.com/password)
+for the OTP code, the secret is hard coded to "base32secret3232" so you can use an app or online tool
+such as <a href="https://totp.danhersam.com/">TOTP Token Generator</a> to generate the code.
+
+
+Scan Application (with OpenText Application Security)
+-----------------------------------------------------
 
 To carry out a Fortify Static Code Analyzer local scan, run the following:
 
@@ -90,8 +94,8 @@ To carry out a Fortify ScanCentral SAST scan, run the following:
 ```
 fcli ssc session login
 scancentral package -o package.zip -bt none --python-virtual-env .venv -oss
-fcli ssc sast-scan start --release "_YOURAPP_:_YOURREL_" -f package.zip --store curScan
-fcli ssc sast-scan wait-for ::curScan::
+fcli sast-scan start --release "_YOURAPP_:_YOURREL_" -f package.zip --store curScan
+fcli sast-scan wait-for ::curScan::
 fcli ssc action run appversion-summary --av "_YOURAPP_:_YOURREL_" -fs "Security Auditor View" -f summary.md
 ```
 

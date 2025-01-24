@@ -2,9 +2,8 @@ import base64
 import functools
 from io import BytesIO
 import logging
-import os
 
-from flask import Blueprint, Response, json
+from flask import Blueprint
 from flask import flash
 from flask import g
 from flask import redirect
@@ -16,7 +15,6 @@ import pyotp
 import qrcode
 from werkzeug.security import check_password_hash
 from werkzeug.security import generate_password_hash
-from flask import current_app
 
 from ..repository.db import get_db
 
@@ -27,7 +25,6 @@ bp = Blueprint("auth", __name__, url_prefix="/auth")
 
 def login_required(view):
     """View decorator that redirects anonymous users to the login page."""
-
     @functools.wraps(view)
     def wrapped_view(**kwargs):
         if g.user is None:
@@ -110,65 +107,23 @@ def login():
             error = "Incorrect password."
 
         if error is None:
-            # store the user id in a new session and navigate to dashboard
+            # store the user id in a new session and navigate to home
             session.clear()
             session["user_id"] = user["id"]
             if user["otp_enabled"]:
                 return redirect(url_for("auth.verify_2fa"))
             else:
-                return redirect(url_for("dashboard"))
+                return redirect(url_for("home"))
 
         flash(error)
 
     return render_template("auth/login.html")
 
 
-@bp.route("/enable_2fa", methods=("GET", "POST"))
-@login_required
-def enable_2fa():
-
-    if g.user['otp_enabled']:
-        # 2FA is already enabled
-        secret = g.user['otp_secret']
-    else:
-        # Generate and store a secret for the user  
-        user_id: int = session["user_id"]
-        secret = pyotp.random_base32()
-        db = get_db()
-        error = None
-        db.execute(
-            "UPDATE users SET otp_enabled=?, otp_secret=? WHERE id=?",
-            (1, secret, user_id),
-        )
-        db.commit()
-        load_logged_in_user()
-
-    # Generate a QR code for the user to scan
-    totp = pyotp.TOTP(secret)
-    qr_url = totp.provisioning_uri(g.user['username'], issuer_name="InsecureWebApp")
-
-    qr = qrcode.QRCode(
-        version=1,
-        error_correction=qrcode.constants.ERROR_CORRECT_L,
-        box_size=10,
-        border=4,
-    )
-    qr.add_data(qr_url)
-    qr.make(fit=True)
-
-    qr_img = qr.make_image(fill_color="black", back_color="white")
-
-    # Convert the QR code to base64 for display
-    buffered = BytesIO()
-    qr_img.save(buffered, format="PNG")
-    qr_b64 = base64.b64encode(buffered.getvalue()).decode()
-
-    return render_template("auth/enable_2fa.html", qr_b64=qr_b64, secret=secret)
-
-
 @bp.route("/verify_2fa", methods=("GET", "POST"))
 @login_required
 def verify_2fa():
+    """Requests a TOTP code to confirm login"""
     if not g.user['otp_enabled']:
         return "2FA is not enabled.", 400
 
@@ -184,8 +139,8 @@ def verify_2fa():
         if error is None:
             totp = pyotp.TOTP(secret)
             if totp.verify(otp):
-                # Success, go to the dashboard.
-                return redirect(url_for("dashboard"))
+                # Success, go to the home.
+                return redirect(url_for("user.home"))
             else:
                 # Invalid OTP, try again/
                 error = "The OTP is invalid, please try again."
@@ -193,6 +148,7 @@ def verify_2fa():
         flash(error)
 
     return render_template("auth/verify_2fa.html", otp_secret=g.user['otp_secret'])
+
 
 @bp.route("/logout")
 def logout():

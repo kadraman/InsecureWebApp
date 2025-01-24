@@ -1,18 +1,16 @@
 import logging
 import os
-from flask import Blueprint, Response, send_file, send_from_directory
+from flask import Blueprint, send_file
 from flask import flash
 from flask import g
 from flask import redirect
 from flask import render_template
 from flask import request
 from flask import url_for
-from werkzeug.exceptions import abort
 
 from iwa.repository.ProductRepository import get_product, get_products, get_reviews
 from .AuthRoutes import login_required
 from ..repository.db import get_db
-from ..models.Product import Product
 
 logger = logging.getLogger(__name__)
 

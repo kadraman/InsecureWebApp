@@ -1,5 +1,4 @@
 import logging
-import os
 
 from flask import Blueprint, Response, json, request
 from flask_cors import cross_origin

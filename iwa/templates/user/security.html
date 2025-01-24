@@ -1,0 +1,79 @@
+{% extends 'base.html' %}
+
+{% block header %}
+<h1>{% block title %} InsecureWebApp :: Login & Security {% endblock %}</h1>
+{% endblock %}
+
+{% block content %}
+
+<div class="site-section">
+    <div class="container">
+
+        <div class="row justify-content-center align-items-center">
+            {% for message in get_flashed_messages() %}
+            <div class="flash">{{ message }}</div>
+            {% endfor %}
+        </div>
+
+        <div class="row">
+            <div class="col-md-3 mr-auto">
+                {% include "sidebar.html" ignore missing without context %}
+            </div>
+
+            <div class="col-md-9">
+                <h1>Login & Security</h1>
+                <h2>Two-Factor Authentication</h2>
+                <ul>
+                    <li>Download <a href="">Google Authenticator</a> or similar app to your mobile</li>
+                    <li>Setup a new Authenticator</li>
+                    <li>Scan the QR code or enter the Secret Token shown below</li>
+                </ul>
+
+                <img src="data:image/png;base64,{{ qr_b64 }}" alt="QR Code">
+                <div class="form-group row">
+                    <div class="col-md-12">
+                        <label for="secret" class="text-black">Secret Token</label>
+                        <div class="input-group">
+                            <input type="text" class="form-control" id="secret-input" name="-input" value="{{ secret }}"
+                                readonly>
+                            <div class="input-group-prepend">
+                                <button class="btn btn-outline-secondary" type="button" id="copy-secret-button"
+                                    >Copy to clipboard</button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+            </div>
+
+        </div>
+
+    </div>
+
+</div>
+
+{% endblock %}
+
+{% block scripts %}
+<script type="text/javascript">
+    (function ($) {
+        $(document).ready(function () {
+            $('#copy-secret-button').on("click", function(e) {
+                e.preventDefault();
+		        copy_input($('#secret-input'));
+            });
+        });
+
+        // copy function
+        function copy_input($input) {
+            $input.focus();
+            $input.select();
+            try {  
+                var successful = document.execCommand('copy'); 
+            } catch(err) {  
+                console.error('Unable to copy'); 
+            }
+        }
+    })(jQuery);
+</script>
+{% endblock %}

@@ -46,12 +46,6 @@ def create_app(test_config=None):
     def index():
         logger.info("[index] Rendering home page.")
         return render_template('index.html')
-    
-    # user dahboard
-    @app.route('/dashboard')
-    def dashboard():
-        logger.info("[dashboard] Rendering user dashboard.")
-        return render_template('dashboard.html', messagesLink="")
 
     # route to reset the database
     @app.route("/reset-db")
@@ -74,11 +68,13 @@ def create_app(test_config=None):
     # apply the blueprints to the app
     from .routes import AuthRoutes
     from .routes import ApiRoutes
+    from .routes import UserRoutes
     from .routes import ProductRoutes
     from .routes import InsecureRoutes
 
     app.register_blueprint(AuthRoutes.bp)
     app.register_blueprint(ApiRoutes.bp)
+    app.register_blueprint(UserRoutes.bp)
     app.register_blueprint(ProductRoutes.bp)
     app.register_blueprint(InsecureRoutes.bp)
 

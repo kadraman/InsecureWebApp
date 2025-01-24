@@ -2,16 +2,10 @@ import logging
 import os
 
 from flask import Blueprint, make_response, render_template_string
-from flask import flash
-from flask import g
-from flask import redirect
 from flask import render_template
 from flask import request
-from flask import session
-from flask import url_for
 
 from jinja2 import Template as Jinja2_Template
-from jinja2 import Environment, DictLoader
 
 logger = logging.getLogger(__name__)
 
