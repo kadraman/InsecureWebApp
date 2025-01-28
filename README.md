@@ -1,20 +1,16 @@
-[![Fortify on Demand](https://github.com/fortify-presales/InsecureWebApp/actions/workflows/fod.yml/badge.svg)](https://github.com/fortify-presales/InsecureWebApp/actions/workflows/fod.yml) [![Debricked](https://github.com/fortify-presales/InsecureWebApp/actions/workflows/debricked.yml/badge.svg)](https://github.com/fortify-presales/InsecureWebApp/actions/workflows/debricked.yml)
+[![Fortify on Demand](https://github.com/kadraman/InsecureWebApp/actions/workflows/fod.yml/badge.svg)](https://github.com/kadraman/InsecureWebApp/actions/workflows/fod.yml) [![Debricked](https://github.com/kadraman/InsecureWebApp/actions/workflows/debricked.yml/badge.svg)](https://github.com/kadraman/InsecureWebApp/actions/workflows/debricked.yml)
 
 # InsecureWebApp
 
-This is a simple Python Flask web application that can be used for the demonstration of application
-security testing tools - such as [OpenText Application Security](https://www.opentext.com/products/application-security). 
-It is a cut down "search" results/details page from a larger sample application [IWA-Java](https://github.com/fortify/IWA-Java) and is kept deliberately small for demos.
+This is a simple Python Flask web application that can be used for the demonstration of Application
+Security testing tools - such as [OpenText Application Security](https://www.opentext.com/products/application-security). 
 
 Pre-requisities
 ---------------
 
  - Windows or Linux machine with Python 3.12 or later
  - [Pip package manager](https://pypi.org/project/pip/)
- - Local Fortify Static Code Analyzer installation 
- - Local Docker installation
- - [Debricked CLI](https://docs.debricked.com/tools-and-integrations/cli/debricked-cli)
- - [Fortify CLI](https://github.com/fortify/fcli)
+ - Local Docker installation (optional)
 
 Run Application (locally)
 -------------------------

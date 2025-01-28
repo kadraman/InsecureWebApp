@@ -20,7 +20,7 @@
 name: Build and Deploy to Azure
 
 env:
-  AZURE_WEBAPP_NAME: insecureapp      # set this to the name of your Azure Web App
+  AZURE_WEBAPP_NAME: insecurewebapp   # set this to the name of your Azure Web App
   PYTHON_VERSION: '3.12'              # set this to the Python version to use
 
 on:

@@ -49,7 +49,7 @@ on:
 # Global environment variables
 env:
   DEFAULT_APP_NAME: "InsecureWebApp"
-  AZURE_WEBAPP_NAME: fortifydemoapp
+  AZURE_WEBAPP_NAME: insecurewebapp
   PYTHON_VERSION: "3.12.3"
 
 jobs:
