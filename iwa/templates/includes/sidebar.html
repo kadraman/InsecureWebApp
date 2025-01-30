@@ -1,0 +1,21 @@
+{% set navigation_bar = [
+    (url_for('user.home'),      'home',     'fa-home',              'Home'),
+    (url_for('user.security'),  'security', 'fa-lock',              'Login & Security'),
+    ('',                        'profile',  'fa-user',              'Profile'),
+    ('',                        'orders',   'fa-shopping-cart',     'Orders'),
+    ('',                        'reviews',  'fa-comment-alt',       'Reviews'),
+    ('',                        'messages', 'fa-envelope',          'Messages')
+] -%}
+
+<div class="side-menu">
+    <div class="list-group list-group-flush">
+        {% for href, id, icon, caption in navigation_bar %}
+            <a {% if id == active_page %} class="list-group-item list-group-item-action active" {% else %} class="list-group-item list-group-item-action" {% endif %} href="{{ href|e }}"><i class="fas {{ icon|e }} fa-fw"></i> {{ caption|e }}
+                {% if id == 'messages' %}
+                    <span id="unread-message-count" class="badge badge-pill badge-info">0</span>
+                    <span class="sr-only">unread messages</span>
+                {% endif %}
+            </a>
+        {% endfor %}
+    </div>
+</div>

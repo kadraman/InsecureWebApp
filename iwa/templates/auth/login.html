@@ -1,18 +1,14 @@
 {% extends 'base.html' %}
 
 {% block header %}
-<h1>{% block title %} InsecureWebApp :: Log  {% endblock %}</h1>
+<h1>{% block title %} InsecureWebApp :: Login {% endblock %}</h1>
 {% endblock %}
 
 {% block content %}
 <div class="site-section">
     <div class="container h-100">
 
-        <div class="row justify-content-center align-items-center">
-            {% for message in get_flashed_messages() %}
-            <div class="flash">{{ message }}</div>
-            {% endfor %}
-        </div>
+        {% include "includes/alerts.html" ignore missing with context %}
 
         <div class="row align-items-center">
             <img src="{{ url_for('static', filename='img/login_logo.png') }}" class="rounded mx-auto d-block"

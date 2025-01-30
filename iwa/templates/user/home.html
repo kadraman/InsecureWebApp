@@ -6,12 +6,16 @@
 
   <div class="site-section">
     <div class="container">
+
       <div class="row">
         <div class="col-md-3 mr-auto">
-          {% include "sidebar.html" ignore missing without context %}
+          {% set active_page = "home" %}
+          {% include "includes/sidebar.html" ignore missing %}
         </div>
 
         <div class="col-md-9">
+
+          {% include "includes/alerts.html" ignore missing with context %}
 
           <form class="form-horizontal">
             <div class="jumbotron">

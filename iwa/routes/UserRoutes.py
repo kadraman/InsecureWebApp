@@ -1,49 +1,23 @@
 import base64
-import functools
 from io import BytesIO
 import logging
 
-from flask import Blueprint
+from flask import Blueprint, flash, redirect, request, url_for
 from flask import g
-from flask import redirect
 from flask import render_template
 from flask import session
-from flask import url_for
 import pyotp
 import qrcode
+from werkzeug.security import generate_password_hash
+
+from iwa.utils.DbUtils import load_logged_in_user
+from iwa.utils.ViewUtils import login_required
 
 from ..repository.db import get_db
 
 logger = logging.getLogger(__name__)
 
 bp = Blueprint("user", __name__, url_prefix="/user")
-
-
-def login_required(view):
-    """View decorator that redirects anonymous users to the login page."""
-    @functools.wraps(view)
-    def wrapped_view(**kwargs):
-        if g.user is None:
-            return redirect(url_for("auth.login"))
-
-        return view(**kwargs)
-
-    return wrapped_view
-
-
-@bp.before_app_request
-def load_logged_in_user():
-    """If a user id is stored in the session, load the user object from
-    the database into ``g.user``."""
-    user_id = session.get("user_id")
-
-    if user_id is None:
-        g.user = None
-    else:
-        g.user = (
-            get_db().execute("SELECT * FROM users WHERE id = ?", (user_id,)).fetchone()
-        )
-        logger.debug(f"Logged in user {g.user['email']}")
 
 
 @bp.route("/home")
@@ -93,5 +67,16 @@ def security():
     qr_img.save(buffered, format="PNG")
     qr_b64 = base64.b64encode(buffered.getvalue()).decode()
 
-    return render_template("user/security.html", qr_b64=qr_b64, secret=secret)
+    return render_template("user/security.html", user=g.user, qr_b64=qr_b64, secret=secret)
 
+
+@bp.route("/update_security", methods=("GET", "POST"))
+@login_required
+def update_security():
+    """Edit the users security details."""
+    if request.method == "POST":
+        user_id = session["user_id"]
+        # TODO: implement update security
+        flash('Updating security details has not yet been implemented.', 'info')
+
+    return render_template("user/update_security.html", user=g.user)

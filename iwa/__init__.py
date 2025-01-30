@@ -1,13 +1,10 @@
 import logging
 import os
-import random
-from flask import Flask, json, redirect, render_template, request, Response, url_for
+from flask import Flask, g, redirect, render_template, url_for, session
 from flask_cors import CORS
-from docx import Document
-from werkzeug.utils import secure_filename
 
-from jinja2 import Template as Jinja2_Template
-from jinja2 import Environment, DictLoader
+from iwa.repository.db import get_db
+
 
 logger = logging.getLogger(__name__)
 
@@ -77,5 +74,19 @@ def create_app(test_config=None):
     app.register_blueprint(UserRoutes.bp)
     app.register_blueprint(ProductRoutes.bp)
     app.register_blueprint(InsecureRoutes.bp)
+
+    @app.before_request
+    def load_logged_in_user():
+        """If a user id is stored in the session, load the user object from
+        the database into ``g.user``."""
+        user_id = session.get("user_id")
+
+        if user_id is None:
+            g.user = None
+        else:
+            g.user = (
+                get_db().execute("SELECT * FROM users WHERE id = ?", (user_id,)).fetchone()
+            )
+            logger.debug(f"Logged in user {g.user['email']}")
 
     return app

@@ -9,11 +9,7 @@
 
     <div class="container">
 
-        <div class="row justify-content-center align-items-center">
-            {% for message in get_flashed_messages() %}
-            <div class="flash">{{ message }}</div>
-            {% endfor %}
-        </div>
+        {% include "includes/alerts.html" ignore missing with context %}
 
         <div class="row align-items-center">
             <img src="{{ url_for('static', filename='img/login_logo.png') }}" class="rounded mx-auto d-block" style="padding-top:20px;" alt="IWA Pharmacy Direct">

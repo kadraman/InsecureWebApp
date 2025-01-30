@@ -1,0 +1,19 @@
+<div class="row justify-content-center align-items-center">
+    {% with messages = get_flashed_messages(with_categories=true) %}
+    {% if messages %}
+    {% for category, message in messages %}
+        {% if category == "success" %}
+            {% set alert_class = "alert-success" %}
+        {% elif category == "error" %}
+            {% set alert_class = "alert-danger" %}
+        {% else %}
+            {% set alert_class = "alert-info" %}
+        {% endif %}
+        <div class="alert {{ alert_class }} alert-dismissible auto-dismiss" role="alert">
+            <button type="button" class="close" data-dismiss="alert" aria-label="Close"><span aria-hidden="true">&times;</span></button>
+            {{ message }}
+        </div>
+    {% endfor -%}
+    {% endif %}
+    {% endwith %}
+</div>

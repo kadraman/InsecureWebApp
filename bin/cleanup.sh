@@ -18,9 +18,10 @@ echo Removing files...
 sourceanalyzer $ScanSwitches -b "$AppName" -clean
 rm -rf .fortify
 rm -f "${AppName}.fpr"
-rm -f "${AppName}.pdfr"
+rm -f "${AppName}.pdf"
 rm -f "fod.zip"
-rm -f "*Package.zip"
-rm -rf ".debricked"
+rm -f "package.zip"
+rm -rf "*.debricked"
+rm -rf "*.debricked.lock"
 rm -rf "instance"
 echo Done.
