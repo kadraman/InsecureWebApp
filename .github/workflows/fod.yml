@@ -178,7 +178,7 @@ jobs:
     needs: [ Build-And-Unit-Test, FoD-SAST-Scan ]
     environment:
       name: 'Development'
-      url: ${{ steps.deploy-to-webapp.outputs.webapp-url }}
+      #url: ${{ steps.deploy-to-webapp.outputs.webapp-url }}
     if: ${{ success() && github.ref_name == github.event.repository.default_branch }}
     steps:
       - name: Download artifact from build job
@@ -186,12 +186,13 @@ jobs:
         with:
           name: python-app
           path: .
-      - name: 'Deploy to Azure Web App'
-        id: deploy-to-webapp
-        uses: azure/webapps-deploy@v2
-        with:
-          app-name: ${{ env.AZURE_WEBAPP_NAME }}
-          publish-profile: ${{ secrets.AZURE_WEBAPP_PUBLISH_PROFILE }}     
+      # Example deployment to azure web app
+      #- name: 'Deploy to Azure Web App'
+      #  id: deploy-to-webapp
+      #  uses: azure/webapps-deploy@v2
+      #  with:
+      #    app-name: ${{ env.AZURE_WEBAPP_NAME }}
+      #    publish-profile: ${{ secrets.AZURE_WEBAPP_PUBLISH_PROFILE }}     
 
   Functional-Test:
     runs-on: ubuntu-latest
