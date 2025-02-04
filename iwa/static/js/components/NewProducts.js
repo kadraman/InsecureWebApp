@@ -3,7 +3,7 @@ $.fn.NewProducts = function (options) {
 
         var defaults = $.extend({
             limit: 3,
-            currencySymbol: "&#164;"
+            currencySymbol: "&dollar;"
         });
         options = $.extend(defaults, options);
 

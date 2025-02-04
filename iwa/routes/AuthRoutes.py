@@ -1,18 +1,12 @@
+import base64
 import logging
-
-from flask import Blueprint
-from flask import flash
-from flask import g
-from flask import redirect
-from flask import render_template
-from flask import request
-from flask import session
-from flask import url_for
+import pickle
 import pyotp
-from werkzeug.security import check_password_hash
-from werkzeug.security import generate_password_hash
 
-from iwa.utils.ViewUtils import login_required
+from flask import Blueprint, flash, g, redirect, render_template, request, session, url_for
+from werkzeug.security import check_password_hash, generate_password_hash
+
+from iwa.utils.ViewUtils import gen_login_cookie, login_required
 
 from ..repository.db import get_db
 
@@ -23,10 +17,9 @@ bp = Blueprint("auth", __name__, url_prefix="/auth")
 
 @bp.route("/register", methods=("GET", "POST"))
 def register():
-    """Register a new user.
-
-    Validates that the username is not already taken. Hashes the
-    password for security.
+    """
+    Register a new user. Validates that the username is not
+    already taken. Hashes the password for security.
     """
     if request.method == "POST":
         username = request.form["username"]
@@ -62,7 +55,23 @@ def register():
 
 @bp.route("/login", methods=("GET", "POST"))
 def login():
-    """Log in a registered user by adding the user id to the session."""
+    """
+    Log in a registered user. If "rememberme" session cookie
+    was set then auto login. If not then validate username
+    and password credentials and redirect to OTP authentication
+    if required.
+    """
+    if 'rememberme' in request.cookies:
+        # found 'rememberme' cookie, extract its details
+        b64 = request.cookies.get('rememberme')
+        a = pickle.loads(base64.b64decode(b64))
+        # store the username in a new session and navigate to users home
+        session.clear()
+        session["username"] = a.username
+        session['loggedin'] = True
+        logger.info(f"Logging in user {username} from 'rememberme' cookie")
+        return redirect(url_for("user.home"))
+    
     if request.method == "POST":
         username = request.form["username"]
         password = request.form["password"]
@@ -79,13 +88,17 @@ def login():
             error = "Incorrect password."
 
         if error is None:
-            # store the user id in a new session and navigate to home
+            # store the username in a new session and navigate to home
             session.clear()
-            session["user_id"] = user["id"]
+            #session["user_id"] = user["id"]
+            session["username"] = user["username"]
+            session["password"] = user["password"]
             if user["otp_enabled"]:
                 return redirect(url_for("auth.verify_2fa"))
             else:
-                return redirect(url_for("user.home"))
+                session['loggedin'] = True
+                return gen_login_cookie("rememberme", "user/home.html")
+                #return redirect(url_for("user.home"))
 
         flash(error, 'error')
 
@@ -95,8 +108,11 @@ def login():
 @bp.route("/verify_2fa", methods=("GET", "POST"))
 @login_required
 def verify_2fa():
-    """Requests a TOTP code to confirm login"""
+    """
+    Requests a TOTP code to confirm the users login.
+    """
     if not g.user['otp_enabled']:
+        #TODO: internal error page
         return "2FA is not enabled.", 400
 
     if request.method == "POST":
@@ -111,10 +127,12 @@ def verify_2fa():
         if error is None:
             totp = pyotp.TOTP(secret)
             if totp.verify(otp):
-                # Success, go to the home.
-                return redirect(url_for("user.home"))
+                # Success, go to the users home page
+                session['loggedin'] = True
+                return gen_login_cookie("rememberme", "user/home.html")
+                #return redirect(url_for("user.home"))
             else:
-                # Invalid OTP, try again/
+                # Invalid OTP, try again
                 error = "The OTP is invalid, please try again."
 
         flash(error, 'error')
@@ -124,6 +142,8 @@ def verify_2fa():
 
 @bp.route("/logout")
 def logout():
-    """Clear the current session, including the stored user id."""
+    """
+    Clear the current session, including the stored user id.
+    """
     session.clear()
     return redirect(url_for("index"))

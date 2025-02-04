@@ -1,14 +1,9 @@
 import base64
 from io import BytesIO
 import logging
-
-from flask import Blueprint, flash, redirect, request, url_for
-from flask import g
-from flask import render_template
-from flask import session
 import pyotp
 import qrcode
-from werkzeug.security import generate_password_hash
+from flask import Blueprint, flash, request, g, render_template, session
 
 from iwa.utils.DbUtils import load_logged_in_user
 from iwa.utils.ViewUtils import login_required
@@ -23,26 +18,31 @@ bp = Blueprint("user", __name__, url_prefix="/user")
 @bp.route("/home")
 @login_required
 def home():
-    """Shown the users home page."""
+    """
+    Show the users home page.
+    """
     return render_template("user/home.html", messagesLink="")
 
 
 @bp.route("/security", methods=("GET", "POST"))
 @login_required
 def security():
-    """Display and update the users security configuration."""
+    """
+    Display and update the users security configuration.
+    """
     if g.user['otp_enabled']:
         # 2FA is already enabled
         secret = g.user['otp_secret']
     else:
         # Generate and store a secret for the user  
-        user_id: int = session["user_id"]
+        #user_id: int = session["user_id"]
+        username = session["username"]
         secret = pyotp.random_base32()
         db = get_db()
         error = None
         db.execute(
-            "UPDATE users SET otp_enabled=?, otp_secret=? WHERE id=?",
-            (1, secret, user_id),
+            "UPDATE users SET otp_enabled=?, otp_secret=? WHERE username=?",
+            (1, secret, username),
         )
         db.commit()
         load_logged_in_user()
@@ -73,9 +73,11 @@ def security():
 @bp.route("/update_security", methods=("GET", "POST"))
 @login_required
 def update_security():
-    """Edit the users security details."""
+    """
+    Edit the users security details.
+    """
     if request.method == "POST":
-        user_id = session["user_id"]
+        username = session["username"]
         # TODO: implement update security
         flash('Updating security details has not yet been implemented.', 'info')
 
