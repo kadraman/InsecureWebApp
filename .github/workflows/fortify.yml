@@ -135,47 +135,10 @@ jobs:
       #    echo "$VIRTUAL_ENV/bin" >> $GITHUB_PATH
       #    echo "VIRTUAL_ENV=$VIRTUAL_ENV" >> $GITHUB_ENV
       #- name: VENV Check
-      #  run: ls -R /home/runner/work/IWA-Python/IWA-Python/venv    
-      #- name: Fortify App and Release Name
-      #  id: fortify-app-and-rel-name
-      #  uses: fortify-presales/github-actions/fortify-app-and-release-name@main
-      #  with:
-      #    default_fortify_app_name: ${{ env.DEFAULT_APP_NAME }}
-      #    default_fortify_release_name: ${{ github.ref_name }}
-      #    app_name_postfix: ${{ vars.FORTIFY_APP_NAME_POSTFIX }}
-      # Uncomment below to debug FoD App/Release names   
-      #- name: Print App and Release Name
-      #  shell: bash
-      #  run: |
-      #    echo "FoD App Name: ${FOD_APP_NAME}"
-      #    echo "FoD Release Name: ${FOD_RELEASE_NAME}"
-      #  env:
-      #    FOD_APP_NAME: ${{ steps.fortify-app-and-rel-name.outputs.app_name }}
-      #    FOD_RELEASE_NAME: ${{ steps.fortify-app-and-rel-name.outputs.release_name }}          
+      #  run: ls -R /home/runner/work/IWA-Python/IWA-Python/venv          
       #
       # See: https://github.com/marketplace/actions/fortify-ast-scan
       #
-      #- name: Run FoD SAST Scan
-      #  uses: fortify/github-action/fod-sast-scan@v1
-      #  env:
-      #    FOD_URL: ${{ vars.FOD_URL }}
-      #    FOD_CLIENT_ID: ${{ secrets.FOD_CLIENT_ID }}
-      #    FOD_CLIENT_SECRET: ${{ secrets.FOD_CLIENT_SECRET }}
-      #    # FOD_LOGIN_EXTRA_OPTS: --socket-timeout=60s
-      #    FOD_RELEASE: ${{ format('{0}:{1}', steps.fortify-app-and-rel-name.outputs.app_name, steps.fortify-app-and-rel-name.outputs.release_name) }}
-      #    #FOD_RELEASE: ${{ steps.fortify-app-and-rel-name.outputs.release_id  }}
-      #    #PACKAGE_EXTRA_OPTS: ${{ format('-bt none -pyv {0} -oss', env.VIRTUAL_ENV) }}
-      #    PACKAGE_EXTRA_OPTS: --python-version 3 --python-requirements requirements.txt -oss
-      #    DO_SETUP: true
-      #    #SETUP_EXTRA_OPTS: ${{ format('--sdlc-status Development --copy-from {0}', vars.FOD_PARENT_RELEASE_ID) }}
-      #    SETUP_EXTRA_OPTS: ${{ format('--sdlc-status Development --app-owner {0} --assessment-type "{1}"', vars.FOD_DEFAULT_OWNER, vars.FOD_DEFAULT_ASSESSMENT_TYPE) }}
-      #    DO_WAIT: true
-      #    DO_JOB_SUMMARY: true
-      #    #DO_POLICY_CHECK: true
-      #    DO_PR_COMMENT: true
-      #    DO_EXPORT: true
-      #    # TOOL_DEFINITIONS: https://ftfy.mycompany.com/tool-definitions/v1/tool-definitions.yaml.zip
-
       - name: Run Fortify on Demand SAST & SCA Scan
         uses: fortify/github-action@v1
         with:
@@ -193,7 +156,7 @@ jobs:
           DO_SETUP: true
           # SETUP_ACTION: https://scm.my.org/shared-repos/fcli-actions/setup.yaml
           # SETUP_EXTRA_OPTS: --copy-from "${{ github.repository }}:${{ github.event.repository.default_branch }}"
-          SETUP_EXTRA_OPTS: ${{ format('--copy-from {0}{1}:{3} --sdlc-status Development --app-owner {3} --assessment-type "{4}"', env.DEFAULT_APP_NAME, vars.FORTIFY_APP_NAME_POSTFIX, vars.FORTIFY_PARENT_APPVER_NAME, vars.FOD_DEFAULT_OWNER, vars.FOD_DEFAULT_ASSESSMENT_TYPE) }}
+          SETUP_EXTRA_OPTS: ${{ format('--copy-from "{0}{1}:{2}" --sdlc-status Development --app-owner {3} --assessment-type "{4}"', env.DEFAULT_APP_NAME, vars.FORTIFY_APP_NAME_POSTFIX, vars.FORTIFY_PARENT_APPVER_NAME, vars.FOD_DEFAULT_OWNER, vars.FOD_DEFAULT_ASSESSMENT_TYPE) }}
           # SC_CLIENT_VERSION: 24.2
           # DO_PACKAGE_DEBUG: true
           PACKAGE_EXTRA_OPTS: --python-version 3 --python-requirements requirements.txt
