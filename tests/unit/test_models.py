@@ -1,3 +1,5 @@
+import pytest
+
 def test_new_user(new_user):
     """
     Test the User model of InsecureWebApp

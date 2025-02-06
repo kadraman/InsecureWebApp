@@ -153,7 +153,7 @@ jobs:
           # DO_POLICY_CHECK: true
           # POLICY_CHECK_ACTION: https://scm.my.org/shared-repos/fcli-actions/check-policy.yaml
           # POLICY_CHECK_EXTRA_OPTS: --on-unsigned=ignore
-          DO_JOB_SUMMARY: true
+          DO_JOB_SUMMARY: false
           # JOB_SUMMARY_ACTION: https://scm.my.org/shared-repos/fcli-actions/job-summary.yaml
           # JOB_SUMMARY_EXTRA_OPTS: --on-unsigned=ignore
           DO_PR_COMMENT: true
