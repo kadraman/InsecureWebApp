@@ -213,12 +213,13 @@ jobs:
           name: python-app
           path: .
       # Example deployment to azure web app
-      - name: 'Deploy to Azure Web App'
-        id: deploy-to-webapp
-        uses: azure/webapps-deploy@v3
-        with:
-          app-name: ${{ env.AZURE_WEBAPP_NAME }}
-          publish-profile: ${{ secrets.AZUREAPPSERVICE_PUBLISHPROFILE }}
+      # This is commented out as it is done in workflows/azure_webapp..yml
+      #- name: 'Deploy to Azure Web App'
+      #  id: deploy-to-webapp
+      #   uses: azure/webapps-deploy@v3
+      #  with:
+      #    app-name: ${{ env.AZURE_WEBAPP_NAME }}
+      #    publish-profile: ${{ secrets.AZUREAPPSERVICE_PUBLISHPROFILE_94429323A56E479BA44DAB94865DCF4A }}
 
   Functional-Test:
     runs-on: ubuntu-latest
