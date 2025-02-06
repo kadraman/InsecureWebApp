@@ -69,9 +69,6 @@ jobs:
     steps:
       - name: Checkout
         uses: actions/checkout@v4
-        with:
-          # Fetch at least the immediate parents so that if this is a pull request then we can checkout the head.
-          fetch-depth: 2
       - name: Set up Python
         uses: actions/setup-python@v5
         with:
@@ -82,12 +79,14 @@ jobs:
           python -m venv venv
           source venv/bin/activate          
       - name: Install dependencies
-        run: pip install -r requirements.txt
-      #- uses: pavelzw/pytest-action@v2
-      #  with:
-      #    emoji: true
-      #    verbose: true
-      #    job-summary: true        
+        run: |
+          pip install -r requirements.txt
+          pip install pytest pytest-md pytest-emoji
+      - uses: pavelzw/pytest-action@v2
+        with:
+          emoji: false
+          verbose: false
+          job-summary: true
       # Publish test results
       #- name: Publish Test Results
       #  uses: EnricoMi/publish-unit-test-result-action@v2
@@ -112,9 +111,6 @@ jobs:
     steps:
       - name: Checkout
         uses: actions/checkout@v4
-        with:
-          # Fetch at least the immediate parents so that if this is a pull request then we can checkout the head.
-          fetch-depth: 2
       # TBD
 
   FoD-SAST-Scan:
@@ -123,23 +119,11 @@ jobs:
     steps:
       - name: Checkout
         uses: actions/checkout@v4
-        with:
-          # Fetch at least the immediate parents so that if this is a pull request then we can checkout the head.
-          fetch-depth: 2
       - name: Set up Python
         uses: actions/setup-python@v5
         with:
           python-version: ${{ env.PYTHON_VERSION }}
           cache: 'pip'      
-      #- name: Install dependencies
-      #  run: |
-      #    python -m venv venv
-      #    source venv/bin/activate
-      #    python -m pip install -r requirements.txt
-      #    echo "$VIRTUAL_ENV/bin" >> $GITHUB_PATH
-      #    echo "VIRTUAL_ENV=$VIRTUAL_ENV" >> $GITHUB_ENV
-      #- name: VENV Check
-      #  run: ls -R /home/runner/work/IWA-Python/IWA-Python/venv          
       #
       # See: https://github.com/marketplace/actions/fortify-ast-scan
       #
@@ -186,9 +170,6 @@ jobs:
     steps:
       - name: Checkout
         uses: actions/checkout@v4
-        with:
-          # Fetch at least the immediate parents so that if this is a pull request then we can checkout the head.
-          fetch-depth: 2
       - name: Setup Fortify tools
         uses: fortify/github-action/setup@v1
         with:
@@ -223,7 +204,7 @@ jobs:
     needs: [ Build-And-Unit-Test, FoD-SAST-Scan, FoD-OSS-Scan ]
     environment:
       name: 'Development'
-      #url: ${{ steps.deploy-to-webapp.outputs.webapp-url }}
+      url: ${{ steps.deploy-to-webapp.outputs.webapp-url }}
     if: ${{ success() && github.ref_name == github.event.repository.default_branch }}
     steps:
       - name: Download artifact from build job
@@ -232,12 +213,12 @@ jobs:
           name: python-app
           path: .
       # Example deployment to azure web app
-      #- name: 'Deploy to Azure Web App'
-      #  id: deploy-to-webapp
-      #  uses: azure/webapps-deploy@v2
-      #  with:
-      #    app-name: ${{ env.AZURE_WEBAPP_NAME }}
-      #    publish-profile: ${{ secrets.AZURE_WEBAPP_PUBLISH_PROFILE }}     
+      - name: 'Deploy to Azure Web App'
+        id: deploy-to-webapp
+        uses: azure/webapps-deploy@v3
+        with:
+          app-name: ${{ env.AZURE_WEBAPP_NAME }}
+          publish-profile: ${{ secrets.AZUREAPPSERVICE_PUBLISHPROFILE }}
 
   Functional-Test:
     runs-on: ubuntu-latest
@@ -246,9 +227,6 @@ jobs:
     steps:
       - name: Checkout
         uses: actions/checkout@v4
-        with:
-          # Fetch at least the immediate parents so that if this is a pull request then we can checkout the head.
-          fetch-depth: 2
       # TBD
 
   FoD-DAST-Scan:
@@ -259,16 +237,6 @@ jobs:
     steps:
       - name: Checkout
         uses: actions/checkout@v4
-        with:
-          # Fetch at least the immediate parents so that if this is a pull request then we can checkout the head.
-          fetch-depth: 2
-      #- name: Fortify App and Release Name
-      #  id: fortify-app-and-rel-name
-      #  uses: fortify-presales/github-actions/fortify-app-and-release-name@main
-      #  with:
-      #    default_fortify_app_name: ${{ env.DEFAULT_APP_NAME }}
-      #    default_fortify_release_name: ${{ github.ref_name }}
-      #    app_name_postfix: ${{ vars.FORTIFY_APP_NAME_POSTFIX }}
       - name: FoD DAST scan
         id: fod-dast-scan
         uses: fortify-presales/github-actions/fod-dast-scan@main
@@ -290,9 +258,6 @@ jobs:
     steps:
       - name: Checkout
         uses: actions/checkout@v4
-        with:
-          # Fetch at least the immediate parents so that if this is a pull request then we can checkout the head.
-          fetch-depth: 2
       - name: Verify FoD Security Policy
         uses: fortify-presales/github-actions/verify-fod-security-policy@main
         with:
@@ -308,7 +273,4 @@ jobs:
     steps:
       - name: Checkout
         uses: actions/checkout@v4
-        with:
-          # Fetch at least the immediate parents so that if this is a pull request then we can checkout the head.
-          fetch-depth: 2
       # TBD
