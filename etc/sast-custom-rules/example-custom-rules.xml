@@ -1,0 +1,21 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<RulePack xmlns="xmlns://www.fortifysoftware.com/schema/rules"
+          xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:type="RulePack">
+    <RulePackID>C913491A-A936-4B1A-9B4E-9BFDAEB58F1D</RulePackID>
+    <SKU>some SKU</SKU>
+    <Name><![CDATA[]]></Name>
+    <Version>1.0</Version>
+    <Description><![CDATA[]]></Description>
+    <Rules version="3.2">
+        <RuleDefinitions>
+
+        </RuleDefinitions>
+        <ScriptDefinitions>
+            <ScriptDefinition formatVersion="21.2" type="lib" name="extra_logging"><![CDATA[
+                function dbg(msg){
+                    alert(msg)
+                }
+                ]]></ScriptDefinition>
+        </ScriptDefinitions>
+    </Rules>
+</RulePack>

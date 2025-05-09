@@ -59,6 +59,8 @@ dist/
 build/
 *.egg-info/
 
+flask_session/
+
 # Fortify
 .fortify
 vulnerabilities.txt
