@@ -10,6 +10,7 @@ Pre-requisities
 
  - Windows or Linux machine with Python 3.12 or later
  - [Pip package manager](https://pypi.org/project/pip/)
+ - [GNU Make}(https://www.gnu.org/software/make/)
  - Local Docker installation (optional)
 
 Run Application (locally)
@@ -20,19 +21,8 @@ You can the run the application locally using the following:
 Windows:
 
 ```
-python -m venv .venv
-.venv\Scripts\Activate.ps1
-pip install -r requirements.txt
-.\run.bat
-```
-
-Linux/UNIX:
-
-```
-python3 -m venv .venv           
-. .venv/bin/activate
-pip install -r requirements.txt
-./run.sh
+make build
+make run
 ```
 
 The application should then be available at the URL `http://localhost:5000`. If it fails to start,
@@ -80,9 +70,7 @@ Scan Application (with OpenText Application Security)
 To carry out a Fortify Static Code Analyzer local scan, run the following:
 
 ```
-sourceanalyzer -b iwapy -clean
-sourceanalyzer -b iwapy -python-path ".venv/Lib/site-packages/" -exclude ".venv" "app"
-sourceanalyzer -b iwapy -scan
+make sast-scan
 ```
 
 To carry out a Fortify ScanCentral SAST scan, run the following:

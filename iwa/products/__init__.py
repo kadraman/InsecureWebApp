@@ -1,6 +1,6 @@
 import logging
 import os
-from flask import Blueprint, send_file
+from flask import Blueprint, abort, send_file
 from flask import flash
 from flask import g
 from flask import redirect
@@ -8,7 +8,7 @@ from flask import render_template
 from flask import request
 from flask import url_for
 
-from iwa.products.repository import get_product, get_products, get_reviews
+from iwa.products.repository import get_product, get_product_by_code, get_products, get_product_reviews
 from iwa.utils.ViewUtils import login_required
 from ..repository.db import get_db
 
@@ -32,19 +32,20 @@ def index():
 
 @products_bp.route('/download/<path:filename>', methods=['GET', 'POST'])
 def download(filename):  
-    filename2 = request.args.get('filename')
+    logger.info(f"Downloading file: {filename}")
     """Download an artifact related to the product"""
     if not filename:
-        return 404
-    site_root = os.path.realpath(os.path.dirname(__file__))    
-    return send_file(os.path.join(site_root, "static", "data", filename2))
+        abort(404, "File not specified")
+    site_root = os.path.realpath(os.path.dirname(__file__))
+    logger.info("Download path:" + os.path.join(site_root, "data", filename))
+    return send_file(os.path.join(site_root, "data", filename), as_attachment=True)
 
 
-@products_bp.route("/<int:id>/view")
-def view(id):
+@products_bp.route("/<string:code>/view")
+def view(code):
     """View an individual product and its reviews"""
-    product = get_product(id)
-    reviews = get_reviews(id)
+    product = get_product_by_code(code)
+    reviews = get_product_reviews(product.id)
     return render_template("products/view.html", product=product, reviews=reviews)
 
 

@@ -5,7 +5,7 @@ from flask_session import Session
 from flask_cors import CORS
 
 from iwa import products
-from iwa.openai import OpenAI
+#from iwa.openai import OpenAI
 from iwa.repository.db import get_db
 
 

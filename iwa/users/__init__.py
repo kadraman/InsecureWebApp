@@ -21,7 +21,43 @@ def home():
     """
     Show the users home page.
     """
-    return render_template("user/home.html", messagesLink="")
+    return render_template("user/home.html")
+
+
+@users_bp.route("/profile")
+@login_required
+def profile():
+    """
+    Show the users profile page.
+    """
+    return render_template("user/profile.html")
+
+
+@users_bp.route("/messages")
+@login_required
+def messages():
+    """
+    Show the users message page.
+    """
+    return render_template("user/messages.html")
+
+
+@users_bp.route("/reviews")
+@login_required
+def reviews():
+    """
+    Show the users orders page.
+    """
+    return render_template("user/reviews.html")
+
+
+@users_bp.route("/orders")
+@login_required
+def orders():
+    """
+    Show the users orders page.
+    """
+    return render_template("user/orders.html")
 
 
 @users_bp.route("/security", methods=("GET", "POST"))

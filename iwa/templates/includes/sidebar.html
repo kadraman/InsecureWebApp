@@ -1,10 +1,10 @@
 {% set navigation_bar = [
     (url_for('user.home'),      'home',     'fa-home',              'Home'),
     (url_for('user.security'),  'security', 'fa-lock',              'Login & Security'),
-    ('',                        'profile',  'fa-user',              'Profile'),
-    ('',                        'orders',   'fa-shopping-cart',     'Orders'),
-    ('',                        'reviews',  'fa-comment-alt',       'Reviews'),
-    ('',                        'messages', 'fa-envelope',          'Messages')
+    (url_for('user.profile'),   'profile',  'fa-user',              'Profile'),
+    (url_for('user.orders'),    'orders',   'fa-shopping-cart',     'Orders'),
+    (url_for('user.reviews'),   'reviews',  'fa-comment-alt',       'Reviews'),
+    (url_for('user.messages'),  'messages', 'fa-envelope',          'Messages')
 ] -%}
 
 <div class="side-menu">

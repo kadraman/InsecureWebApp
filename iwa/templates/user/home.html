@@ -27,13 +27,13 @@
 
               <div class="col-md-12">
                   <div class="alert alert-light" role="alert">
-                      You have no new <a href="{{ messagesLink }}">messages</a>.
+                      You have no new <a href="{{ url_for('user.messages') }}">messages</a>.
                   </div>
               </div>
 
               <div class="col-md-12">
                   <div class="alert alert-info" role="alert">
-                      You have no unshipped <a href="#">orders</a>.
+                      You have no unshipped <a href="{{ url_for('user.orders') }}">orders</a>.
                   </div>
                   
               </div>

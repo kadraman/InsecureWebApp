@@ -83,7 +83,7 @@
                 <span class="tag">Sale</span>
                 {% endif %}
 
-                <a href="{{ url_for('products.view', id=p['id']) }}">
+                <a href="{{ url_for('products.view', code=p['code']) }}">
                     {% if p.image %}
                     <img src="{{ url_for('static', filename='img/products/' + p['image']) }}" alt="Image"
                         class="img-thumbnail">

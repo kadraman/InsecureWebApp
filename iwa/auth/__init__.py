@@ -3,7 +3,7 @@ import logging
 import pickle
 import pyotp
 
-from flask import Blueprint, flash, g, make_response, redirect, render_template, request, session, url_for
+from flask import Blueprint, abort, flash, g, make_response, redirect, render_template, request, session, url_for
 from werkzeug.security import check_password_hash, generate_password_hash
 
 from iwa.utils.DbUtils import load_logged_in_user
@@ -115,8 +115,7 @@ def verify_2fa():
     Requests a TOTP code to confirm the users login.
     """
     if not session['otp_enabled']:
-        #TODO: internal error page
-        return "2FA is not enabled.", 400
+        abort(500, "2FA is not enabled.")
 
     load_logged_in_user()
     logger.debug(f"verify_2fa:: OTP secret for {g.user['username']} is {g.user['otp_secret']}")
