@@ -1,5 +1,6 @@
 Flask==2.3.3
 Flask-Cors==4.0.0
+Flask-Session==0.7.0
 Werkzeug==2.3.8
 python-docx==1.0.1
 python-dotenv==1.0.0
@@ -12,3 +13,6 @@ pyotp==2.9.0
 qrcode==8.0
 pytest==8.1.1
 coverage==7.5.1
+openai==1.76.2
+tiktoken==0.7.0
+cachelib==0.9.0

@@ -1,6 +1,6 @@
 
 from venv import logger
-from flask import session
+from flask import g, session
 
 from iwa.repository.db import get_db
 

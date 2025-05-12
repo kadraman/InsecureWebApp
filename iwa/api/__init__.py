@@ -8,10 +8,10 @@ from ..repository.db import get_db
 
 logger = logging.getLogger(__name__)
 
-bp = Blueprint("api", __name__, url_prefix="/api")
+api_bp = Blueprint("api", __name__, url_prefix="/api")
 
 
-@bp.route("/subscribe-user", methods=['POST'])
+@api_bp.route("/subscribe-user", methods=['POST'])
 @cross_origin()
 def subscribe_user():
     """Subscribe a user to the newsletter by writing to the JSON file"""    
@@ -33,7 +33,7 @@ def subscribe_user():
         r.status_code = 200
     return r
 
-@bp.route("/new-products", methods=['GET'])
+@api_bp.route("/new-products", methods=['GET'])
 @cross_origin()
 def new_products():  
     limit = request.args.get('limit', 3)  

@@ -2,7 +2,7 @@ import logging
 
 from werkzeug.exceptions import abort
 
-from .db import get_db
+from ..repository.db import get_db
 from ..models.Product import Product
 from ..models.Review import Review
 

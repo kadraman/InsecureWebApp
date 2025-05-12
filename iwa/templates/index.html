@@ -12,13 +12,13 @@
           <h1 class="main-title">Welcome To IWA Pharmacy Direct</h1>
         </div>
         <div class="jumbotron text-center" style="opacity: 0.9">
-          {% if g.user %}
-          <h4>Welcome back <span>{{ g.user['first_name'] }}&nbsp;{{ g.user['last_name'] }}</span></h4>
+          {% if session.loggedin %}
+          <h4>Welcome back</h4>
           {% else %}
-          <h4>Welcome Guest</h4>
+          <h4>Welcome guest</h4>
           {% endif %}
           <p class="pt-4">
-            {% if not g.user %}
+            {% if not session.loggedin %}
             <a href="{{ url_for('auth.register') }}" class="btn p-2 btn-outline-info"> Register </a>
             {% endif %}
             <a href="{{ url_for('products.index') }}" class="btn p-2 btn-outline-success">Shop Now</a>

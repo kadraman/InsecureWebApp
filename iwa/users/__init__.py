@@ -12,10 +12,10 @@ from ..repository.db import get_db
 
 logger = logging.getLogger(__name__)
 
-bp = Blueprint("user", __name__, url_prefix="/user")
+users_bp = Blueprint("user", __name__, url_prefix="/user")
 
 
-@bp.route("/home")
+@users_bp.route("/home")
 @login_required
 def home():
     """
@@ -24,7 +24,7 @@ def home():
     return render_template("user/home.html", messagesLink="")
 
 
-@bp.route("/security", methods=("GET", "POST"))
+@users_bp.route("/security", methods=("GET", "POST"))
 @login_required
 def security():
     """
@@ -70,7 +70,7 @@ def security():
     return render_template("user/security.html", user=g.user, qr_b64=qr_b64, secret=secret)
 
 
-@bp.route("/update_security", methods=("GET", "POST"))
+@users_bp.route("/update_security", methods=("GET", "POST"))
 @login_required
 def update_security():
     """
@@ -82,3 +82,17 @@ def update_security():
         flash('Updating security details has not yet been implemented.', 'info')
 
     return render_template("user/update_security.html", user=g.user)
+
+
+@users_bp.before_request
+def load_logged_in_user():
+    """If a username is stored in the session, load the user object from
+    the database into ``g.user``."""
+    username = session.get("username")
+    if username is None:
+        g.user = None
+    else:
+        g.user = (
+            get_db().execute("SELECT * FROM users WHERE username = ?", (username,)).fetchone()
+       )
+    logger.debug(f"Loading logged in user {g.user['username']}")

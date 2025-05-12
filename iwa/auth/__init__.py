@@ -3,19 +3,20 @@ import logging
 import pickle
 import pyotp
 
-from flask import Blueprint, flash, g, redirect, render_template, request, session, url_for
+from flask import Blueprint, flash, g, make_response, redirect, render_template, request, session, url_for
 from werkzeug.security import check_password_hash, generate_password_hash
 
+from iwa.utils.DbUtils import load_logged_in_user
 from iwa.utils.ViewUtils import gen_login_cookie, login_required
 
 from ..repository.db import get_db
 
 logger = logging.getLogger(__name__)
 
-bp = Blueprint("auth", __name__, url_prefix="/auth")
+auth_bp = Blueprint("auth", __name__, url_prefix="/auth")
 
 
-@bp.route("/register", methods=("GET", "POST"))
+@auth_bp.route("/register", methods=("GET", "POST"))
 def register():
     """
     Register a new user. Validates that the username is not
@@ -53,7 +54,7 @@ def register():
     return render_template("auth/register.html")
 
 
-@bp.route("/login", methods=("GET", "POST"))
+@auth_bp.route("/login", methods=("GET", "POST"))
 def login():
     """
     Log in a registered user. If "rememberme" session cookie
@@ -69,13 +70,12 @@ def login():
         session.clear()
         session["username"] = a.username
         session['loggedin'] = True
-        logger.info(f"Logging in user {username} from 'rememberme' cookie")
         return redirect(url_for("user.home"))
     
     if request.method == "POST":
         username = request.form["username"]
         password = request.form["password"]
-        logger.info(f"Logging in user {username}:{password}")
+        logger.debug(f"Logging in user {username}:{password}")
         db = get_db()
         error = None
         user = db.execute(
@@ -93,7 +93,10 @@ def login():
             #session["user_id"] = user["id"]
             session["username"] = user["username"]
             session["password"] = user["password"]
+            session["otp_enabled"] = 0
             if user["otp_enabled"]:
+                load_logged_in_user()
+                session["otp_enabled"] = 1
                 return redirect(url_for("auth.verify_2fa"))
             else:
                 session['loggedin'] = True
@@ -105,15 +108,18 @@ def login():
     return render_template("auth/login.html")
 
 
-@bp.route("/verify_2fa", methods=("GET", "POST"))
+@auth_bp.route("/verify_2fa", methods=("GET", "POST"))
 @login_required
 def verify_2fa():
     """
     Requests a TOTP code to confirm the users login.
     """
-    if not g.user['otp_enabled']:
+    if not session['otp_enabled']:
         #TODO: internal error page
         return "2FA is not enabled.", 400
+
+    load_logged_in_user()
+    logger.debug(f"verify_2fa:: OTP secret for {g.user['username']} is {g.user['otp_secret']}")
 
     if request.method == "POST":
         # retrieve secret for the user  
@@ -140,10 +146,12 @@ def verify_2fa():
     return render_template("auth/verify_2fa.html", otp_secret=g.user['otp_secret'])
 
 
-@bp.route("/logout")
+@auth_bp.route("/logout")
 def logout():
     """
     Clear the current session, including the stored user id.
     """
     session.clear()
-    return redirect(url_for("index"))
+    resp = make_response(redirect(url_for("index")))
+    resp.set_cookie("rememberme", "", expires=0)
+    return resp

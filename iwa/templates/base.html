@@ -98,10 +98,10 @@
                         <ul>
                             <li>
                                 <div class="has-children">
-                                    {% if g.user %}
+                                    {% if session.loggedin %}
                                     <a href="{{ url_for('user.home') }}" class="icons-menu d-inline-block">
                                         <span class="icon-account_circle"></span>
-                                        <span class="my-account-text">{{ g.user['first_name'] }}&nbsp;{{ g.user['last_name'] }}</span>
+                                        <span class="my-account-text">{{ session.username }}</span>
                                     </a>
                                     <ul class="dropdown">
                                         <li>

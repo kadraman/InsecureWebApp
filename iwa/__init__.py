@@ -1,12 +1,16 @@
 import logging
 import os
 from flask import Flask, g, redirect, render_template, url_for, session
+from flask_session import Session
 from flask_cors import CORS
 
+from iwa import products
+from iwa.openai import OpenAI
 from iwa.repository.db import get_db
 
 
 logger = logging.getLogger(__name__)
+#openai_extension = OpenAI()
 
 def create_app(test_config=None):
     """Create and configure an instance of the Flask application."""
@@ -16,6 +20,8 @@ def create_app(test_config=None):
         SECRET_KEY="dev",
         # store the database in the instance folder
         DATABASE=os.path.join(app.instance_path, "insecurewebapp.sqlite"),
+        # session type
+        SESSION_TYPE="filesystem",
     )
 
     if test_config is None:
@@ -38,19 +44,35 @@ def create_app(test_config=None):
     # enabled CORS on api routes
     cors = CORS(app, resources={r"/api/*": {"origins": "*"}})
 
+    # OpenAI configuration for Agent
+    #app.config['OPENAI_API_KEY'] = os.getenv('OPENAI_API_KEY')
+    #openai_extension.init_app(app)
+
+    Session(app)
+
     # initial route
     @app.route('/')
     def index():
-        logger.info("[index] Rendering home page.")
+        logger.debug("[index] Rendering home page.")
         return render_template('index.html')
+   
+    # 404 error handler
+    @app.errorhandler(404)
+    def not_found_error(error):
+        return render_template('errors/404.html'), 404
 
+    # 500 error handler
+    @app.errorhandler(500)
+    def internal_error(error):
+        return render_template('errors/500.html'), 500
+    
     # route to reset the database
     @app.route("/reset-db")
     def reset_db():
-        logger.info("[reset_db] Re-initializing database.")
+        logger.debug("[reset_db] Re-initializing database.")
         db.init_db()
         return redirect(url_for("products.index"))
-    
+
     # register the database commands
     from .repository import db
     db.init_app(app)
@@ -63,30 +85,18 @@ def create_app(test_config=None):
     app.config['SUBSCRIBERS_FILENAME'] = os.path.join(site_root, "static", "data", "email-db.json")
 
     # apply the blueprints to the app
-    from .routes import AuthRoutes
-    from .routes import ApiRoutes
-    from .routes import UserRoutes
-    from .routes import ProductRoutes
-    from .routes import InsecureRoutes
+    from iwa.auth import auth_bp
+    from iwa.api import api_bp
+    from iwa.users import users_bp
+    from iwa.products import products_bp
+    #from iwa.agent import agent_bp
+    from iwa.insecure import insecure_bp
 
-    app.register_blueprint(AuthRoutes.bp)
-    app.register_blueprint(ApiRoutes.bp)
-    app.register_blueprint(UserRoutes.bp)
-    app.register_blueprint(ProductRoutes.bp)
-    app.register_blueprint(InsecureRoutes.bp)
-
-    @app.before_request
-    def load_logged_in_user():
-        """If a user id is stored in the session, load the user object from
-        the database into ``g.user``."""
-        user_id = session.get("user_id")
-
-        if user_id is None:
-            g.user = None
-        else:
-            g.user = (
-                get_db().execute("SELECT * FROM users WHERE id = ?", (user_id,)).fetchone()
-            )
-            logger.debug(f"Logged in user {g.user['email']}")
+    app.register_blueprint(auth_bp)
+    app.register_blueprint(api_bp)
+    app.register_blueprint(users_bp)
+    app.register_blueprint(products_bp)
+    #app.register_blueprint(agent_bp)
+    app.register_blueprint(insecure_bp)
 
     return app

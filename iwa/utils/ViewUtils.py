@@ -18,7 +18,7 @@ def login_required(view):
     """View decorator that redirects anonymous users to the login page."""
     @functools.wraps(view)
     def wrapped_view(**kwargs):
-        if g.user is None:
+        if session['username'] is None:
             return redirect(url_for("auth.login"))
 
         return view(**kwargs)
@@ -29,7 +29,7 @@ def login_required(view):
 def gen_login_cookie(cookie_name, template):
     username = session["username"]
     password = session["password"]
-    logger.info(f"Creating {cookie_name} cookie for {username}:{password}")
+    logger.debug(f"Creating {cookie_name} cookie for {username}:{password}")
     u1 = usr(username, password)
     ser = pickle.dumps(u1)
     b64 = base64.b64encode(ser)

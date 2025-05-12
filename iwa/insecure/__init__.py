@@ -9,7 +9,7 @@ from jinja2 import Template as Jinja2_Template
 
 logger = logging.getLogger(__name__)
 
-bp = Blueprint("insecure", __name__, url_prefix="/insecure")
+insecure_bp = Blueprint("insecure", __name__, url_prefix="/insecure")
 
 INITCMD = "setup.bat"
 
@@ -18,17 +18,17 @@ INITCMD = "setup.bat"
 Some additional insecure examples not related to the functionality of the application.
 """
 
-@bp.route("/xss1", methods = ["GET"])
+@insecure_bp.route("/xss1", methods = ["GET"])
 def xss1():   
     user_input = request.args.get('input') 
     return render_template("insecure/xss.jinja", input=user_input)
 
-@bp.route("/xss2", methods = ["GET"])
+@insecure_bp.route("/xss2", methods = ["GET"])
 def xss2():   
     user_input = request.args.get('input') 
     return render_template_string("<div><h1>XSS Example</h1><p>User Input: %s</p></div>" % user_input)
 
-@bp.route("/load_file", methods = ["GET"])
+@insecure_bp.route("/load_file", methods = ["GET"])
 def load_file(): 
     filename = request.args.get('filename') 
     contents = source(filename)
@@ -36,7 +36,7 @@ def load_file():
     response.mimetype = "text/plain"
     return response
 
-@bp.route("/command_injection", methods = ["GET"])
+@insecure_bp.route("/command_injection", methods = ["GET"])
 def command_injection():   
     arguments = request.args.get('arguments') 
     home = os.getenv('APPHOME')
@@ -44,7 +44,7 @@ def command_injection():
     cmd = home.join(INITCMD).join(arguments)
     os.system(cmd);
     
-@bp.route("/template_injection", methods=['POST'])
+@insecure_bp.route("/template_injection", methods=['POST'])
 def template_injection():
     template = request.form.get('template') 
     filename = request.form.get('filename') 
@@ -53,13 +53,13 @@ def template_injection():
     html = t.render(name=name)
     return html
 
-@bp.route("/insecure_headers", methods=['POST'])
+@insecure_bp.route("/insecure_headers", methods=['POST'])
 def insecure_headers():
     response = make_response('')
     response.headers.add("Access-Control-Allow-Origin", "*")
     return response
 
-@bp.route("/insecure_cookies", methods=['POST'])
+@insecure_bp.route("/insecure_cookies", methods=['POST'])
 def insecure_cookies():
     email = request.form.get('email') 
     response = make_response('')

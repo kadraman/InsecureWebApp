@@ -7,6 +7,9 @@ PROJECTS := $(shell ls . | grep project)
 VERSION ?= $(shell git describe --tags --always --dirty --match=v* 2> /dev/null || echo "1.0.0")
 COMMIT := $(shell git log -1 --pretty=format:"%H")
 
+FLASK_APP := iwa
+FLASK := FLASK_APP=$(FLASK_APP) .venv/bin/flask
+
 SAST_DEFAULT_OPTS := -Dcom.fortify.sca.ProjectRoot=.fortify -b "$(PROJECT)"
 SAST_TRANSLATE_OPTS := $(SAST_DEFAULT_OPTS) -python-path ".venv/lib/python3.12/site-packages" iwa
 SAST_SCAN_OPTS := $(SAST_DEFAULT_OPTS)
@@ -37,15 +40,17 @@ build-docker: ## build the project as a docker image
 .PHONY: run
 run: ## run the project
 	@echo "Running $(PROJECT)..."
-	export FLASK_APP=iwa
-	export FLASK_ENV=development
-	export FLASK_DEBUG=1
-	.venv/bin/flask --app iwa run --host 0.0.0.0
+	FLASK_ENV=development FLASK_DEBUG=1 FLASK_APP=$(FLASK_APP) .venv/bin/flask run --host 0.0.0.0
+
+.PHONY: run-production
+run-production: ## run the project in production mode
+	@echo "Running $(PROJECT) in production mode..."
+	FLASK_ENV=production FLASK_APP=$(FLASK_APP) .venv/bin/flask run --host 0.0.0.0
 
 .PHONY: test
 test: ## run unit tests for the project
 	@echo "Testing $(PROJECT)..."
-	.venv/bin/pytest
+	FLASK_ENV=development FLASK_DEBUG=1 FLASK_APP=$(FLASK_APP) .venv/bin/pytest
 
 .PHONY: clean
 clean: ## remove temporary files

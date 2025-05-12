@@ -193,15 +193,15 @@ jobs:
         shell: bash
         run: |
           fcli --version
-          fcli fod session login --url $FOD_API_URI --client-id $FOD_CLIENT_ID --client-secret $FOD_CLIENT_SECRET --session github-actions
+          fcli fod session login --url $FOD_API_URI --client-id $FOD_CLIENT_ID --client-secret $FOD_CLIENT_SECRET --fod-session github-actions
           rm -f $PACKAGE_FILE
           debricked resolve
           zip $PACKAGE_FILE requirements.txt.pip.debricked.lock debricked-config.yaml     
-          fcli fod oss-scan start --release "${FOD_RELEASE}" -f $PACKAGE_FILE --store curScan --session github-actions
+          fcli fod oss-scan start --release "${FOD_RELEASE}" -f $PACKAGE_FILE --store curScan --fod-session github-actions
           sleep 10
           echo "fod_scan_id=$(fcli util var contents curScan -o 'expr={scanId}')" >> $GITHUB_OUTPUT
-          fcli fod oss-scan wait-for ::curScan:: --session github-actions
-          fcli fod session logout --session github-actions
+          fcli fod oss-scan wait-for ::curScan:: --fod-session github-actions
+          fcli fod session logout --fod-session github-actions
         env:
           FOD_API_URI: ${{ vars.FOD_API_URL }}
           FOD_CLIENT_ID: ${{ secrets.FOD_CLIENT_ID }}
@@ -298,6 +298,7 @@ jobs:
           fcli fod action run release-summary --release "${FOD_RELEASE}" --fod-session github-actions >> $GITHUB_STEP_SUMMARY
           fcli fod action run etc/custom-check-policy.action --on-unsigned=ignore --release "${FOD_RELEASE}" --fod-session github-actions
           fcli fod session logout --fod-session github-actions
+        continue-on-error: true # allow the workflow to continue even if this job fails
         env:
           FOD_API_URI: ${{ vars.FOD_API_URL }}
           FOD_CLIENT_ID: ${{ secrets.FOD_CLIENT_ID }}

@@ -8,15 +8,15 @@ from flask import render_template
 from flask import request
 from flask import url_for
 
-from iwa.repository.ProductRepository import get_product, get_products, get_reviews
-from .AuthRoutes import login_required
+from iwa.products.repository import get_product, get_products, get_reviews
+from iwa.utils.ViewUtils import login_required
 from ..repository.db import get_db
 
 logger = logging.getLogger(__name__)
 
-bp = Blueprint("products", __name__, url_prefix="/products")
+products_bp = Blueprint("products", __name__, url_prefix="/products")
 
-@bp.route("/")
+@products_bp.route("/")
 def index():  
     keywords = request.args.get('keywords')
     if (keywords):
@@ -30,7 +30,7 @@ def index():
     return render_template("products/index.html", products=products)
 
 
-@bp.route('/download/<path:filename>', methods=['GET', 'POST'])
+@products_bp.route('/download/<path:filename>', methods=['GET', 'POST'])
 def download(filename):  
     filename2 = request.args.get('filename')
     """Download an artifact related to the product"""
@@ -40,7 +40,7 @@ def download(filename):
     return send_file(os.path.join(site_root, "static", "data", filename2))
 
 
-@bp.route("/<int:id>/view")
+@products_bp.route("/<int:id>/view")
 def view(id):
     """View an individual product and its reviews"""
     product = get_product(id)
@@ -51,7 +51,7 @@ def view(id):
 """The below are not yet used"""
 
 
-@bp.route("/create", methods=("GET", "POST"))
+@products_bp.route("/create", methods=("GET", "POST"))
 @login_required
 def create():
     """Create a new product for the current user."""
@@ -77,7 +77,7 @@ def create():
     return render_template("products/create.html")
 
 
-@bp.route("/<int:id>/update", methods=("GET", "POST"))
+@products_bp.route("/<int:id>/update", methods=("GET", "POST"))
 @login_required
 def update(id):
     """Update a product if the current user is the author."""
@@ -104,7 +104,7 @@ def update(id):
     return render_template("products/update.html", product=product)
 
 
-@bp.route("/<int:id>/delete", methods=("POST",))
+@products_bp.route("/<int:id>/delete", methods=("POST",))
 @login_required
 def delete(id):
     """Delete a product.
