@@ -99,7 +99,7 @@ def login():
                 return redirect(url_for("auth.verify_2fa"))
             else:
                 session['loggedin'] = True
-                return gen_login_cookie("rememberme", "user/home.html")
+                return gen_login_cookie("rememberme", "users/home.html")
                 #return redirect(url_for("users.home"))
 
         flash(error, 'error')
@@ -133,7 +133,7 @@ def verify_2fa():
             if totp.verify(otp):
                 # Success, go to the users home page
                 session['loggedin'] = True
-                return gen_login_cookie("rememberme", "user/home.html")
+                return gen_login_cookie("rememberme", "users/home.html")
                 #return redirect(url_for("users.home"))
             else:
                 # Invalid OTP, try again

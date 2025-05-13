@@ -20,7 +20,7 @@ def home():
     """
     Show the users home page.
     """
-    return render_template("user/home.html")
+    return render_template("users/home.html")
 
 
 @users_bp.route("/profile")
@@ -29,7 +29,7 @@ def profile():
     """
     Show the users profile page.
     """
-    return render_template("user/profile.html")
+    return render_template("users/profile.html")
 
 
 @users_bp.route("/messages")
@@ -38,7 +38,7 @@ def messages():
     """
     Show the users message page.
     """
-    return render_template("user/messages.html")
+    return render_template("users/messages.html")
 
 
 @users_bp.route("/reviews")
@@ -47,7 +47,7 @@ def reviews():
     """
     Show the users orders page.
     """
-    return render_template("user/reviews.html")
+    return render_template("users/reviews.html")
 
 
 @users_bp.route("/orders")
@@ -56,7 +56,7 @@ def orders():
     """
     Show the users orders page.
     """
-    return render_template("user/orders.html")
+    return render_template("users/orders.html")
 
 
 @users_bp.route("/security", methods=("GET", "POST"))
@@ -102,7 +102,7 @@ def security():
     qr_img.save(buffered, format="PNG")
     qr_b64 = base64.b64encode(buffered.getvalue()).decode()
 
-    return render_template("user/security.html", user=g.user, qr_b64=qr_b64, secret=secret)
+    return render_template("users/security.html", user=g.user, qr_b64=qr_b64, secret=secret)
 
 
 @users_bp.route("/update_security", methods=("GET", "POST"))
@@ -116,7 +116,7 @@ def update_security():
         # TODO: implement update security
         flash('Updating security details has not yet been implemented.', 'info')
 
-    return render_template("user/update_security.html", user=g.user)
+    return render_template("users/update_security.html", user=g.user)
 
 
 @users_bp.before_request
