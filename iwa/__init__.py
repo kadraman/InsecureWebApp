@@ -4,7 +4,6 @@ from flask import Flask, g, redirect, render_template, url_for, session
 from flask_session import Session
 from flask_cors import CORS
 
-from iwa.products import routes
 #from iwa.openai import OpenAI
 from iwa.repository.db import get_db
 
@@ -49,13 +48,7 @@ def create_app(test_config=None):
     #openai_extension.init_app(app)
 
     Session(app)
-
-    # initial route
-    @app.route('/')
-    def index():
-        logger.debug("[index] Rendering home page.")
-        return render_template('index.html')
-   
+  
     # 404 error handler
     @app.errorhandler(404)
     def not_found_error(error):
@@ -66,13 +59,6 @@ def create_app(test_config=None):
     def internal_error(error):
         return render_template('errors/500.html'), 500
     
-    # route to reset the database
-    @app.route("/reset-db")
-    def reset_db():
-        logger.debug("[reset_db] Re-initializing database.")
-        db.init_db()
-        return redirect(url_for("products.index"))
-
     # register the database commands
     from .repository import db
     db.init_app(app)
@@ -85,6 +71,9 @@ def create_app(test_config=None):
     app.config['SUBSCRIBERS_FILENAME'] = os.path.join(site_root, "static", "data", "email-db.json")
 
     # register blueprints
+
+    from iwa.main.routes import main_bp
+    app.register_blueprint(main_bp, url_prefix='/')
 
     from iwa.auth.routes import auth_bp
     app.register_blueprint(auth_bp, url_prefix='/auth')

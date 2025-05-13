@@ -32,6 +32,7 @@ def subscribe_user():
         r.status_code = 200
     return r
 
+
 @api_bp.route("/new-products", methods=['GET'])
 @cross_origin()
 def new_products():  

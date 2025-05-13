@@ -10,7 +10,8 @@ from flask import url_for
 
 from iwa.products import products_bp
 from iwa.products.repository import get_product, get_product_by_code, get_products, get_product_reviews
-from iwa.utils.ViewUtils import login_required
+from iwa.utils.file_utils import get_file_path
+from iwa.utils.view_utils import login_required
 from ..repository.db import get_db
 
 logger = logging.getLogger(__name__)
@@ -32,13 +33,11 @@ def index():
 
 @products_bp.route('/download/<path:filename>', methods=['GET', 'POST'])
 def download(filename):  
-    logger.info(f"Downloading file: {filename}")
     """Download an artifact related to the product"""
+    logger.info(f"Downloading file: {filename}")
     if not filename:
         abort(404, "File not specified")
-    site_root = os.path.realpath(os.path.dirname(__file__))
-    logger.info("Download path:" + os.path.join(site_root, "data", filename))
-    return send_file(os.path.join(site_root, "data", filename), as_attachment=True)
+    return send_file(get_file_path(__file__, filename), as_attachment=True)
 
 
 @products_bp.route("/<string:code>/view")

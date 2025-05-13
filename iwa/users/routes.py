@@ -6,8 +6,8 @@ import qrcode
 from flask import Blueprint, flash, request, g, render_template, session
 
 from iwa.users import users_bp
-from iwa.utils.DbUtils import load_logged_in_user
-from iwa.utils.ViewUtils import login_required
+from iwa.utils.db_utils import load_logged_in_user
+from iwa.utils.view_utils import login_required
 
 from ..repository.db import get_db
 

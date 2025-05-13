@@ -6,8 +6,8 @@ import pyotp
 from flask import Blueprint, abort, flash, g, make_response, redirect, render_template, request, session, url_for
 from werkzeug.security import check_password_hash, generate_password_hash
 
-from iwa.utils.DbUtils import load_logged_in_user
-from iwa.utils.ViewUtils import gen_login_cookie, login_required
+from iwa.utils.db_utils import load_logged_in_user
+from iwa.utils.view_utils import gen_login_cookie, login_required
 
 from iwa.auth import auth_bp
 from ..repository.db import get_db
@@ -150,6 +150,6 @@ def logout():
     Clear the current session, including the stored user id.
     """
     session.clear()
-    resp = make_response(redirect(url_for("index")))
+    resp = make_response(redirect(url_for("main.index")))
     resp.set_cookie("rememberme", "", expires=0)
     return resp
