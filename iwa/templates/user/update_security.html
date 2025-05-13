@@ -24,7 +24,7 @@
                     <div class="form-group row">
                         <div class="col-md-12">
                             <label for="username" class="text-black">Username</label>
-                            <input type="text" readonly class="form-control" id="username" name="username" value="{{ user.username }}">
+                            <input type="text" readonly class="form-control" id="username" name="username" value="{{ users.username }}">
                             <small id="usernameHelp" class="form-text text-muted">Your username cannot be changed from the website.</small>
                         </div>
                     </div>
@@ -32,11 +32,11 @@
                     <div class="form-group row">
                         <div class="col-md-6">
                             <label for="email" class="text-black">Email Address </label>
-                            <input value="{{ user.email }}" type="text" class="form-control" id="email" name="email">
+                            <input value="{{ users.email }}" type="text" class="form-control" id="email" name="email">
                         </div>
                         <div class="col-md-6">
                             <label for="phone" class="text-black">Mobile </label>
-                            <input value="{{ user.phone }}" type="text" class="form-control" id="phone" name="phone" placeholder="Mobile Number">
+                            <input value="{{ users.phone }}" type="text" class="form-control" id="phone" name="phone" placeholder="Mobile Number">
                         </div>
                     </div>
 
@@ -78,7 +78,7 @@
                     <div class="form-group row mt-4">
                         <div class="col-md-12">
                             <button id="submit-btn" type="submit" class="btn btn-primary">Submit</button>
-                            <a class="btn btn-info" href="{{ url_for("user.security") }}">Cancel</a>
+                            <a class="btn btn-info" href="{{ url_for("users.security") }}">Cancel</a>
                         </div>
                     </div>
                 </form>

@@ -99,13 +99,13 @@
                             <li>
                                 <div class="has-children">
                                     {% if session.loggedin %}
-                                    <a href="{{ url_for('user.home') }}" class="icons-menu d-inline-block">
+                                    <a href="{{ url_for('users.home') }}" class="icons-menu d-inline-block">
                                         <span class="icon-account_circle"></span>
                                         <span class="my-account-text">{{ session.username }}</span>
                                     </a>
                                     <ul class="dropdown">
                                         <li>
-                                            <a href="{{ url_for('user.home') }}"><i class="fas fa-home fa-fw"></i> Home
+                                            <a href="{{ url_for('users.home') }}"><i class="fas fa-home fa-fw"></i> Home
                                             </a>
                                         </li>
                                         <li>

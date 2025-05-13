@@ -4,7 +4,7 @@ from flask import Flask, g, redirect, render_template, url_for, session
 from flask_session import Session
 from flask_cors import CORS
 
-from iwa import products
+from iwa.products import routes
 #from iwa.openai import OpenAI
 from iwa.repository.db import get_db
 
@@ -84,19 +84,24 @@ def create_app(test_config=None):
     site_root = os.path.realpath(os.path.dirname(__file__))    
     app.config['SUBSCRIBERS_FILENAME'] = os.path.join(site_root, "static", "data", "email-db.json")
 
-    # apply the blueprints to the app
-    from iwa.auth import auth_bp
-    from iwa.api import api_bp
-    from iwa.users import users_bp
-    from iwa.products import products_bp
-    #from iwa.agent import agent_bp
-    from iwa.insecure import insecure_bp
+    # register blueprints
 
-    app.register_blueprint(auth_bp)
-    app.register_blueprint(api_bp)
-    app.register_blueprint(users_bp)
-    app.register_blueprint(products_bp)
+    from iwa.auth.routes import auth_bp
+    app.register_blueprint(auth_bp, url_prefix='/auth')
+
+    from iwa.api.routes import api_bp
+    app.register_blueprint(api_bp, url_prefix='/api')
+
+    from iwa.users.routes import users_bp
+    app.register_blueprint(users_bp, url_prefix='/user')
+
+    from iwa.products.routes import products_bp
+    app.register_blueprint(products_bp, url_prefix='/products')
+
+    #from iwa.agent.routes import agent_bp
     #app.register_blueprint(agent_bp)
-    app.register_blueprint(insecure_bp)
+
+    from iwa.insecure.routes import insecure_bp
+    app.register_blueprint(insecure_bp, url_prefix='/insecure')
 
     return app
