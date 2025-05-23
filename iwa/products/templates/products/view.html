@@ -99,21 +99,17 @@
                         <span class="badge badge-success">In Stock</span>
                         {% else %}
                         <span class="badge badge-danger">Out of Stock</span>
-                        <span>In stock in {{ product.to_to_stock }} days"><span>
-                                {% endif %}
+                        <span>In stock in {{ product.time_to_stock }} days<span>
+                        {% endif %}
                     </h5>
                     <div class="cart-add">
                         <div class="mb-4">
                             <div class="input-group mb-3" style="max-width: 180px;">
-                                <div class="input-group-prepend">
                                     <button id="quantity-minus" class="btn btn-outline-primary js-btn-minus"
                                         type="button">&minus;</button>
-                                </div>
                                 <input class="form-control text-center" value="1" id="quantity-value" readonly>
-                                <div class="input-group-append">
                                     <button id="quantity-plus" class="btn btn-outline-primary js-btn-plus"
                                         type="button">&plus;</button>
-                                </div>
                             </div>
                         </div>
                         <p>

@@ -21,7 +21,7 @@
 
                 <form method="post" class="form-horizontal">
 
-                    <div class="form-group row">
+                    <div class="row">
                         <div class="col-md-12">
                             <label for="username" class="text-black">Username</label>
                             <input type="text" readonly class="form-control" id="username" name="username" value="{{ users.username }}">
@@ -29,7 +29,7 @@
                         </div>
                     </div>
 
-                    <div class="form-group row">
+                    <div class="row">
                         <div class="col-md-6">
                             <label for="email" class="text-black">Email Address </label>
                             <input value="{{ users.email }}" type="text" class="form-control" id="email" name="email">
@@ -40,7 +40,7 @@
                         </div>
                     </div>
 
-                    <div class="form-group row">
+                    <div class="row">
                         <div class="col-md-6">
                             <label for="mfaType" class="text-black">Multi-Factor Authentication <span class="text-danger"></span></label>
                             <select id="mfaType" class="form-control" name="mfaType">
@@ -52,7 +52,7 @@
                         </div>
                     </div>
 
-                    <div class="form-group row">
+                    <div class="row">
                         <div class="col-md-6">
                             <label for="password" class="text-black">Password <span class="text-danger"></span></label>
                             <input type="text" class="form-control" id="password" name="password" value="">
@@ -66,7 +66,7 @@
                         </div>
                     </div>
 
-                    <div class="form-group row border border-primary">
+                    <div class="row border border-primary">
                         <div class="col-md-12">
                             <label for="password" class="text-black">Password</label>
                             <input type="password" class="form-control" id="password" autocomplete="off" value="" name="password">
@@ -75,7 +75,7 @@
                         </div>
                     </div>
 
-                    <div class="form-group row mt-4">
+                    <div class="row mt-4">
                         <div class="col-md-12">
                             <button id="submit-btn" type="submit" class="btn btn-primary">Submit</button>
                             <a class="btn btn-info" href="{{ url_for("users.security") }}">Cancel</a>

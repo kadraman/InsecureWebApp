@@ -34,7 +34,7 @@ jQuery(document).ready(function($) {
                 $this.prepend('<span class="arrow-collapse collapsed">');
 
                 $this.find('.arrow-collapse').attr({
-                    'data-toggle' : 'collapse',
+                    'data-bs-toggle' : 'collapse',
                     'data-target' : '#collapseItem' + counter,
                 });
 

@@ -21,7 +21,7 @@
 
                 <form class="form-horizontal">
 
-                    <div class="form-group row">
+                    <div class="row">
                         <div class="col-md-12">
                             <label for="username" class="text-black">Username</label>
                             <input type="text" readonly class="form-control" id="username" name="username" value="{{ user.username }}">
@@ -29,7 +29,7 @@
                         </div>
                     </div>
 
-                    <div class="form-group row">
+                    <div class="row">
                         <div class="col-md-6">
                             <label for="email" class="text-black">Email Address </label>
                             <input readonly value="{{ user.email }}" type="text" class="form-control" id="email" name="email">
@@ -40,14 +40,14 @@
                         </div>
                     </div>
 
-                    <div class="form-group row mt-4">
+                    <div class="row mt-4">
                         <div class="col-md-12">
                             <a class="btn btn-primary" href="{{ url_for("users.update_security") }}">Update Details</a>
                         </div>
                     </div>
                 </form>
 
-                <div class="form-group row">
+                <div class="row">
                     <div class="col-md-12">
                         <div>
                             {% if user.otp_enabled %}
@@ -61,13 +61,13 @@
                                 </ul>
                 
                                 <img src="data:image/png;base64,{{ qr_b64 }}" alt="QR Code">
-                                <div class="form-group row">
+                                <div class="row">
                                     <div class="col-md-12">
                                         <label for="secret-input" class="text-black">Secret Token</label>
                                         <div class="input-group">
                                             <input type="text" class="form-control" id="secret-input" name="secret-input" value="{{ secret }}"
                                                 readonly>
-                                            <div class="input-group-prepend">
+                                            <div class="input-group">
                                                 <button class="btn btn-outline-secondary" type="button" id="copy-secret-button"
                                                     >Copy to clipboard</button>
                                             </div>

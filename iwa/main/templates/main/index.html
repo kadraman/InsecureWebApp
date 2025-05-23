@@ -11,7 +11,7 @@
           <h2 class="sub-title">Local Service, Global Reach</h2>
           <h1 class="main-title">Welcome To IWA Pharmacy Direct</h1>
         </div>
-        <div class="jumbotron text-center" style="opacity: 0.9">
+        <div class="p-5 text-center bg-body-tertiary rounded-3" style="opacity: 0.9">
           {% if session.loggedin %}
           <h4>Welcome back</h4>
           {% else %}
@@ -31,40 +31,46 @@
 
 <div class="site-section">
   <div class="container">
-    <div class="row align-items-stretch section-overlap">
-      <div class="col-md-6 col-lg-4 mb-4 mb-lg-0">
-        <div class="banner-wrap bg-primary h-100">
-          <a href="#" class="h-100">
-            <h5>Free <br> Shipping</h5>
-            <p>
-              Amet sit amet dolor
-              <strong>Lorem, ipsum dolor sit amet consectetur adipisicing.</strong>
-            </p>
-          </a>
+
+    <div class="row row-cols-1 row-cols-md-3 mb-3 text-center">
+      <div class="col">
+        <div class="card mb-4 text-bg-primary">
+          <div class="card-body">
+              <h2>Free Shipping</h2>
+              <p class="card-text">
+                Amet sit amet dolor
+                <strong>Lorem, ipsum dolor sit amet consectetur adipisicing.</strong>
+              </p>
+              <button type="button" class="w-100 btn btn-lg btn-primary">Find out More</button>
+          </div>
         </div>
       </div>
-      <div class="col-md-6 col-lg-4 mb-4 mb-lg-0">
-        <div class="banner-wrap h-100">
-          <a href="#" class="h-100">
-            <h5>Season <br> Sale 50% Off</h5>
-            <p>
-              Amet sit amet dolor
-              <strong>Lorem, ipsum dolor sit amet consectetur adipisicing.</strong>
-            </p>
-          </a>
+      <div class="col">
+        <div class="card mb-4 text-bg-success">
+          <div class="card-body">
+              <h2>Sale 50% Off</h2>
+              <p class="card-text">
+                Amet sit amet dolor
+                <strong>Lorem, ipsum dolor sit amet consectetur adipisicing.</strong>
+              </p>
+              <button type="button" class="w-100 btn btn-lg btn-success">Find out More</button>
+          </div>
         </div>
       </div>
-      <div class="col-md-6 col-lg-4 mb-4 mb-lg-0">
-        <div class="banner-wrap bg-warning h-100">
-          <a href="#" class="h-100">
-            <h5>Buy <br> A Gift Card</h5>
-            <p>
-              Amet sit amet dolor
-              <strong>Lorem, ipsum dolor sit amet consectetur adipisicing.</strong>
-            </p>
-          </a>
+      <div class="col">
+        <div class="card mb-4 text-bg-danger">
+          <div class="card-body">
+              <h2>Buy a Gift Card</h2>
+              <p class="card-text">
+                Amet sit amet dolor
+                <strong>Lorem, ipsum dolor sit amet consectetur adipisicing.</strong>
+              </p>
+              <button type="button" class="w-100 btn btn-lg btn-danger">Find out More</button>
+          </div>
         </div>
       </div>
+    </div>
+
 
     </div>
   </div>
