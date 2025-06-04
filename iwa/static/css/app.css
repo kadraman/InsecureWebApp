@@ -127,6 +127,26 @@ a:hover {
     padding: 1.0em 0;
 }
 
+/*@media (max-width:768px) {
+  .navbar-header {
+    display:flex;
+  }
+}
+
+@media (max-width:768px) {
+  .navbar-brand {
+    order:1;
+  }
+}
+
+@media (max-width:768px) {
+  .navbar-toggle {
+    order:0;
+    margin-left:15px;
+    margin-right:0;
+  }
+}*/
+
 @media (min-width: 768px) {
     .site-section {
         padding: 1.0em 0;
@@ -1838,6 +1858,10 @@ a:hover {
     z-index: 10000000 !important;
 }
 
+.dropdown-menu {
+    background-color:#3c3d41;
+}
+
 .dropdown-menu li {
   position: relative;
 } 
@@ -1863,7 +1887,7 @@ a:hover {
 }
 
 .dropdown>.dropdown-toggle:active {
-  /*Without this, clicking will make it sticky*/
+    /* Without this, clicking will make it sticky */
     pointer-events: none;
 }
 

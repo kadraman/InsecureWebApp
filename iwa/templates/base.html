@@ -8,8 +8,8 @@
     <title>{% block title %} {% endblock %}</title>
     <link rel="stylesheet" href="{{ url_for('static', filename='css/lib/bootstrap.min.css') }}" />
     <link rel="stylesheet" href="{{ url_for('static', filename='css/lib/bootstrap-icons.min.css') }}" />
-    <link rel="stylesheet" href="{{ url_for('static', filename='css/lib/fontawesome.all.css') }}" />
-    <link rel="stylesheet" href="{{ url_for('static', filename='css/lib/icomoon/style.css') }}" />
+    <!--link rel="stylesheet" href="{{ url_for('static', filename='css/lib/fontawesome.all.css') }}" />
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/lib/icomoon/style.css') }}" /-->
     <link rel="stylesheet" href="{{ url_for('static', filename='css/lib/owl.carousel/owl.carousel.min.css') }}" />
     <link rel="stylesheet" href="{{ url_for('static', filename='css/lib/owl.carousel/owl.theme.default.min.css') }}" />
     <link rel="stylesheet" href="{{ url_for('static', filename='css/lib/star-rating.min.css') }}" />
@@ -22,16 +22,16 @@
 
 <div id="app" class="d-flex flex-column min-vh-100 site-wrap">
 
-    <nav class="navbar navbar-expand-lg navbar-dark bg-dark" aria-label="Main navigation">
+    <nav class="navbar site-navbar navbar-expand-lg navbar-dark" aria-label="Main navigation">
         <div class="container-fluid">
-            <a class="navbar-brand" href="{{ url_for('main.index') }}">
-                <img src="{{ url_for('static', filename='img/logo.png') }}" alt="IWA Pharmacy Direct">
-            </a>
+
             <button class="navbar-toggler" type="button" data-bs-toggle="offcanvas" data-bs-target="#offcanvasDarkNavbar" aria-controls="offcanvasDarkNavbar">
                 <span class="navbar-toggler-icon"></span>
             </button>
-            
-            <div class="offcanvas offcanvas-end text-bg-dark" tabindex="-1" id="offcanvasDarkNavbar" aria-labelledby="offcanvasDarkNavbarLabel">
+                        <a class="navbar-brand" href="{{ url_for('main.index') }}" >
+                <img src="{{ url_for('static', filename='img/logo.png') }}" width="160" height="60" alt="IWA Pharmacy Direct">
+            </a>
+            <div class="offcanvas offcanvas-start text-bg-dark" tabindex="-1" id="offcanvasDarkNavbar" aria-labelledby="offcanvasDarkNavbarLabel">
                 <div class="offcanvas-header">
                     <h5 class="offcanvas-title" id="offcanvasNavbarLabel">IWAPharmacyDirect</h5>
                     <button type="button" class="btn-close btn-close-white" data-bs-dismiss="offcanvas" aria-label="Close"></button>
@@ -112,17 +112,21 @@
                                 {% if session.loggedin %}
                                 <a class="nav-link dropdown-toggle" href="{{ url_for('users.home') }}" id="userDropdownMenuLink" role="button" data-bs-toggle="dropdown" aria-expanded="false">
                                     <i class="bi bi-person-circle"></i>
-                                    {{ session.username }}
+                                    Hello, {{ session.firstname }}
                                 </a>
                                 <ul class="dropdown-menu dropdown-menu-dark" aria-labelledby="userDropdownMenuLink">
-                                    <li><a class="dropdown-item" href="{{ url_for('users.home') }}">Profile</a></li>
-                                    <li><a class="dropdown-item" href="{{ url_for('users.home') }}">Settings</a></li>
+                                    <li><a class="dropdown-item" href="{{ url_for('users.profile') }}">Profile</a></li>
+                                    <li><a class="dropdown-item" href="{{ url_for('users.security') }}">Security</a></li>
+                                    <li><a class="dropdown-item" href="{{ url_for('users.orders') }}">Orders</a></li>
+                                    <li><a class="dropdown-item" href="{{ url_for('users.reviews') }}">Reviews</a></li>
+                                    <li><a class="dropdown-item" href="{{ url_for('users.messages') }}">Messages</a></li>
+                                    <li><hr class="dropdown-divider"></li>
                                     <li><a class="dropdown-item" href="{{ url_for('auth.logout') }}">Logout</a></li>
                                 </ul>
                                 {% else %}
                                 <a class="nav-link dropdown-toggle" href="{{ url_for('auth.login') }}" id="userDropdownMenuLink" role="button" data-bs-toggle="dropdown" aria-expanded="false">
                                     <i class="bi bi-person-circle"></i>
-                                    My Account
+                                    Hello, sign in
                                 </a>
                                 <ul class="dropdown-menu dropdown-menu-dark" aria-labelledby="userDropdownMenuLink">
                                     <li><a class="dropdown-item" href="{{ url_for('auth.login') }}">Login</a></li>
@@ -159,7 +163,6 @@
                         See the source code on <a href="https://github.com/kadraman/InsecureWebApp">GitHub.</a> 
                         Made available under the
                         <a href="https://www.gnu.org/licenses/gpl-3.0.html" target="_blank">GNU General Public License v3.0.</a>
-                        Based on a template by <a href="https://colorlib.com" target="_blank" class="text-info">Colorlib</a>.
                     </p>
                 </div>
                 <div class="col-md-4 footer-nav animated fadeInUp">
@@ -202,7 +205,7 @@
                                 <input type="text" placeholder="Your email address" class="form-control"
                                     id="email-subscribe-input" required />
                                 <button type="button" class="btn btn-secondary" id="email-subscribe-button">
-                                    <i class="fa fa-envelope"></i>
+                                    <i class="bi bi-envelope-arrow-up"></i>
                                 </button>
                             </div>
 
@@ -275,7 +278,6 @@
             function () {
                 userAccountMenu.classList.remove("text-end");
                 console.log('show')
-
             })
         </script>
 

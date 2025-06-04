@@ -52,7 +52,7 @@
                         <tr>
                             <td colspan="2">
                                 <a href="{{ url_for('products.download', filename=product['code']+'/datasheet.pdf') }}">
-                                    <i class="fas fa-download fa-fw"></i> Download Datasheet
+                                    <i class="bi bi-file-arrow-down"></i></i> Download Datasheet
                                 </a>
                             </td>
                         </tr>
@@ -65,11 +65,12 @@
                 </h2>
                 <span class="product-rating">
                     {% for _ in range(1, product.rating+1) %}
-                    <i class="fas fa-star" style="color: cornflowerblue"> </i>
+                    <i class="bi bi-star-fill"></i>
                     {% endfor %}
                     {% for _ in range(product.rating, 5) %}
-                    <i class="fas fa-star" style="color: gray"> </i>
+                    <i class="bi bi-star"></i>
                     {% endfor %}
+                    <br/>
                     <span class="product-reviews pl-2"><a href="#reviews-start">Customer Reviews</a>&nbsp(<span
                             id="review-count">{{ reviews|length }})</span>
                     </span>

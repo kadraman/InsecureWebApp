@@ -89,7 +89,8 @@ def login():
         if error is None:
             # store the username in a new session and navigate to home
             session.clear()
-            #session["user_id"] = user["id"]
+            session["firstname"] = user["first_name"]
+            session["lastname"] = user["last_name"]
             session["username"] = user["username"]
             session["password"] = user["password"]
             session["otp_enabled"] = 0
