@@ -6,9 +6,7 @@
 
 {% block content %}
 <div class="site-section bg-light">
-    <div class="container h-100">
-
-        {% include "includes/alerts.html" ignore missing with context %}
+    <div class="container min-vh-100">
 
         <section class="py-3 py-md-5">
             <div class="container">
@@ -23,22 +21,29 @@
                                     </a>
                                 </div>
                                 <div class="invisible">Site message</div>
-                                <h2 class="fs-6 fw-normal text-center text-secondary mb-4">Enter your OTP</h2>
+                                <h2 class="fs-6 fw-normal text-center text-secondary mb-4">Please enter the six-digit
+                                    code from your authenticator app</h2>
 
-                                <form method="post">
+                                <form class="needs-validation" method="post">
                                     <div class="row gy-2 overflow-hidden">
                                         <div class="col-12">
                                             <div class="form-floating mb-3">
-                                                <input type="text" class="form-control" name="otp" id="otp" value=""
-                                                    placeholder="Enter OTP" autofocus="autofocus" autocomplete="off"
-                                                    required>
-                                                <!--label for="otp" class="form-label">OTP</label-->
+                                                <input type="text" class="form-control {{ 'is-invalid' if errors.otp }}"
+                                                    aria-describedby="otp-feedback" name="otp" id="otp" pattern="[0-9]+"
+                                                    minlength="6" maxlength="6" placeholder="Enter OTP"
+                                                    autofocus="autofocus" autocomplete="off" required>
+                                                <label for="otp" class="form-label">Code</label>
+                                                {% if errors.otp %}
+                                                <div id="otp-feedback" class="invalid-feedback">
+                                                    {{ errors.otp }}
+                                                </div>
+                                                {% endif %}
                                             </div>
                                         </div>
                                         <div class="col-12">
                                             <div class="d-grid my-3">
                                                 <input type="hidden" id="otp_secret" name="otp_secret"
-                                                    class="form-control" value="{{ otp_secret }}">
+                                                    placlass="form-control" value="{{ otp_secret }}">
                                                 <button class="btn btn-primary btn-lg" name="verify-submit"
                                                     id="verify-submit" type="submit">Verify</button>
                                             </div>

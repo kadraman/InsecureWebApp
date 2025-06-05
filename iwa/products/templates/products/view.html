@@ -4,7 +4,7 @@
 
 {% block content %}
 <!-- page title -->
-<div class="bg-light py-3">
+<div class="py-3">
     <div class="container">
         <div class="row">
             <div class="col-md-12 mb-0"><a href="{{ url_for('products.index') }}">Shop</a> <span
@@ -14,25 +14,25 @@
 </div>
 
 <!-- content -->
-<div class="site-section-sm">
+<div class="site-section bg-light">
 
-    <div class="container">
+    <div class="container min-vh-100">
 
         <div class="row">
 
             <div class="col-md-5 mr-auto">
-                <div class="border text-center">
+                <div class="border-light-subtle border text-center">
                     {% if product.image %}
                     <img src="{{ url_for('static', filename='img/products/' + product['image']) }}" alt="Image"
-                        class="img-fluid p-5">
+                        class="img-fluid">
                     {% else %}
                     <img src="{{ url_for('static', filename='img/products/awaiting-image-sm.png') }}" alt="Image"
-                        class="img-fluid p-5">
+                        class="img-fluid">
                     {% endif %}
                 </div>
                 <div class="mt-4">
                     <h5>Product Information</h5>
-                    <table class="table table-sm table-borderless">
+                    <table class="table table-light table-sm table-borderless">
                         <tr>
                             <th scope="row">Code:</th>
                             <td>{{ product.code }}</td>
@@ -70,7 +70,7 @@
                     {% for _ in range(product.rating, 5) %}
                     <i class="bi bi-star"></i>
                     {% endfor %}
-                    <br/>
+                    <br />
                     <span class="product-reviews pl-2"><a href="#reviews-start">Customer Reviews</a>&nbsp(<span
                             id="review-count">{{ reviews|length }})</span>
                     </span>
@@ -106,11 +106,11 @@
                     <div class="cart-add">
                         <div class="mb-4">
                             <div class="input-group mb-3" style="max-width: 180px;">
-                                    <button id="quantity-minus" class="btn btn-outline-primary js-btn-minus"
-                                        type="button">&minus;</button>
+                                <button id="quantity-minus" class="btn btn-outline-primary js-btn-minus"
+                                    type="button">&minus;</button>
                                 <input class="form-control text-center" value="1" id="quantity-value" readonly>
-                                    <button id="quantity-plus" class="btn btn-outline-primary js-btn-plus"
-                                        type="button">&plus;</button>
+                                <button id="quantity-plus" class="btn btn-outline-primary js-btn-plus"
+                                    type="button">&plus;</button>
                             </div>
                         </div>
                         <p>
@@ -136,7 +136,8 @@
             {% endif %}
             {% for r in reviews %}
             <div class="col-sm-12 item mb-4">
-                <h6 class='text-dark pt-2'>Review by <em>{{ r.username }}</em> on {{ r.review_date.strftime('%d %B, %Y') }}</h6>
+                <h6 class='text-dark pt-2'>Review by <em>{{ r.username }}</em> on {{ r.review_date.strftime('%d %B, %Y')
+                    }}</h6>
                 <p>{{ r.comment }}</p>
             </div>
             {% endfor %}

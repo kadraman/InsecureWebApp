@@ -61,6 +61,8 @@ def login():
     and password credentials and redirect to OTP authentication
     if required.
     """
+    errors = {}
+
     if 'rememberme' in request.cookies:
         # found 'rememberme' cookie, extract its details
         b64 = request.cookies.get('rememberme')
@@ -82,11 +84,11 @@ def login():
         ).fetchone()
 
         if user is None:
-            error = "Incorrect username."
+            errors['username'] = "Incorrect username."
         elif not check_password_hash(user["password"], password):
-            error = "Incorrect password."
+            errors['password'] = "Incorrect password."
 
-        if error is None:
+        if not errors:
             # store the username in a new session and navigate to home
             session.clear()
             session["firstname"] = user["first_name"]
@@ -103,9 +105,9 @@ def login():
                 return gen_login_cookie("rememberme", "users/home.html")
                 #return redirect(url_for("users.home"))
 
-        flash(error, 'error')
+        #flash(error, 'error')
 
-    return render_template("auth/login.html")
+    return render_template("auth/login.html", errors=errors, username=request.form.get("username", ""))
 
 
 @auth_bp.route("/verify_2fa", methods=("GET", "POST"))
@@ -114,6 +116,8 @@ def verify_2fa():
     """
     Requests a TOTP code to confirm the users login.
     """
+    errors = {}
+
     if not session['otp_enabled']:
         abort(500, "2FA is not enabled.")
 
@@ -124,12 +128,10 @@ def verify_2fa():
         # retrieve secret for the user  
         secret = g.user['otp_secret']
         otp = request.form["otp"]
-        error = None
 
         if not otp:
-            error = "An OTP is required."
-
-        if error is None:
+            errors['otp'] = "An OTP is required."
+        else:
             totp = pyotp.TOTP(secret)
             if totp.verify(otp):
                 # Success, go to the users home page
@@ -138,11 +140,12 @@ def verify_2fa():
                 #return redirect(url_for("users.home"))
             else:
                 # Invalid OTP, try again
-                error = "The OTP is invalid, please try again."
+                errors['otp'] = "The OTP is invalid, please try again."
 
-        flash(error, 'error')
+        #flash(error, 'error')
 
-    return render_template("auth/verify_2fa.html", otp_secret=g.user['otp_secret'])
+    return render_template("auth/verify_2fa.html", errors=errors,
+                           otp_secret=g.user['otp_secret'])
 
 
 @auth_bp.route("/logout")

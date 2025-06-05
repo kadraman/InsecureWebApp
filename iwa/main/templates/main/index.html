@@ -36,44 +36,44 @@
       <div class="col">
         <div class="card mb-4 text-bg-primary">
           <div class="card-body">
-              <h2>Free Shipping</h2>
-              <p class="card-text">
-                Amet sit amet dolor
-                <strong>Lorem, ipsum dolor sit amet consectetur adipisicing.</strong>
-              </p>
-              <button type="button" class="w-100 btn btn-lg btn-primary">Find out More</button>
+            <h2>Free Shipping</h2>
+            <p class="card-text">
+              Amet sit amet dolor
+              <strong>Lorem, ipsum dolor sit amet consectetur adipisicing.</strong>
+            </p>
+            <button type="button" class="w-100 btn btn-lg btn-primary">Find out More</button>
           </div>
         </div>
       </div>
       <div class="col">
         <div class="card mb-4 text-bg-success">
           <div class="card-body">
-              <h2>Sale 50% Off</h2>
-              <p class="card-text">
-                Amet sit amet dolor
-                <strong>Lorem, ipsum dolor sit amet consectetur adipisicing.</strong>
-              </p>
-              <button type="button" class="w-100 btn btn-lg btn-success">Find out More</button>
+            <h2>Sale 50% Off</h2>
+            <p class="card-text">
+              Amet sit amet dolor
+              <strong>Lorem, ipsum dolor sit amet consectetur adipisicing.</strong>
+            </p>
+            <button type="button" class="w-100 btn btn-lg btn-success">Find out More</button>
           </div>
         </div>
       </div>
       <div class="col">
         <div class="card mb-4 text-bg-danger">
           <div class="card-body">
-              <h2>Buy a Gift Card</h2>
-              <p class="card-text">
-                Amet sit amet dolor
-                <strong>Lorem, ipsum dolor sit amet consectetur adipisicing.</strong>
-              </p>
-              <button type="button" class="w-100 btn btn-lg btn-danger">Find out More</button>
+            <h2>Buy a Gift Card</h2>
+            <p class="card-text">
+              Amet sit amet dolor
+              <strong>Lorem, ipsum dolor sit amet consectetur adipisicing.</strong>
+            </p>
+            <button type="button" class="w-100 btn btn-lg btn-danger">Find out More</button>
           </div>
         </div>
       </div>
     </div>
 
 
-    </div>
   </div>
+</div>
 </div>
 
 <div id="new-products">
@@ -170,6 +170,31 @@
   (function ($) {
     $(document).ready(function () {
       $('#new-products').NewProducts({ currencySymbol: "\u0024" });
+      $('.nonloop-block-3').owlCarousel({
+        center: false,
+        items: 1,
+        loop: true,
+        smartSpeed: 700,
+        stagePadding: 15,
+        margin: 20,
+        autoplay: true,
+        nav: true,
+        navText: ['<span class="icon-arrow_back">', '<span class="icon-arrow_forward">'],
+        responsive: {
+          600: {
+            margin: 20,
+            items: 2
+          },
+          1000: {
+            margin: 20,
+            items: 3
+          },
+          1200: {
+            margin: 20,
+            items: 3
+          }
+        }
+      });
     });
   })(jQuery);
 </script>

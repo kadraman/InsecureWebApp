@@ -4,7 +4,7 @@
 
 {% block content %}
 <!-- page title -->
-<div class="bg-light py-3">
+<div class="py-3">
     <div class="container">
         <div class="row">
             <div class="col-md-12 mb-0"><a href="{{ url_for('products.index') }}">Shop</a> </div>
@@ -13,9 +13,9 @@
 </div>
 
 <!-- content -->
-<div class="site-section-sm">
+<div class="site-section bg-light">
 
-    <div class="container">
+    <div class="container min-vh-100">
 
         {% if request.args.get('keywords') %}
         <div class="row pt-2">
@@ -37,7 +37,7 @@
                                 <div class="dropdown"> <button class="btn btn-secondary dropdown-toggle" type="button"
                                         id="dropdownMenuButton" data-bs-toggle="dropdown" aria-expanded="false"> Category
                                     </button>
-                                    <ul class="dropdown-menu" aria-labelledby="dropdownMenuButton">
+                                    <ul class="dropdown-menu dropdown-menu-dark" aria-labelledby="dropdownMenuButton">
                                         <li><a class="dropdown-item" href="#">Vitamins & supplements</a></li>
                                         <li><a class="dropdown-item" href="#">Skincare</a></li>
                                         <li><a class="dropdown-item" href="#">Electricals</a></li>

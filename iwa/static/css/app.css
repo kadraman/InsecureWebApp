@@ -56,19 +56,6 @@ a:hover {
     visibility: hidden;
 }
 
-.offcanvas-menu .site-wrap {
-    position: absolute;
-    height: 100%;
-    width: 100%;
-    z-index: 2;
-    overflow: hidden;
-}
-
-.offcanvas-menu .site-wrap:before {
-    opacity: 1;
-    visibility: visible;
-}
-
 .btn {
     -webkit-transition: .3s all ease-in-out;
     -o-transition: .3s all ease-in-out;
@@ -320,6 +307,7 @@ a:hover {
     position: relative;
 }
 
+/* Navbar */
 .site-navbar {
     margin-bottom: 0px;
     z-index: 1999;
@@ -328,7 +316,7 @@ a:hover {
     width: 100%;
     background-color: #3c3d41;
 }
-
+/*
 .site-navbar.position-relative {
     position: relative;
     background: #f9f9f9 !important;
@@ -392,7 +380,7 @@ a:hover {
 }
 
 .site-navbar .site-top-icons ul li a {
-    /*margin-right: 10px;*/
+    margin-right: 10px;
 }
 
 .site-navbar .site-top-icons ul li a.site-cart {
@@ -523,7 +511,7 @@ a:hover {
 }
 
 .site-navbar .site-top-icons .has-children a {
-    /*text-transform: uppercase;*/
+    text-transform: uppercase;
 }
 
 .site-navbar .site-top-icons .has-children:hover > a, .site-navbar .site-navigation .site-menu .has-children:focus > a, .site-navbar .site-navigation .site-menu .has-children:active > a {
@@ -897,6 +885,7 @@ a:hover {
     font-size: 16px;
     padding-left: 60px;
 }
+*/
 
 /* Blocks */
 .site-blocks-cover {
@@ -908,7 +897,7 @@ a:hover {
 
 .site-blocks-cover, .site-blocks-cover > .container > .row {
     min-height: 700px;
-//height: calc(100vh);
+    height: calc(100vh);
 }
 
 .site-blocks-cover.inner-page, .site-blocks-cover.inner-page .row {
@@ -1878,6 +1867,7 @@ a:hover {
   left: auto;
 }
 
+/*
 .dropdown-menu>li:hover>.dropdown-submenu {
   display: block;
 }
@@ -1888,8 +1878,24 @@ a:hover {
 
 .dropdown>.dropdown-toggle:active {
     /* Without this, clicking will make it sticky */
-    pointer-events: none;
-}
+    /*pointer-events: none;
+}*/
+
+   .dropdown-submenu {
+       position: relative; /* For relative positioning within the parent dropdown */
+       display: inline-block; /* Ensure it's treated as a block within its parent */
+   }
+
+   .dropdown-submenu .dropdown-menu {
+       left: 100%; /* Position the submenu to the right of the parent */
+       top: 0; /* Position the submenu at the top of the parent */
+       display: none; /* Initially hide the submenu */
+       position: absolute; /* Position the submenu absolutely within its parent */
+   }
+
+   .dropdown-submenu:hover .dropdown-menu {
+       display: block; /* Show the submenu on hover */
+   }
 
 .navbar{ height: 75px;}
 
