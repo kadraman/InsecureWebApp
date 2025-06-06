@@ -15,11 +15,11 @@
           {% if session.loggedin %}
           <h4>Welcome back</h4>
           {% else %}
-          <h4>Welcome guest</h4>
+          <h4>Welcome Guest</h4>
           {% endif %}
           <p class="pt-4">
             {% if not session.loggedin %}
-            <a href="{{ url_for('auth.register') }}" class="btn p-2 btn-outline-info"> Register </a>
+            <a href="{{ url_for('auth.register') }}" class="btn p-2 btn-outline-info">Register</a>
             {% endif %}
             <a href="{{ url_for('products.index') }}" class="btn p-2 btn-outline-success">Shop Now</a>
           </p>
@@ -31,14 +31,13 @@
 
 <div class="site-section">
   <div class="container">
-
-    <div class="row row-cols-1 row-cols-md-3 mb-3 text-center">
+    <div class="row align-items-stretch section-overlap row-cols-1 row-cols-md-3 mb-3 text-center">
       <div class="col">
-        <div class="card mb-4 text-bg-primary">
+        <div class="card mb-4 text-bg-primary" style="opacity: 0.9">
           <div class="card-body">
-            <h2>Free Shipping</h2>
+            <h1><i>Free Shipping</i></h1>
+            <h5>Amet sit amet dolor</h5>
             <p class="card-text">
-              Amet sit amet dolor
               <strong>Lorem, ipsum dolor sit amet consectetur adipisicing.</strong>
             </p>
             <button type="button" class="w-100 btn btn-lg btn-primary">Find out More</button>
@@ -46,11 +45,11 @@
         </div>
       </div>
       <div class="col">
-        <div class="card mb-4 text-bg-success">
+        <div class="card mb-4 text-bg-success" style="opacity: 0.9">
           <div class="card-body">
-            <h2>Sale 50% Off</h2>
+            <h1><i>Sale 50% Off</i></h2>
+            <h5>Amet sit amet dolor</h5>
             <p class="card-text">
-              Amet sit amet dolor
               <strong>Lorem, ipsum dolor sit amet consectetur adipisicing.</strong>
             </p>
             <button type="button" class="w-100 btn btn-lg btn-success">Find out More</button>
@@ -58,11 +57,11 @@
         </div>
       </div>
       <div class="col">
-        <div class="card mb-4 text-bg-danger">
+        <div class="card mb-4 text-bg-danger" style="opacity: 0.9">
           <div class="card-body">
-            <h2>Buy a Gift Card</h2>
+            <h1><i>Buy a Gift Card</i></h1>
+            <h5>Amet sit amet dolor</h5>
             <p class="card-text">
-              Amet sit amet dolor
               <strong>Lorem, ipsum dolor sit amet consectetur adipisicing.</strong>
             </p>
             <button type="button" class="w-100 btn btn-lg btn-danger">Find out More</button>
@@ -70,8 +69,6 @@
         </div>
       </div>
     </div>
-
-
   </div>
 </div>
 </div>
@@ -85,7 +82,7 @@
         </div>
       </div>
       <div id="product-data" class="row">
-
+        <!-- New products will be loaded here by JavaScript -->
       </div>
     </div>
   </div>
