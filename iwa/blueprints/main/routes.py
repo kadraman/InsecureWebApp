@@ -1,3 +1,4 @@
+    
 """
         InsecureWebApp - an insecure Python/Flask Web application
 
@@ -17,16 +18,33 @@
         along with this program.  If not, see <http://www.gnu.org/licenses/>.
 """
 
-from dataclasses import dataclass
-from datetime import datetime
+import logging
+from flask import g
+from flask import redirect
+from flask import render_template
+from flask import request
+from flask import url_for
+
+from iwa.blueprints.main import main_bp
+from iwa.repository import db
 
 
-@dataclass
-class Review:
-    id: int
-    product_id: int
-    user_id: int
-    review_date: datetime
-    comment: str
-    rating: int
-    visible: bool
+logger = logging.getLogger(__name__)
+
+
+@main_bp.route("/")
+def index():
+    """
+    Show the home page.
+    """
+    return render_template("main/index.html")
+
+
+@main_bp.route("/reset-db")
+def reset_db():
+    """
+    Reset the database to its initial state.
+    """
+    logger.debug("[reset_db] Re-initializing database.")
+    db.init_db()
+    return redirect(url_for("products.index"))

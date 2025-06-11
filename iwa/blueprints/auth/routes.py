@@ -1,16 +1,36 @@
+"""
+        InsecureWebApp - an insecure Python/Flask Web application
+
+        Copyright (C) 2024-2025  Kevin A. Lee (kadraman)
+
+        This program is free software: you can redistribute it and/or modify
+        it under the terms of the GNU General Public License as published by
+        the Free Software Foundation, either version 3 of the License, or
+        (at your option) any later version.
+
+        This program is distributed in the hope that it will be useful,
+        but WITHOUT ANY WARRANTY; without even the implied warranty of
+        MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+        GNU General Public License for more details.
+
+        You should have received a copy of the GNU General Public License
+        along with this program.  If not, see <http://www.gnu.org/licenses/>.
+"""
+
 import base64
 import logging
 import pickle
 import pyotp
 
-from flask import Blueprint, abort, flash, g, make_response, redirect, render_template, request, session, url_for
+from flask import abort, flash, g, make_response, redirect, render_template, request, session, url_for
 from werkzeug.security import check_password_hash, generate_password_hash
 
 from iwa.utils.db_utils import load_logged_in_user
 from iwa.utils.view_utils import gen_login_cookie, login_required
 
-from iwa.auth import auth_bp
-from ..repository.db import get_db
+from iwa.blueprints.auth import auth_bp
+from iwa.repository.db import get_db
+
 
 logger = logging.getLogger(__name__)
 

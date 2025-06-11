@@ -57,8 +57,6 @@ There are only a few features that are functional in this version of the app:
 - you can download a datasheet PDF from a details page
 - you can subscribe to the newsletter by entering an email address in the input field of the footer
 
-These have been "enabled" because they all have potential security issues that can be found by Fortify.
-
 You can login/logout (user credentials are: user1@localhost.com/password or admin@localhost.com/password)
 for the OTP code, the secret is hard coded to "base32secret3232" so you can use an app or online tool
 such as <a href="https://totp.danhersam.com/">TOTP Token Generator</a> to generate the code.

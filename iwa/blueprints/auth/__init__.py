@@ -17,16 +17,8 @@
         along with this program.  If not, see <http://www.gnu.org/licenses/>.
 """
 
-from dataclasses import dataclass
-from datetime import datetime
+from flask import Blueprint
 
+auth_bp = Blueprint("auth", __name__, template_folder='templates')
 
-@dataclass
-class Review:
-    id: int
-    product_id: int
-    user_id: int
-    review_date: datetime
-    comment: str
-    rating: int
-    visible: bool
+from iwa.blueprints.auth import routes

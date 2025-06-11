@@ -17,16 +17,12 @@
         along with this program.  If not, see <http://www.gnu.org/licenses/>.
 """
 
-from dataclasses import dataclass
-from datetime import datetime
+import logging
 
+from werkzeug.exceptions import abort
 
-@dataclass
-class Review:
-    id: int
-    product_id: int
-    user_id: int
-    review_date: datetime
-    comment: str
-    rating: int
-    visible: bool
+from iwa.repository.db import get_db
+from iwa.models.User import User
+from iwa.models.Review import Review
+
+logger = logging.getLogger(__name__)
