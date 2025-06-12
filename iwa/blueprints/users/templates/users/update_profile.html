@@ -24,37 +24,11 @@
                     <div class="row">
                         <div class="col-md-6">
                             <label for="email" class="text-black">Email Address </label>
-                            <input value="{{ users.email }}" type="text" class="form-control" id="email" name="email">
+                            <input value="{{ user.email }}" type="text" class="form-control" id="email" name="email">
                         </div>
                         <div class="col-md-6">
                             <label for="phone" class="text-black">Mobile </label>
-                            <input value="{{ users.phone }}" type="text" class="form-control" id="phone" name="phone" placeholder="Mobile Number">
-                        </div>
-                    </div>
-
-                    <div class="row">
-                        <div class="col-md-6">
-                            <label for="mfaType" class="text-black">Multi-Factor Authentication <span class="text-danger"></span></label>
-                            <select id="mfaType" class="form-control" name="mfaType">
-                                <option value="MFA_NONE" selected="selected">None</option>
-                                <option value="MFA_EMAIL">Email</option>
-                                <option value="MFA_SMS">SMS</option>
-                                <option value="MFA_APP">Authenticator App</option>
-                            </select>
-                        </div>
-                    </div>
-
-                    <div class="row">
-                        <div class="col-md-6">
-                            <label for="password" class="text-black">Password <span class="text-danger"></span></label>
-                            <input type="text" class="form-control" id="password" name="password" value="">
-                            <small id="passwordHelp" class="form-text text-muted">Enter your new password.</small>
-                            
-                        </div>
-                        <div class="col-md-6">
-                            <label for="confirmPassword" class="text-black">Confirm Password <span class="text-danger"></span></label>
-                            <input type="text" class="form-control" id="confirmPassword" name="confirmPassword" value="">
-                            <small id="confirmPasswordHelp" class="form-text text-muted">Confirm your new password.</small>
+                            <input value="{{ user.phone }}" type="text" class="form-control" id="phone" name="phone" placeholder="Mobile Number">
                         </div>
                     </div>
 

@@ -9,7 +9,7 @@
         {% else %}
             {% set alert_class = "alert-info" %}
         {% endif %}
-        <div class="alert {{ alert_class }} alert-dismissible auto-dismiss" role="alert">
+        <div class="alert {{ alert_class }} alert-dismissible auto-dismiss" data-timeout="6000" role="alert">
             <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
             {{ message }}
         </div>

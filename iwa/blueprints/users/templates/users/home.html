@@ -26,13 +26,15 @@
             <hr class="my-4">
 
             <div class="col-md-12">
-              <div class="alert alert-light" role="alert">
+              <div class="alert alert-light alert-dismissible auto-dismiss" data-timeout="10000" role="alert">
+                <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
                 You have no new <a href="{{ url_for('users.messages') }}">messages</a>.
               </div>
             </div>
 
             <div class="col-md-12">
-              <div class="alert alert-info" role="alert">
+              <div class="alert alert-info alert-dismissible auto-dismiss" data-timeout="12000" role="alert">
+                <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
                 You have no unshipped <a href="{{ url_for('users.orders') }}">orders</a>.
               </div>
 

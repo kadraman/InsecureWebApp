@@ -22,7 +22,7 @@ from io import BytesIO
 import logging
 import pyotp
 import qrcode
-from flask import flash, request, g, render_template, session
+from flask import flash, redirect, request, g, render_template, session, url_for
 
 from iwa.blueprints.users import users_bp
 from iwa.utils.db_utils import load_logged_in_user
@@ -39,7 +39,7 @@ def home():
     """
     Show the users home page.
     """
-    return render_template("users/home.html")
+    return render_template("users/home.html", user=g.user)
 
 
 @users_bp.route("/profile")
@@ -48,7 +48,21 @@ def profile():
     """
     Show the users profile page.
     """
-    return render_template("users/profile.html")
+    return render_template("users/profile.html", user=g.user)
+
+
+@users_bp.route("/update_profile", methods=("GET", "POST"))
+@login_required
+def update_profile():
+    """
+    Edit the users profile.
+    """
+    if request.method == "POST":
+        email = session["email"]
+        # TODO: implement update profile
+        flash('Updating profile has not yet been implemented.', 'info')
+
+    return render_template("users/profile.html", user=g.user)
 
 
 @users_bp.route("/messages")
@@ -57,7 +71,7 @@ def messages():
     """
     Show the users message page.
     """
-    return render_template("users/messages.html")
+    return render_template("users/messages.html", user=g.user)
 
 
 @users_bp.route("/reviews")
@@ -66,7 +80,7 @@ def reviews():
     """
     Show the users orders page.
     """
-    return render_template("users/reviews.html")
+    return render_template("users/reviews.html", user=g.user)
 
 
 @users_bp.route("/orders")
@@ -75,7 +89,7 @@ def orders():
     """
     Show the users orders page.
     """
-    return render_template("users/orders.html")
+    return render_template("users/orders.html", user=g.user)
 
 
 @users_bp.route("/security", methods=("GET", "POST"))
@@ -84,58 +98,72 @@ def security():
     """
     Display and update the users security configuration.
     """
-    if g.user['otp_enabled']:
-        # 2FA is already enabled
-        secret = g.user['otp_secret']
-    else:
-        # Generate and store a secret for the user  
-        #user_id: int = session["user_id"]
-        email = session["email"]
-        secret = pyotp.random_base32()
-        db = get_db()
-        error = None
-        db.execute(
-            "UPDATE users SET otp_enabled=?, otp_secret=? WHERE email=?",
-            (1, secret, email),
+
+    if request.method == "POST":
+        # Handle form submission for enabling/disabling 2FA
+        if request.form.get('enable_otp'):
+            logger.debug("Enabling two-factor authentication (2FA) for user")
+            # User wants to enable 2FA
+            if g.user['otp_enabled']:
+                flash('Two-factor authentication is already enabled.', 'info')
+            else:
+                # Generate and store a secret for the user  
+                email = session["email"]
+                secret = pyotp.random_base32()
+                db = get_db()
+                error = None
+                db.execute(
+                    "UPDATE users SET otp_enabled=?, otp_secret=? WHERE email=?",
+                    (1, secret, email),
+                )
+                db.commit()
+                load_logged_in_user()
+                # Success, redirect back to security page
+                flash('Two-factor authentication has been successfully enabled.', 'success')
+                return redirect(url_for("users.security"))
+
+        elif request.form.get('disable_otp'):
+            logger.debug("Disabling two-factor authentication (2FA) for user")
+            # User wants to disable 2FA
+            if not g.user['otp_enabled']:
+                flash('Two-factor authentication is already disabled.', 'info')
+            else:
+                db = get_db()
+                db.execute(
+                    "UPDATE users SET otp_enabled=?, otp_secret=? WHERE email=?",
+                    (0, None, g.user['email']),
+                )
+                db.commit()
+                load_logged_in_user()
+                # Success, redirect nack to security page
+                flash('Two-factor authentication has been successfully disabled.', 'success')
+                return redirect(url_for("users.security"))
+
+    secret = g.user['otp_secret'] if g.user['otp_enabled'] else None
+
+    if secret:
+        # Generate a QR code for the user to scan
+        totp = pyotp.TOTP(secret)
+        qr_url = totp.provisioning_uri(g.user['email'], issuer_name="InsecureWebApp")
+
+        qr = qrcode.QRCode(
+            version=1,
+            error_correction=qrcode.constants.ERROR_CORRECT_L,
+            box_size=10,
+            border=4,
         )
-        db.commit()
-        load_logged_in_user()
+        qr.add_data(qr_url)
+        qr.make(fit=True)
 
-    # Generate a QR code for the user to scan
-    totp = pyotp.TOTP(secret)
-    qr_url = totp.provisioning_uri(g.user['email'], issuer_name="InsecureWebApp")
+        qr_img = qr.make_image(fill_color="black", back_color="white")
 
-    qr = qrcode.QRCode(
-        version=1,
-        error_correction=qrcode.constants.ERROR_CORRECT_L,
-        box_size=10,
-        border=4,
-    )
-    qr.add_data(qr_url)
-    qr.make(fit=True)
+        # Convert the QR code to base64 for display
+        buffered = BytesIO()
+        qr_img.save(buffered, format="PNG")
 
-    qr_img = qr.make_image(fill_color="black", back_color="white")
-
-    # Convert the QR code to base64 for display
-    buffered = BytesIO()
-    qr_img.save(buffered, format="PNG")
-    qr_b64 = base64.b64encode(buffered.getvalue()).decode()
+    qr_b64 = base64.b64encode(buffered.getvalue()).decode() if secret else None
 
     return render_template("users/security.html", user=g.user, qr_b64=qr_b64, secret=secret)
-
-
-@users_bp.route("/update_security", methods=("GET", "POST"))
-@login_required
-def update_security():
-    """
-    Edit the users security details.
-    """
-    if request.method == "POST":
-        email = session["email"]
-        # TODO: implement update security
-        flash('Updating security details has not yet been implemented.', 'info')
-
-    return render_template("users/update_security.html", user=g.user)
 
 
 @users_bp.before_request

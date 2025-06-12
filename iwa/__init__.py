@@ -50,9 +50,13 @@ def create_app(test_config=None):
         # load the test config if passed in
         app.config.update(test_config)
 
-    # set default Flask log level to INFO
-    logger.setLevel(logging.INFO)
-    app.logger.setLevel(logging.INFO)
+    # Set log level based on FLASK_DEBUG environment variable
+    if os.environ.get("FLASK_DEBUG"):
+        logger.setLevel(logging.DEBUG)
+        app.logger.setLevel(logging.DEBUG)
+    else:
+        logger.setLevel(logging.INFO)
+        app.logger.setLevel(logging.INFO)
 
     # ensure the instance folder exists
     try:

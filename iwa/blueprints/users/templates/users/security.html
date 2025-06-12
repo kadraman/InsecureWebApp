@@ -6,7 +6,7 @@
 
 {% block content %}
 
-<div class="site-section">
+<div class="site-section bg-light">
     <div class="container min-vh-100">
 
         <div class="row">
@@ -18,56 +18,54 @@
             <div class="col-md-9">
 
                 {% include "includes/alerts.html" ignore missing with context %}
-
-                <form class="form-horizontal">
-
-                    <div class="row">
-                        <div class="col-md-6">
-                            <label for="email" class="text-black">Email Address </label>
-                            <input readonly value="{{ user.email }}" type="text" class="form-control" id="email" name="email">
-                        </div>
-                        <div class="col-md-6">
-                            <label for="phone" class="text-black">Mobile </label>
-                            <input readonly value="{{ user.phone }}" type="text" class="form-control" id="phone" name="phone" placeholder="Mobile Number">
-                        </div>
-                    </div>
-
-                    <div class="row mt-4">
-                        <div class="col-md-12">
-                            <a class="btn btn-primary" href="{{ url_for("users.update_security") }}">Update Details</a>
-                        </div>
-                    </div>
-                </form>
+ 
 
                 <div class="row">
                     <div class="col-md-12">
                         <div>
                             {% if user.otp_enabled %}
-                                <p class="text-black">
-                                    Two-Factor Authentication (2FA) is enabled for your account. Please refer to the following instructions:
+                                <p class="lead">
+                                    Two-Factor Authentication (2FA) is enabled for your account.
                                 </p>
-                                <ul>
-                                    <li>Download <a href="">Google Authenticator</a> or similar app to your mobile</li>
+                                <p>Please refer to the following instructions to make use of 2FA:</p>
+                                <ol>
+                                    <li>Download <a href="">Google Authenticator</a> or a similar App to your mobile</li>
                                     <li>Setup a new Authenticator</li>
-                                    <li>Scan the QR code or enter the Secret Token shown below</li>
-                                </ul>
+                                    <li>Scan the QR code below or enter the Secret Token text</li>
+                                </ol>
                 
-                                <img src="data:image/png;base64,{{ qr_b64 }}" alt="QR Code">
                                 <div class="row">
-                                    <div class="col-md-12">
+                                    <div class="col-md-6">
+                                        <img src="data:image/png;base64,{{ qr_b64 }}" alt="QR Code" class="img-fluid mx-auto d-block" style="max-width:200px;">
                                         <label for="secret-input" class="text-black">Secret Token</label>
-                                        <div class="input-group">
+                                        <div role="group" class="input-group">
                                             <input type="text" class="form-control" id="secret-input" name="secret-input" value="{{ secret }}"
                                                 readonly>
-                                            <div class="input-group">
-                                                <button class="btn btn-outline-secondary" type="button" id="copy-secret-button"
-                                                    >Copy to clipboard</button>
-                                            </div>
+                                            <button class="btn btn-outline-secondary" type="button" id="copy-secret-button">Copy to clipboard</button>
                                         </div>
                                     </div>
-                                </div>                             
+                                </div>
+                                
+                                <form class="form-horizontal" method="post">
+                                    <div class="row mt-4">
+                                        <div class="col-md-12">
+                                            <button class="btn btn-primary" type="submit" href="{{ url_for("users.security") }}">Disable 2FA</a>
+                                            <input type="hidden" name="disable_otp" value="{{ true }}">
+                                        </div>
+                                    </div>
+                                </form>    
+
                             {% else %}
-                                <p class="text-black">Two-Factor Authentication (2FA) is not enabled for your account.</p>  
+                                <p class="lead">Two-Factor Authentication (2FA) is not enabled for your account.</p>
+
+                                <form class="form-horizontal" method="post">
+                                    <div class="row mt-4">
+                                        <div class="col-md-12">
+                                            <button class="btn btn-primary" type="submit" href="{{ url_for("users.security") }}">Enable 2FA</a>
+                                            <input type="hidden" name="enable_otp" value="{{ true }}">
+                                        </div>
+                                    </div>
+                                </form> 
                             {% endif %}                              
                         </div>
                     </div>

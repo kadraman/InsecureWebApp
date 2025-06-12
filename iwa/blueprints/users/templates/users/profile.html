@@ -6,7 +6,7 @@
 
 {% block content %}
 
-<div class="site-section">
+<div class="site-section bg-light">
     <div class="container min-vh-100">
 
         <div class="row">
@@ -19,7 +19,26 @@
 
                 {% include "includes/alerts.html" ignore missing with context %}
 
-                <h2>This page has not been implemented yet.</h2>
+                <form class="form-horizontal">
+
+                    <div class="row">
+                        <div class="col-md-6">
+                            <label for="email" class="text-black">Email Address </label>
+                            <input readonly value="{{ user.email }}" type="text" class="form-control" id="email" name="email">
+                        </div>
+                        <div class="col-md-6">
+                            <label for="phone" class="text-black">Mobile </label>
+                            <input readonly value="{{ user.phone }}" type="text" class="form-control" id="phone" name="phone" placeholder="Mobile Number">
+                        </div>
+                    </div>
+
+                    <div class="row mt-4">
+                        <div class="col-md-12">
+                            <a class="btn btn-primary" href="{{ url_for("users.update_profile") }}">Update</a>
+                        </div>
+                    </div>
+                    
+                </form>
 
             </div>
 
