@@ -1,0 +1,132 @@
+{% extends 'base.html' %}
+
+{% block title %} InsecureWebApp :: Shop {% endblock %}
+
+{% block content %}
+<!-- page title -->
+<div class="py-3">
+    <div class="container">
+        <div class="row">
+            <div class="col-md-12 mb-0"><a href="{{ url_for('products.index') }}">Shop</a> </div>
+        </div>
+    </div>
+</div>
+
+<!-- content -->
+<div class="site-section bg-light">
+
+    <div class="container min-vh-100">
+
+        {% if request.args.get('keywords') %}
+        <div class="row pt-2">
+            <div class="col-md-12 text-center">
+                <h2>Searching for:
+                    <span class="bg-light text-dark"><span id="search-keywords">{{ request.args.get('keywords') | safe }}</span>
+                </h2>
+            </div>
+        </div>
+        {% endif %}
+
+        <!-- search box -->
+        <div class="row d-flex justify-content-center">
+            <form id="search" class="col-md-10" action="#" method="GET">
+                <div class="card p-3 py-4">
+                    <div class="row g-3 mt-2">
+                        <div class="input-group">
+                            <div class="col-md-3">
+                                <div class="dropdown"> <button class="btn btn-secondary dropdown-toggle" type="button"
+                                        id="dropdownMenuButton" data-bs-toggle="dropdown" aria-expanded="false"> Category
+                                    </button>
+                                    <ul class="dropdown-menu dropdown-menu-dark" aria-labelledby="dropdownMenuButton">
+                                        <li><a class="dropdown-item" href="#">Vitamins & supplements</a></li>
+                                        <li><a class="dropdown-item" href="#">Skincare</a></li>
+                                        <li><a class="dropdown-item" href="#">Electricals</a></li>
+                                        <li><a class="dropdown-item" href="#">Health & wellbeing</a></li>
+                                    </ul>
+                                </div>
+                            </div>
+                            <div class="col-md-7">
+                                <input type="text" class="form-control" placeholder="Enter search keywords"
+                                    name="keywords" id="keywords-search-input"
+                                    value="{{ request.args.get('keywords') if request.args.get('keywords') else '' }}" />
+                            </div>
+                            <div class="col-md-2">
+                                <button id="keywords-search-button" class="btn btn-secondary d-block w-100"
+                                    type="submit">
+                                    <div class="ml-2"><i class="bi bi-search"></i>Search</div>
+                                    </button>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="mt-3"> <a data-bs-toggle="collapse" href="#collapseExample" role="button"
+                            aria-expanded="false" aria-controls="collapseExample" class="advanced"> Advance Search With
+                            Filters <i class="bi bi-funnel"></i> </a>
+                        <div class="collapse" id="collapseExample">
+                            <div class="card card-body">
+                                <div class="row">
+                                    <div class="col-md-4"> <input type="text" placeholder="Product ID"
+                                            class="form-control"> </div>
+                                    <div class="col-md-4"> <input type="text" class="form-control"
+                                            placeholder="Medical Condition"> </div>
+                                    <div class="col-md-4"> <input type="text" class="form-control"
+                                            placeholder="Search by Brand"> </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </form>
+        </div>
+
+        <div class="row row-cols-1 row-cols-md-3 g-4 pt-5"">
+            {% for p in products %}
+            <div class="col text-center item mb-4">
+                <div class="card h-100">
+                    {% if p.on_sale %}
+                    <span class="tag">Sale</span>
+                    {% endif %}
+
+                    <a href="{{ url_for('products.view', code=p['code']) }}">
+                        {% if p.image %}
+                        <img src="{{ url_for('static', filename='img/products/' + p['image']) }}" alt="Image"
+                            class="card-img-top">
+                        {% else %}
+                        <img src="{{ url_for('static', filename='img/products/awaiting-image-sm.png') }}" alt="Image"
+                            class="card-img-top">
+                        {% endif %}
+                    </a>
+                    <div class="card-body">
+                        <h3 class="card-title text-dark"><a href="#">{{ p['name'] }}</a></h3>
+                        <p class="card-text">
+                            {% if p.on_sale %}
+                            <del>
+                                <span>
+                                    {{ "${:,.2f}".format(p.price) }}
+                                </span>
+                            </del>
+                            <span>&ndash;</span>
+                            <span>
+                                {{ "${:,.2f}".format(p.sale_price) }}
+                            </span>
+                            {% else %}
+                            <span>
+                                {{ "${:,.2f}".format(p.price) }}
+                            </span>
+                            {% endif %}
+                        </p>
+                    </div>
+                </div>
+            </div>
+            {% endfor %}
+        </div>
+
+        <div class="row pt-4">
+            <div class="col-md-12">
+                <h5>Showing <span>{{ products|length }} products</span></h5>
+            </div>
+        </div>
+
+    </div>
+
+</div>
+{% endblock %}

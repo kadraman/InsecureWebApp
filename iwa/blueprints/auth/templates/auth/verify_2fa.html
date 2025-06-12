@@ -1,0 +1,62 @@
+{% extends 'base.html' %}
+
+{% block header %}
+<h1>{% block title %}Verify{% endblock %}</h1>
+{% endblock %}
+
+{% block content %}
+<div class="site-section bg-light">
+    <div class="container min-vh-100">
+
+        <section class="py-3 py-md-5">
+            <div class="container">
+                <div class="row justify-content-center">
+                    <div class="col-12 col-sm-10 col-md-8 col-lg-6 col-xl-5 col-xxl-4">
+                        <div class="card border border-light-subtle rounded-3 shadow-sm">
+                            <div class="card-body p-3 p-md-4 p-xl-5">
+                                <div class="text-center mb-3">
+                                    <a href="#!">
+                                        <img src="{{ url_for('static', filename='img/login_logo.png') }}"
+                                            alt="IWA Pharmacy Direct" width="175" height="175">
+                                    </a>
+                                </div>
+                                <div class="invisible">Site message</div>
+                                <h2 class="fs-6 fw-normal text-center text-secondary mb-4">Please enter the six-digit
+                                    code from your authenticator app</h2>
+
+                                <form class="needs-validation" method="post">
+                                    <div class="row gy-2 overflow-hidden">
+                                        <div class="col-12">
+                                            <div class="form-floating mb-3">
+                                                <input type="text" class="form-control {{ 'is-invalid' if errors.otp }}"
+                                                    aria-describedby="otp-feedback" name="otp" id="otp" pattern="[0-9]+"
+                                                    minlength="6" maxlength="6" placeholder="Enter OTP"
+                                                    autofocus="autofocus" autocomplete="off" required>
+                                                <label for="otp" class="form-label">Code</label>
+                                                {% if errors.otp %}
+                                                <div id="otp-feedback" class="invalid-feedback">
+                                                    {{ errors.otp }}
+                                                </div>
+                                                {% endif %}
+                                            </div>
+                                        </div>
+                                        <div class="col-12">
+                                            <div class="d-grid my-3">
+                                                <input type="hidden" id="otp_secret" name="otp_secret"
+                                                    placlass="form-control" value="{{ otp_secret }}">
+                                                <button class="btn btn-primary btn-lg" name="verify-submit"
+                                                    id="verify-submit" type="submit">Verify</button>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </form>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+            </div>
+
+    </div>
+
+    {% endblock %}
