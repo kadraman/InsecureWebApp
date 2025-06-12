@@ -7,41 +7,17 @@
 {% block content %}
 <div class="site-section bg-light">
 
-    <div class="container">
+    <div class="container min-vh-100">
 
+        <section class="py-3 py-md-5">
+
+            <div class="container">
         {% include "includes/alerts.html" ignore missing with context %}
 
         <form id="register-form" class="form-horizontal needs-validation form-register" autocomplete="off"
             method="post"><input type="hidden" name="_csrf" value="4c5dc820-d678-4338-be51-dc576db07b54" />
 
             <h1 class="h3 mb-3 font-weight-normal">Enter your registration details</h1>
-
-            <div class="row">
-                <div id="check-username" class="col-md-6">
-                    <label for="username" class="text-black">Username <span class="text-danger">*</span></label>
-                    <div class="input-group">
-                        <input type="text" class="form-control" id="username" name="username" value=""
-                            aria-describedby="usernameHelpBlock">
-                            <button class="btn btn-outline-secondary" type="button" id="check-username-button">Check
-                                Username</button>
-                    </div>
-                    <small id="usernameHelpBlock" class="form-text text-muted">
-                        Your username must be 4-20 characters long, containing letters and numbers, and not spaces or
-                        any special characters.
-                        You can click on "Check Username" to see if it is available.
-                    </small>
-                </div>
-                <div class="col-md-6"></div>
-                <div class="col-md-6">
-                    <div id="username-taken" class="d-none">
-                        <p class="alert alert-danger"></p>
-                    </div>
-                    <div id="username-available" class="d-none">
-                        <p class="alert alert-success"></p>
-                    </div>
-                </div>
-                <div class="col-md-6"></div>
-            </div>
 
             <div class="row">
                 <div class="col-md-6">
@@ -105,6 +81,10 @@
                 </div>
             </div>
         </form>
+
+        </div>
+        
+        </section>
 
     </div>
 

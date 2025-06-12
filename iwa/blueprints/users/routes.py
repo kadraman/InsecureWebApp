@@ -90,20 +90,20 @@ def security():
     else:
         # Generate and store a secret for the user  
         #user_id: int = session["user_id"]
-        username = session["username"]
+        email = session["email"]
         secret = pyotp.random_base32()
         db = get_db()
         error = None
         db.execute(
-            "UPDATE users SET otp_enabled=?, otp_secret=? WHERE username=?",
-            (1, secret, username),
+            "UPDATE users SET otp_enabled=?, otp_secret=? WHERE email=?",
+            (1, secret, email),
         )
         db.commit()
         load_logged_in_user()
 
     # Generate a QR code for the user to scan
     totp = pyotp.TOTP(secret)
-    qr_url = totp.provisioning_uri(g.user['username'], issuer_name="InsecureWebApp")
+    qr_url = totp.provisioning_uri(g.user['email'], issuer_name="InsecureWebApp")
 
     qr = qrcode.QRCode(
         version=1,
@@ -131,7 +131,7 @@ def update_security():
     Edit the users security details.
     """
     if request.method == "POST":
-        username = session["username"]
+        email = session["email"]
         # TODO: implement update security
         flash('Updating security details has not yet been implemented.', 'info')
 
@@ -140,13 +140,13 @@ def update_security():
 
 @users_bp.before_request
 def load_logged_in_user():
-    """If a username is stored in the session, load the user object from
+    """If a email is stored in the session, load the user object from
     the database into ``g.user``."""
-    username = session.get("username")
-    if username is None:
+    email = session.get("email")
+    if email is None:
         g.user = None
     else:
         g.user = (
-            get_db().execute("SELECT * FROM users WHERE username = ?", (username,)).fetchone()
+            get_db().execute("SELECT * FROM users WHERE email = ?", (email,)).fetchone()
        )
-    logger.debug(f"Loading logged in user {g.user['username']}")
+    logger.debug(f"Loading logged in user {g.user['email']}")

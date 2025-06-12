@@ -1,6 +1,6 @@
 
 # Create GitHub Action Repository Variables for your version of the application:
-#   FOD_BASE_URL                - FoD BASE URL for your tenant (e.g. https://ams.fortify.com)
+#   FOD_URL                     - FoD Portal URL for your tenant (e.g. https://ams.fortify.com)
 #   FOD_API_URL                 - FoD API URL for your tenant (e.g. https://api.ams,fortify.com)
 #   FORTIFY_APP_NAME_POSTFIX    - A postfix string to apply to the application to make it unique, set to empty to use DEFAULT_APP_NAME
 #   FOD_PARENT_RELEASE_NAME     - FoD release name corresponding to the parent branch of any newly created branch, this is typically "main" or "develop"

@@ -30,8 +30,8 @@ logger = logging.getLogger(__name__)
 
 
 class usr:
-    def __init__(self, username, password):
-        self.username = username
+    def __init__(self, email, password):
+        self.email = email
         self.password = password
 
 
@@ -39,7 +39,7 @@ def login_required(view):
     """View decorator that redirects anonymous users to the login page."""
     @functools.wraps(view)
     def wrapped_view(**kwargs):
-        if session['username'] is None:
+        if session['email'] is None:
             return redirect(url_for("auth.login"))
 
         return view(**kwargs)
@@ -48,10 +48,10 @@ def login_required(view):
 
 
 def gen_login_cookie(cookie_name, template):
-    username = session["username"]
+    email = session["email"]
     password = session["password"]
-    logger.debug(f"Creating {cookie_name} cookie for {username}:{password}")
-    u1 = usr(username, password)
+    logger.debug(f"Creating {cookie_name} cookie for {email}:{password}")
+    u1 = usr(email, password)
     ser = pickle.dumps(u1)
     b64 = base64.b64encode(ser)
     res = make_response(render_template(template))

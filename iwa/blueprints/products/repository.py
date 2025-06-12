@@ -134,7 +134,7 @@ def get_product_reviews(pid):
     """
     db = get_db()
     data = db.execute(
-        "SELECT r.user_id, r.review_date, r.comment, u.username"
+        "SELECT r.user_id, r.review_date, r.comment, u.email"
         " FROM reviews r"
         " JOIN users u ON r.user_id = u.id AND"
         " (r.product_id = ? OR r.product_id IS null)",
@@ -155,7 +155,7 @@ def get_user_reviews(uid):
     """
     db = get_db()
     data = db.execute(
-        "SELECT r.user_id, r.review_date, r.comment, u.username"
+        "SELECT r.user_id, r.review_date, r.comment, u.email"
         " FROM reviews r"
         " JOIN users u ON r.user_id = u.id AND"
         " (r.user_id = ? OR r.product_id IS null)",

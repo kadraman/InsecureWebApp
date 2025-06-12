@@ -56,6 +56,13 @@ test: ## run unit tests for the project
 clean: ## remove temporary files
 	rm -rf instance .venv .fortify *.lock
 
+.PHONY: bandit-scan
+bandit-scan: ## run Bandit security analysis
+	@echo "Running Bandit security analysis..."
+	@.venv/bin/pip install bandit
+	@.venv/bin/bandit -r iwa -f html -o bandit-report.html
+	@echo "Bandit report generated: bandit-report.html"
+
 .PHONY: sast-scan
 sast-scan: ## run OpenText static application security testing
 	@echo "Running OpenText static application security testing..."

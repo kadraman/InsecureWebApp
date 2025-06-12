@@ -32,7 +32,7 @@ from iwa import create_app, get_db
 @pytest.fixture(scope='module')
 def new_user():
     user = User(10, "user5@localhost.com", "password", datetime.now(), "Steve", "Shopper",
-                "user5@localhost.com", "+44808123456", "London", "State", "Greater London",
+                "+44808123456", "London", "State", "Greater London",
                 "United Kingdom", "ROLE_USER", True, False, "")
     return user
 

@@ -38,31 +38,31 @@ logger = logging.getLogger(__name__)
 @auth_bp.route("/register", methods=("GET", "POST"))
 def register():
     """
-    Register a new user. Validates that the username is not
+    Register a new user. Validates that the email is not
     already taken. Hashes the password for security.
     """
     if request.method == "POST":
-        username = request.form["username"]
+        email = request.form["email"]
         password = request.form["password"]
         db = get_db()
         error = None
 
-        if not username:
-            error = "Username is required."
+        if not email:
+            error = "Email is required."
         elif not password:
             error = "Password is required."
 
         if error is None:
             try:
                 db.execute(
-                    "INSERT INTO users (username, password) VALUES (?, ?)",
-                    (username, generate_password_hash(password)),
+                    "INSERT INTO users (email, password) VALUES (?, ?)",
+                    (email, generate_password_hash(password)),
                 )
                 db.commit()
             except db.IntegrityError:
-                # The username was already taken, which caused the
+                # The email was already taken, which caused the
                 # commit to fail. Show a validation error.
-                error = f"User {username} is already registered."
+                error = f"User {email} is already registered."
             else:
                 # Success, go to the login page.
                 flash('You have been successfully registered', 'success')
@@ -77,7 +77,7 @@ def register():
 def login():
     """
     Log in a registered user. If "rememberme" session cookie
-    was set then auto login. If not then validate username
+    was set then auto login. If not then validate email
     and password credentials and redirect to OTP authentication
     if required.
     """
@@ -87,33 +87,33 @@ def login():
         # found 'rememberme' cookie, extract its details
         b64 = request.cookies.get('rememberme')
         a = pickle.loads(base64.b64decode(b64))
-        # store the username in a new session and navigate to users home
+        # store the email in a new session and navigate to users home
         session.clear()
-        session["username"] = a.username
+        session["email"] = a.email
         session['loggedin'] = True
         return redirect(url_for("users.home"))
     
     if request.method == "POST":
-        username = request.form["username"]
+        email = request.form["email"]
         password = request.form["password"]
-        logger.debug(f"Logging in user {username}:{password}")
+        logger.debug(f"Logging in user {email}:{password}")
         db = get_db()
         error = None
         user = db.execute(
-            "SELECT * FROM users WHERE username = ?", (username,)
+            "SELECT * FROM users WHERE email = ?", (email,)
         ).fetchone()
 
         if user is None:
-            errors['username'] = "Incorrect username."
+            errors['email'] = "Incorrect email address."
         elif not check_password_hash(user["password"], password):
             errors['password'] = "Incorrect password."
 
         if not errors:
-            # store the username in a new session and navigate to home
+            # store the email in a new session and navigate to home
             session.clear()
             session["firstname"] = user["first_name"]
             session["lastname"] = user["last_name"]
-            session["username"] = user["username"]
+            session["email"] = user["email"]
             session["password"] = user["password"]
             session["otp_enabled"] = 0
             if user["otp_enabled"]:
@@ -127,7 +127,7 @@ def login():
 
         #flash(error, 'error')
 
-    return render_template("auth/login.html", errors=errors, username=request.form.get("username", ""))
+    return render_template("auth/login.html", errors=errors, email=request.form.get("email", ""))
 
 
 @auth_bp.route("/verify_2fa", methods=("GET", "POST"))
@@ -142,7 +142,7 @@ def verify_2fa():
         abort(500, "2FA is not enabled.")
 
     load_logged_in_user()
-    logger.debug(f"verify_2fa:: OTP secret for {g.user['username']} is {g.user['otp_secret']}")
+    logger.debug(f"verify_2fa:: OTP secret for {g.user['email']} is {g.user['otp_secret']}")
 
     if request.method == "POST":
         # retrieve secret for the user  

@@ -136,7 +136,7 @@
             {% endif %}
             {% for r in reviews %}
             <div class="col-sm-12 item mb-4">
-                <h6 class='text-dark pt-2'>Review by <em>{{ r.username }}</em> on {{ r.review_date.strftime('%d %B, %Y')
+                <h6 class='text-dark pt-2'>Review by <em>{{ r.email }}</em> on {{ r.review_date.strftime('%d %B, %Y')
                     }}</h6>
                 <p>{{ r.comment }}</p>
             </div>

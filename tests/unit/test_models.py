@@ -23,8 +23,9 @@ def test_new_user(new_user):
     """
     Test the User model of InsecureWebApp
     """
-    assert new_user.username == 'user5@localhost.com'
     assert new_user.email == 'user5@localhost.com'
+    assert new_user.first_name == 'Steve'
+    assert new_user.last_name == 'Shopper'
 
 
 def test_new_product(new_product):

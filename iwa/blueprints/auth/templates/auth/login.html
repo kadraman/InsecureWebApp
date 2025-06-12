@@ -27,14 +27,14 @@
                   <div class="row gy-2 overflow-hidden">
                     <div class="col-12">
                       <div class="form-floating mb-3">
-                        <input type="email" class="form-control {{ 'is-invalid' if errors.username }}" name="username"
-                          id="username" aria-describedby="username-feedback" value="{{ username }}"
+                        <input type="email" class="form-control {{ 'is-invalid' if errors.email }}" name="email"
+                          id="email" aria-describedby="email-feedback" value="{{ email }}"
                           pattern="[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}" placeholder="name@example.com"
                           autofocus="autofocus" required>
-                        <label for="username" class="form-label">Email</label>
-                        {% if errors.username %}
-                        <div id="username-feedback" class="invalid-feedback">
-                          {{ errors.username }}
+                        <label for="email" class="form-label">Email</label>
+                        {% if errors.email %}
+                        <div id="email-feedback" class="invalid-feedback">
+                          {{ errors.email }}
                         </div>
                         {% endif %}
                       </div>
