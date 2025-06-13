@@ -3,7 +3,15 @@
 # More info on Python, GitHub Actions, and Azure App Service: https://aka.ms/python-webapps-actions
 
 name: Build and Deploy to Azure
-
+permissions:
+    # required for all workflows
+    security-events: write
+    # required to fetch internal or private CodeQL packs
+    packages: read
+    # only required for workflows in private repositories
+    actions: read
+    contents: read
+    
 on:
   push:
     branches:

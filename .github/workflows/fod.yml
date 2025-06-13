@@ -16,11 +16,13 @@
 
 name: DevSecOps with Fortify on Demand
 permissions:
-  contents: read
-  pull-requests: write
-  actions: write
-  checks: write
-  id-token: write
+    # required for all workflows
+    security-events: write
+    # required to fetch internal or private CodeQL packs
+    packages: read
+    # only required for workflows in private repositories
+    actions: read
+    contents: read
 
 on:
   # Triggers the workflow on push or pull request events but only for the main or develop branches

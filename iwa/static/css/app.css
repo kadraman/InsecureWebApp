@@ -212,6 +212,7 @@ a:hover {
     background-position: center center;
     position: relative;
 }
+/*
 .site-blocks-cover, .site-blocks-cover > .container > .row {
     min-height: 700px;
     height: calc(100vh);
@@ -219,7 +220,7 @@ a:hover {
 .site-blocks-cover.inner-page, .site-blocks-cover.inner-page .row {
     min-height: 400px;
     height: 700px;
-}
+}*/
 .site-blocks-cover h2 {
     font-size: 14px;
     font-weight: normal;
@@ -627,7 +628,7 @@ a:hover {
     z-index: 2;
 }
 .section-overlap {
-    margin-top: -300px;
+    margin-top: -100px;
 }
 .custom-pill .nav-item {
     margin-right: 4px;

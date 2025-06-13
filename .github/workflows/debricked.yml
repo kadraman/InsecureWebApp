@@ -3,7 +3,15 @@
 #   DEBRICKEN_TOKEN should be an API Access Token from your Debricked tenant.
 
 name: OSS SCA with Debricked
-
+permissions:
+    # required for all workflows
+    security-events: write
+    # required to fetch internal or private CodeQL packs
+    packages: read
+    # only required for workflows in private repositories
+    actions: read
+    contents: read
+    
 on:
   # Triggers the workflow on push or pull request events but only for the main and dev branches
   push:
