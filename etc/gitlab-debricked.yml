@@ -1,0 +1,46 @@
+# Example jobs for working with OpenText Software Composition Analysis Core (debricked)
+
+debricked-prepare:
+  stage: test
+  script: |
+    if [[ $CI_MERGE_REQUEST_ID != "" ]]; then
+        echo "Running in a merge request pipeline ..."
+        echo "DEBRICKED_REPO=${DEFAULT_APP_NAME}" >> build.env
+        echo "DEBRICKED_BRANCH=${CI_MERGE_REQUEST_SOURCE_BRANCH_NAME}" >> build.env
+    else
+        echo "Running in a branch pipeline ..."
+        echo "DEBRICKED_REPO=${DEFAULT_APP_NAME}" >> build.env
+        echo "DEBRICKED_BRANCH=${CI_COMMIT_BRANCH}" >> build.env
+    fi
+    echo "Created build.env with the following contents:"
+    cat build.env
+  artifacts:
+    reports:
+      dotenv: build.env
+
+debricked-sca-scan:
+  extends: fcli
+  stage: test
+  needs: 
+    - job: debricked-prepare
+      artifacts: true
+  before_script: |
+    echo "DEBRICKED_REPO=${DEBRICKED_REPO}"
+    echo "DEBRICKED_BRANCH=${DEBRICKED_BRANCH}"
+  script: |
+    curl -L https://github.com/debricked/cli/releases/latest/download/cli_linux_x86_64.tar.gz | tar -xz debricked
+    chmod a+x ./debricked
+    ./debricked scan . -r ${DEBRICKED_REPO} -b ${DEBRICKED_BRANCH} -t ${DEBRICKED_TOKEN} --sbom CycloneDX --sbom-output gl-sbom-cdx.json
+  variables:
+    DEBRICKED_TOKEN: ${DEBRICKED_TOKEN}
+  artifacts:
+    reports:
+      cyclonedx:
+        - gl-sbom-cdx.json
+  rules:
+    - if: ( $DEBRICKED_TOKEN != null || $DEBRICKED_TOKEN =~ /^./ )
+    - if: $CI_PIPELINE_SOURCE == "merge_request_event"
+    - if: $CI_COMMIT_BRANCH && $CI_OPEN_MERGE_REQUESTS
+      when: never
+    - if: $CI_COMMIT_BRANCH
+

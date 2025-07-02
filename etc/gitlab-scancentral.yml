@@ -1,0 +1,78 @@
+# Example jobs for working with OpenText Application Security (ScanCentral)
+
+env-prepare:
+  stage: build
+  script: |
+    if [[ $CI_MERGE_REQUEST_ID != "" ]]; then
+        echo "Running in a merge request pipeline ..."
+        echo "SSC_APPVERSION=${DEFAULT_APP_NAME}${SSC_APP_NAME_POSTFIX}:merge-to-${CI_MERGE_REQUEST_TARGET_BRANCH_NAME}!MR${CI_MERGE_REQUEST_IID}" >> build.env
+        echo "SSC_PARENT_APPVERSION=${DEFAULT_APP_NAME}${SSC_APP_NAME_POSTFIX}:${CI_MERGE_REQUEST_SOURCE_BRANCH_NAME}" >> build.env
+    else
+        echo "Running in a branch pipeline ..."
+        echo "SSC_APPVERSION=${DEFAULT_APP_NAME}${SSC_APP_NAME_POSTFIX}:${CI_COMMIT_BRANCH}" >> build.env
+        echo "SSC_PARENT_APPVERSION=${DEFAULT_APP_NAME}${SSC_APP_NAME_POSTFIX}:${DEFAULT_PARENT_APPVERSION_NAME}" >> build.env
+    fi
+    echo "Created build.env with the following contents:"
+    cat build.env
+  artifacts:
+    reports:
+      dotenv: build.env
+
+fortify-sast-scan:                # Needs to match the job name specified above
+  stage: scan
+  needs: 
+    - job: python-test
+    - job: fortify-sast-scan-prepare
+    - job: env-prepare
+      artifacts: true
+  before_script: |
+    echo "SSC_APPVERSION=${SSC_APPVERSION}"
+    echo "SSC_PARENT_APPVERSION=${SSC_PARENT_APPVERSION}"
+  variables:                      # Specify AST scan configuration like SSC/FOD URL/credentials, tasks to execute, ...
+    SSC_URL: ${SSC_URL}           # See https://fortify.github.io/fcli/<fcli-version>/generic-actions.html#_ci for details
+    SSC_TOKEN: ${SSC_TOKEN}
+    SC_SAST_TOKEN: ${SC_SAST_TOKEN}
+    #SSC_APPVERSION: "${DEFAULT_APP_NAME}${SSC_APP_NAME_POSTFIX}:${DEFAULT_APPVERSION_NAME}"
+    DO_SETUP: true
+    SETUP_EXTRA_OPTS: '--copy-from "${SSC_PARENT_APPVERSION}" --issue-template "Prioritized High Risk Issue Template"'
+    #PACKAGE_EXTRA_OPTS: --python-version 3 --python-virtual-env .ven --python-requirements requirements.txt
+    #USE_PACKAGE: myCustomPackage.zip
+    DO_APPVERSION_SUMMARY: true
+    DO_CHECK_POLICY: false       # Set to true to check for policy violations and fail build if any are found
+    DO_PR_COMMENT: true
+    DO_EXPORT: true
+  rules:
+    - if: ( $SSC_URL != null || $SSC_URL =~ /^./ )
+
+
+fortify-dast-scan:
+  extends: fcli
+  stage: scan
+  needs: 
+    - job: python-build
+    - job: fcli-prepare
+    - job: env-prepare
+      artifacts: true
+    - job: fortify-sast-scan # add as dependency so that a new SSC App Version is automatically created (if required)
+  before_script: |
+    echo "SSC_APPVERSION=${SSC_APPVERSION}"
+    echo "SSC_PARENT_APPVERSION=${SSC_PARENT_APPVERSION}"
+    sh ./bin/wait-for-website.sh
+  script: |
+    ${FCLI} ssc session login --url ${SSC_URL} -t ${SSC_TOKEN} -c ${SC_SAST_TOKEN} --ssc-session gitlab
+    ${FCLI} sc-dast scan start -n "$SCAN_NAME" -s $SCDAST_SETTINGS_ID --store curScan --ssc-session gitlab
+    ${FCLI} sc-dast scan wait-for ::curScan:: --ssc-session gitlab
+    ${FCLI} ssc action run gitlab-dast-report --av ${SSC_APPVERSION} --ssc-session gitlab
+    ${FCLI} ssc session logout --ssc-session gitlab
+  variables:
+    SSC_URL: ${SSC_URL}
+    SSC_TOKEN: ${SSC_TOKEN}
+    SCAN_NAME: "GitLab Pipeline Scan"
+    SCDAST_SETTINGS_ID: ${SCDAST_SETTINGS_ID}
+  artifacts:
+    reports:
+      dast:
+        - gl-fortify-dast.json
+  rules:
+    - if: ( $SCDAST_SETTINGS_ID != null || $SCDAST_SETTINGS_ID =~ /^./ )
+    - if: '$CI_COMMIT_BRANCH == "main"' # only run DAST scan on main branch
