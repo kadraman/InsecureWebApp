@@ -76,3 +76,4 @@ app/static/data/email-db.json
 requirements.txt.pip.debricked.lock
 ams.fod.login.sh
 emea.fod.login.sh
+bandit-report.html

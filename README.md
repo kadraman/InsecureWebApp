@@ -8,9 +8,10 @@ Security testing tools - such as [OpenText Application Security](https://www.ope
 Pre-requisities
 ---------------
 
- - Windows or Linux machine with Python 3.12 or later
+ - [Python 3.12 or later](https://www.python.org/downloads/)
  - [Pip package manager](https://pypi.org/project/pip/)
- - [GNU Make](https://www.gnu.org/software/make/)
+ - [CygWin](https://www.cygwin.com/) - if running on Windows
+ - [Rust Compiler](https://www.rust-lang.org/tools/install) - if running on Windows as some Pip packages require it
  - Docker installation (optional)
 
 Run Application (locally)

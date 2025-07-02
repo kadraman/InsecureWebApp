@@ -33,7 +33,7 @@ fortify-sast-scan:                # Needs to match the job name specified above
     SSC_TOKEN: ${SSC_TOKEN}
     SC_SAST_TOKEN: ${SC_SAST_TOKEN}
     #SSC_APPVERSION: "${DEFAULT_APP_NAME}${SSC_APP_NAME_POSTFIX}:${DEFAULT_APPVERSION_NAME}"
-    DO_SETUP: true
+    DO_SETUP: false
     SETUP_EXTRA_OPTS: '--copy-from "${SSC_PARENT_APPVERSION}" --issue-template "Prioritized High Risk Issue Template"'
     #PACKAGE_EXTRA_OPTS: --python-version 3 --python-virtual-env .ven --python-requirements requirements.txt
     #USE_PACKAGE: myCustomPackage.zip
