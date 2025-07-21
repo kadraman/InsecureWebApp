@@ -1,13 +1,11 @@
 -include .env
 
 ROOT_DIR := $(abspath $(dir $(lastword $(MAKEFILE_LIST)))/..)
-ROOT_DIR := $(shell dirname $(realpath $(firstword $(MAKEFILE_LIST))))
 PROJECT := InsecureWebApp
-PROJECT_LOWER := $(shell echo $(PROJECT) | tr '[:upper:]' '[:lower:]')
-PROJECTS := $(shell ls . | grep project)
+PROJECT_LOWER := $(call tolower,$(PROJECT))
+PROJECTS := $(filter %project%,$(wildcard *))
 VERSION ?= $(shell git describe --tags --always --dirty --match=v* 2> /dev/null || echo "1.0.0")
 COMMIT := $(shell git log -1 --pretty=format:"%H")
-UNAME := $(shell uname)
 
 FLASK_APP := iwa
 
@@ -29,12 +27,7 @@ default: help
 # generate help info from comments
 .PHONY: help
 help: ## help information about make commands
-ifeq ($(OS),Windows_NT)
-	@echo Running on Windows: $(OS)
-else
-	@echo Running on Linux/UNIX: $(UNAME)
-endif
-	@grep -h -P '^[a-zA-Z_-]+:.*?## .*$$' $(MAKEFILE_LIST) | sort | awk 'BEGIN {FS = ":.*?## "}; {printf "\033[36m%-30s\033[0m %s\n", $$1, $$2}'
+	@python etc/print_makefile_help.py
 
 .PHONY: version
 version: ## display the version of the service
@@ -44,6 +37,7 @@ version: ## display the version of the service
 build:  ## build the project
 	@echo "Building $(PROJECT)..."
 	python -m venv .venv
+	pip install -U flask
 ifeq ($(OS),Windows_NT)
 	cmd /c .\.venv\Scripts\activate.bat
 	.venv/Scripts/pip install -r requirements.txt
@@ -61,7 +55,7 @@ build-docker: ## build the project as a docker image
 run: ## run the project
 	@echo "Running $(PROJECT)..."
 ifeq ($(OS),Windows_NT)
-	cmd /C "set FLASK_ENV=development && set FLASK_DEBUG=1 && set FLASK_APP=$(FLASK_APP) && flask run --host 0.0.0.0"
+	cmd /C ".\.venv\Scripts\activate.bat && set FLASK_ENV=development && set FLASK_DEBUG=1 && set FLASK_APP=$(FLASK_APP) && flask run --host 0.0.0.0"
 else
 	FLASK_ENV=development FLASK_DEBUG=1 FLASK_APP=$(FLASK_APP) .venv/bin/flask run --host 0.0.0.0
 endif
@@ -70,7 +64,7 @@ endif
 run-production: ## run the project in production mode
 	@echo "Running $(PROJECT) in production mode..."
 ifeq ($(OS),Windows_NT)
-	cmd /C "set FLASK_ENV=production && set FLASK_APP=$(FLASK_APP) && flask run --host 0.0.0.0"
+	cmd /C ".\.venv\Scripts\activate.bat && set FLASK_ENV=production && set FLASK_APP=$(FLASK_APP) && flask run --host 0.0.0.0"
 else
 	FLASK_ENV=production FLASK_APP=$(FLASK_APP) .venv/bin/flask run --host 0.0.0.0
 endif
@@ -78,8 +72,9 @@ endif
 .PHONY: test
 test: ## run unit tests for the project
 	@echo "Testing $(PROJECT)..."
+	pip install -U pytest
 ifeq ($(OS),Windows_NT)
-	cmd /C "set FLASK_ENV=development && set FLASK_DEBUG=1 && set FLASK_APP=$(FLASK_APP) && pytest"
+	cmd /C ".\.venv\Scripts\activate.bat && set FLASK_ENV=development && set FLASK_DEBUG=1 && set FLASK_APP=$(FLASK_APP) && pytest"
 else
 	FLASK_ENV=development FLASK_DEBUG=1 FLASK_APP=$(FLASK_APP) .venv/bin/pytest
 endif
@@ -87,9 +82,9 @@ endif
 .PHONY: clean
 clean: ## remove temporary files
 ifeq ($(OS),Windows_NT)
-	cmd /c "rmdir /s /q instance .venv .fortify"
+	cmd /c "rmdir /s /q instance .venv .fortify bandit-report.html"
 else
-	rm -rf instance .venv .fortify
+	rm -rf instance .venv .fortify bandit-report.html
 endif
 
 .PHONY: bandit-scan
