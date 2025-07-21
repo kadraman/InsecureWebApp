@@ -168,7 +168,7 @@ jobs:
           FOD_CLIENT_ID: ${{secrets.FOD_CLIENT_ID}}
           FOD_CLIENT_SECRET: ${{secrets.FOD_CLIENT_SECRET}}
           # FOD_LOGIN_EXTRA_OPTS: --socket-timeout=60s
-           FOD_RELEASE: ${{ format('{0}{1}:{2}', env.DEFAULT_APP_NAME, vars.FORTIFY_APP_NAME_POSTFIX, github.ref_name) }}
+          FOD_RELEASE: ${{ format('{0}{1}:{2}', env.DEFAULT_APP_NAME, vars.FORTIFY_APP_NAME_POSTFIX, github.ref_name) }}
           # DO_SETUP: true
           # SETUP_ACTION: https://scm.my.org/shared-repos/fcli-actions/setup.yaml
           SETUP_EXTRA_OPTS: ${{ format('--copy-from "{0}" --sdlc-status Development --app-owner {1} --assessment-type "{2}" --use-aviator --technology-stack=JS/TS/HTML', env.FOD_PARENT_RELEASE, vars.FOD_DEFAULT_OWNER, vars.FOD_DEFAULT_ASSESSMENT_TYPE) }} 
