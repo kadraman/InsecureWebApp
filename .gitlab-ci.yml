@@ -45,6 +45,7 @@ image: python:3.12    # default image to use for the pipeline
 
 stages:
   - build
+  - dockerize
   - test
   - deploy
   - scan
@@ -63,6 +64,8 @@ variables:
   DEFAULT_PARENT_APPVERSION_NAME: "main"
   DEFAULT_RELEASE_NAME: "${CI_COMMIT_BRANCH}"
   DEFAULT_APPVERSION_NAME: "${CI_COMMIT_BRANCH}"
+  DEFAULT_SONATYPE_IQ_APPLICATION_ID: "insecurewebapp"
+  IMAGE_TAG: $CI_REGISTRY_IMAGE:$CI_COMMIT_SHORT_SHA
 
 # use a cache for Python .venv and deps
 cache:
@@ -84,7 +87,7 @@ include:
   # include Sonatype Nexus IQ jobs if NEXUS_IQ_URL is defined
   - component: $CI_SERVER_FQDN/sonatype-integrations/components/evaluate-sbom@main
     inputs:
-      application-id: insecurewebapp
+      application-id: $DEFAULT_SONATYPE_IQ_APPLICATION_ID
       scan-targets:
         - deps
       result-file: evaluation-result.json
@@ -148,8 +151,51 @@ python-test:
         coverage_format: cobertura
         path: coverage.xml
 
+# This is a sample job to build the application into a Docker image and push it to the GitLab Container Registry
+docker-build:
+  stage: dockerize
+  image: docker:latest
+  dependencies:
+    - python-build
+  services:
+    - docker:dind
+  before_script:
+    - echo $CI_JOB_TOKEN | docker login -u gitlab-ci-token --password-stdin $CI_REGISTRY
+    - echo $IMAGE_TAG
+  script:
+    - docker build -t $IMAGE_TAG .
+    - docker push $IMAGE_TAG
+  rules:
+    - if: $CI_COMMIT_BRANCH == "main"
+
+# This job runs Sonatype Nexus IQ evaluation on the Docker image built in the docker-build job.
+sonatype-docker-scan:
+  stage: test
+  image: docker:latest
+  services:
+    - docker:dind
+  needs:
+  - job: docker-build
+  before_script:
+    - echo $CI_JOB_TOKEN | docker login -u gitlab-ci-token --password-stdin $CI_REGISTRY
+    - echo $IMAGE_TAG
+    - docker pull $IMAGE_TAG
+    - export NEXUS_CONTAINER_IMAGE_REGISTRY_USER=gitlab-ci-token
+    - export NEXUS_CONTAINER_IMAGE_REGISTRY_PASSWORD=$CI_JOB_TOKEN
+    - export NEXUS_CONTAINER_INCLUDE_ONLY_OS_COMPONENTS=true
+  script:
+    - |
+      docker run -v /tmp:/tmp -v $CI_PROJECT_DIR:/sonatype/reports -v /var/run/docker.sock:/var/run/docker.sock \
+      -e NEXUS_IQ_URL -e NEXUS_IQ_USERNAME -e NEXUS_IQ_PASSWORD -e NEXUS_CONTAINER_IMAGE_REGISTRY_USER -e NEXUS_CONTAINER_IMAGE_REGISTRY_PASSWORD \
+      sonatype/gitlab-nexus-iq-pipeline:latest /sonatype/evaluate -i $DEFAULT_SONATYPE_IQ_APPLICATION_ID -t stage-release container:$IMAGE_TAG
+  artifacts:
+    paths:
+      - $CI_PROJECT_DIR/$CI_PROJECT_NAME-policy-eval-report.html
+  rules:
+    - if: $CI_COMMIT_BRANCH == "main"
+
 # This is a sample job to deploy the application. You can replace it with your actual deploy job.
-python-deploy:
+deploy:
   stage: deploy
   script:
     - echo "Deploying the application..."

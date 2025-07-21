@@ -1,0 +1,75 @@
+# yaml-language-server: $schema=https://fortify.github.io/fcli/schemas/action/fcli-action-schema-2.1.0.json
+
+author: Fortify
+usage:
+  header: Set up application version. 
+  description: |
+      This action allows for preparing an application version for running an application
+      security scan, creating the application and/or release if they do not exist yet.
+      
+      Although the same functionality can be achieved by manually running the 
+      `fcli ssc appversion create` command, this action provides a convenient and 
+      standardized approach for running this command with some default options like
+      `--skip-if-exists` and `--auto-required-attrs`.
+      
+      To provide even more consistency across CI/CD pipelines in your organization, it
+      is recommended to implement one or more custom setup actions that provide suitable
+      default values or even hard-coded, non-overridable values for the various options,
+      for example based on business unit, team, and/or application type. Such custom 
+      actions could for example set standard application version attributes for a 
+      particular type of application to be scanned. Alternative to implementing multiple 
+      custom actions, you may also consider implementing a single custom action that takes 
+      for example a --profile option to select between different profiles that each define 
+      appropriate option values and setup commands to run.
+
+config:
+  rest.target.default: ssc
+  output: immediate
+  
+cli.options:
+  appversion:
+    names: --appversion, --av
+    required: true
+    description: "Required application version name as <appName>:<versionName>"
+  add-users:
+    names: --add-users
+    group: av_create_opts
+    required: false
+    description: "See `fcli ssc appversion create`"
+  attrs:
+    names: --attrs, --attributes
+    group: av_create_opts
+    required: false
+    description: "See `fcli ssc appversion create`"
+  copy:
+    names: --copy
+    group: av_create_opts
+    required: false 
+    description: "See `fcli ssc appversion create`"
+  description:
+    names: --description, -d
+    group: av_create_opts
+    required: false
+    description: "See `fcli ssc appversion create`"
+  copy-from:
+    names: --copy-from, --from
+    group: av_create_opts
+    required: false
+    description: "See `fcli ssc appversion create`"
+  issue-template:
+    names: --issue-template
+    group: av_create_opts
+    required: false
+    description: "See `fcli ssc appversion create`"
+  refresh-timeout:
+    names: --refresh-timeout
+    group: av_create_opts
+    required: false
+    default: "300s"
+    description: "See `fcli ssc appversion create`. Default value: 300s"
+
+steps:
+  - log.progress: "Creating SSC application version if non-existing"
+  - run.fcli:
+      createAppVersion:
+        cmd: ssc av create "${cli.appversion}" --skip-if-exists --auto-required-attrs --refresh ${#action.copyParametersFromGroup("av_create_opts")}

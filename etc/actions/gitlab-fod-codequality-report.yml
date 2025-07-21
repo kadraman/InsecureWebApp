@@ -1,8 +1,8 @@
-$schema: https://fortify.github.io/fcli/schemas/action/fcli-action-schema-2.1.0.json
+# yaml-language-server: $schema=https://fortify.github.io/fcli/schemas/action/fcli-action-schema-2.1.0.json
 
 author: Fortify
 usage:
-  header: Generate a GitLab Code Quality Report listing FoD SAST vulnerabilities. 
+  header: Generate a GitLab Code Quality report listing FoD SAST vulnerabilities.
   description: |
     For information on how to import this report into GitLab, see 
     https://docs.gitlab.com/ee/ci/yaml/artifacts_reports.html#artifactsreportscodequality

@@ -35,51 +35,15 @@ fortify-sast-scan:                # Needs to match the job name specified above
     #FOD_RELEASE: "${DEFAULT_APP_NAME}${FOD_APP_NAME_POSTFIX}:${DEFAULT_RELEASE_NAME}"
     DO_SETUP: true
     SETUP_EXTRA_OPTS: '--copy-from "${FOD_PARENT_RELEASE}" --use-aviator' # --oss
-    PACKAGE_EXTRA_OPTS: -oss
+    PACKAGE_EXTRA_OPTS: '-oss'
     #PACKAGE_EXTRA_OPTS: --python-version 3 --python-virtual-env .ven --python-requirements requirements.txt
     #USE_PACKAGE: myCustomPackage.zip
     DO_RELEASE_SUMMARY: true
     DO_CHECK_POLICY: false       # Set to true to check for policy violations and fail build if any are found
     DO_PR_COMMENT: true
     DO_EXPORT: true
-
-#An example of a job that runs the Fortify SAST scan using the fcli tool
-#fortify-sast-scan:                # Needs to match the job name specified above
-#  extends: fcli
-#  stage: scan
-#  needs: 
-#      - job: python-test
-#      - job: fcli-prepare
-#      - job: env-prepare
-#        artifacts: true
-#  before_script: |
-#    echo "FOD_RELEASE=${FOD_RELEASE}"
-#    echo "FOD_PARENT_RELEASE=${FOD_PARENT_RELEASE}"
-#  script:
-#    - ${FCLI} action run ci
-#  variables:
-#    FOD_URL: ${FOD_URL}           # See https://fortify.github.io/fcli/<fcli-version>/generic-actions.html#_ci for details
-#    FOD_CLIENT_ID: ${FOD_CLIENT_ID}  
-#    FOD_CLIENT_SECRET: ${FOD_CLIENT_SECRET}
-#    #FOD_RELEASE: "${DEFAULT_APP_NAME}${FOD_APP_NAME_POSTFIX}:${DEFAULT_RELEASE_NAME}"
-#    DO_SETUP: true
-#    SETUP_EXTRA_OPTS: '--copy-from "${FOD_PARENT_RELEASE}" --use-aviator' # --oss
-#    PACKAGE_EXTRA_OPTS: -oss
-#    #PACKAGE_EXTRA_OPTS: --python-version 3 --python-virtual-env .ven --python-requirements requirements.txt
-#    #USE_PACKAGE: myCustomPackage.zip
-#    DO_JOB_SUMMARY: true
-#    DO_CHECK_POLICY: false       # Set to true to check for policy violations and fail build if any are found
-#    DO_PR_COMMENT: true
-#    DO_EXPORT: true
-#  artifacts:
-#    reports:
-#      sast: gl-fortify-sast.json
-#    paths: [ gl-fortify-sast.json ]
-#  rules:
-#    - if: $CI_PIPELINE_SOURCE == "merge_request_event"
-#    - if: $CI_COMMIT_BRANCH && $CI_OPEN_MERGE_REQUESTS
-#      when: never
-#    - if: $CI_COMMIT_BRANCH
+  rules:
+    - if: ( $FOD_URL != null || $FOD_URL =~ /^./ )
 
 fortify-sca-scan:
   extends: fcli
@@ -119,7 +83,7 @@ fortify-dast-scan:
   extends: fcli
   stage: scan
   needs: 
-    - job: python-deploy
+    - job: deploy
     - job: fcli-prepare
     - job: env-prepare
       artifacts: true
@@ -129,9 +93,8 @@ fortify-dast-scan:
     echo "FOD_PARENT_RELEASE=${FOD_PARENT_RELEASE}"
   script: |
     ${FCLI} fod session login --url $FOD_API_URL --client-id $FOD_CLIENT_ID --client-secret $FOD_CLIENT_SECRET --fod-session gitlab
-    ${FCLI} fod dast-scan start --release "${FOD_RELEASE}" --store curScan --fod-session gitlab
-    sleep 10
-    ${FCLI} fod sast-scan wait-for ::curScan:: --fod-session gitlab
+    # ${FCLI} fod dast-scan start --release "${FOD_RELEASE}" --store curScan --fod-session gitlab
+    # ${FCLI} fod dast-scan wait-for ::curScan:: --fod-session gitlab
     ${FCLI} fod action run gitlab-dast-report --release "${FOD_RELEASE}" --fod-session gitlab
     ${FCLI} fod session logout --fod-session gitlab
   variables:
@@ -144,9 +107,7 @@ fortify-dast-scan:
       dast: gl-fortify-dast.json
     paths: [ gl-fortify-dast.json ]
   rules:
-    # Only run DAST scan on a schedule
-    - if: $CI_PIPELINE_SOURCE == "schedule"
-      when: on_success
+    - if: '$CI_COMMIT_BRANCH == "main"' # only run DAST scan on main branch
 
 fortify-security-gate:
   extends: fcli
@@ -164,20 +125,17 @@ fortify-security-gate:
     echo "FOD_PARENT_RELEASE=${FOD_PARENT_RELEASE}"
   script: |
     ${FCLI} fod session login --url $FOD_API_URL --client-id $FOD_CLIENT_ID --client-secret $FOD_CLIENT_SECRET --fod-session gitlab
-    ${FCLI} fod action run etc/custom-release-summary.action --on-unsigned=ignore --release "${FOD_RELEASE}" --fod-session gitlab
-    ${FCLI} fod action run etc/gitlab-fod-annotations.action --on-unsigned=ignore --release "${FOD_RELEASE}" --url "${FOD_URL}" --fod-session gitlab
-    ${FCLI} fod action run etc/gitlab-codequality-report.action --on-unsigned=ignore --release "${FOD_RELEASE}" --fod-session gitlab
-    ${FCLI} fod action run etc/custom-check-policy.action --on-unsigned=ignore --release "${FOD_RELEASE}" --fod-session gitlab
+    ${FCLI} fod action run release-summary --on-unsigned=ignore --release "${FOD_RELEASE}" --fod-session gitlab
+    ${FCLI} fod action run etc/actions/gitlab-fod-codequality-report.yml --on-unsigned=ignore --release "${FOD_RELEASE}" -f release-summary.md --fod-session gitlab
+    ${FCLI} fod action run etc/actions/custom-fod-check-policy.yml --on-unsigned=ignore --release "${FOD_RELEASE}" --fod-session gitlab
     ${FCLI} fod session logout --fod-session gitlab
   variables:
     FOD_URL: ${FOD_URL}
     FOD_API_URL: ${FOD_API_URL}
     FOD_CLIENT_ID: ${FOD_CLIENT_ID}  
     FOD_CLIENT_SECRET: ${FOD_CLIENT_SECRET}
-    #FOD_RELEASE: "${DEFAULT_APP_NAME}${FOD_APP_NAME_POSTFIX}:${DEFAULT_RELEASE_NAME}"
   artifacts:
       reports:
-        annotations:  'gl-fortify-annotations.json'
         codequality:  'gl-fortify-codequality.json'
       expose_as: 'Release Summary'
       paths: [ 'release-summary.md' ]

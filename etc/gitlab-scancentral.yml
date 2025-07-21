@@ -18,11 +18,39 @@ env-prepare:
     reports:
       dotenv: build.env
 
+fortify-setup-appversion:
+  extends: fcli
+  stage: scan
+  needs:
+    - job: python-build
+    - job: fcli-prepare
+    - job: env-prepare
+      artifacts: true
+  before_script: |
+    echo "SSC_APPVERSION=${SSC_APPVERSION}"
+    echo "SSC_PARENT_APPVERSION=${SSC_PARENT_APPVERSION}"
+  script: |
+    ${FCLI} ssc session login --url ${SSC_URL} -t ${SSC_TOKEN} -c ${SC_SAST_TOKEN} --ssc-session gitlab
+    if [[ "$s1" == "$s2" ]]
+    then
+      ${FCLI} ssc action run etc/actions/ssc-setup-appversion.yml --on-unsigned=ignore --av "${SSC_APPVERSION}" --issue-template="${SSC_ISSUE_TEMPLATE}" --ssc-session gitlab
+    else
+      ${FCLI} ssc action run etc/actions/ssc-setup-appversion.yml --on-unsigned=ignore --av "${SSC_APPVERSION}" --issue-template="${SSC_ISSUE_TEMPLATE}" --copy-from "${SSC_PARENT_APPVERSION}" --ssc-session gitlab
+    fi
+    ${FCLI} ssc session logout --ssc-session gitlab
+  variables:
+    SSC_URL: ${SSC_URL}
+    SSC_TOKEN: ${SSC_TOKEN}
+    SSC_ISSUE_TEMPLATE: "Prioritized High Risk Issue Template"
+  rules:
+    - if: ( $SSC_URL != null || $SSC_URL =~ /^./ )
+
 fortify-sast-scan:                # Needs to match the job name specified above
   stage: scan
   needs: 
     - job: python-test
     - job: fortify-sast-scan-prepare
+    - job: fortify-setup-appversion
     - job: env-prepare
       artifacts: true
   before_script: |
@@ -32,42 +60,37 @@ fortify-sast-scan:                # Needs to match the job name specified above
     SSC_URL: ${SSC_URL}           # See https://fortify.github.io/fcli/<fcli-version>/generic-actions.html#_ci for details
     SSC_TOKEN: ${SSC_TOKEN}
     SC_SAST_TOKEN: ${SC_SAST_TOKEN}
-    #SSC_APPVERSION: "${DEFAULT_APP_NAME}${SSC_APP_NAME_POSTFIX}:${DEFAULT_APPVERSION_NAME}"
-    DO_SETUP: false
-    SETUP_EXTRA_OPTS: '--copy-from "${SSC_PARENT_APPVERSION}" --issue-template "Prioritized High Risk Issue Template"'
-    #PACKAGE_EXTRA_OPTS: --python-version 3 --python-virtual-env .ven --python-requirements requirements.txt
-    #USE_PACKAGE: myCustomPackage.zip
-    DO_APPVERSION_SUMMARY: true
-    DO_CHECK_POLICY: false       # Set to true to check for policy violations and fail build if any are found
+    DO_SETUP: false               # we will do the setup in the fortify-setup-appversion job
+    DO_APPVERSION_SUMMARY: false
+    DO_CHECK_POLICY: false        # we will do this in the fortify-security-gate job
     DO_PR_COMMENT: true
     DO_EXPORT: true
   rules:
     - if: ( $SSC_URL != null || $SSC_URL =~ /^./ )
 
-
 fortify-dast-scan:
   extends: fcli
   stage: scan
-  needs: 
-    - job: python-build
+  needs:
+    - job: deploy
     - job: fcli-prepare
     - job: env-prepare
       artifacts: true
-    - job: fortify-sast-scan # add as dependency so that a new SSC App Version is automatically created (if required)
+    - job: fortify-setup-appversion
   before_script: |
     echo "SSC_APPVERSION=${SSC_APPVERSION}"
     echo "SSC_PARENT_APPVERSION=${SSC_PARENT_APPVERSION}"
-    sh ./bin/wait-for-website.sh
+   # bash ./bin/update_access_token.sh --fcli ${FCLI} -k '"${DAST_KS_KALKeyStore_InecureWebApp-AccessToken}"'
   script: |
     ${FCLI} ssc session login --url ${SSC_URL} -t ${SSC_TOKEN} -c ${SC_SAST_TOKEN} --ssc-session gitlab
-    ${FCLI} sc-dast scan start -n "$SCAN_NAME" -s $SCDAST_SETTINGS_ID --store curScan --ssc-session gitlab
-    ${FCLI} sc-dast scan wait-for ::curScan:: --ssc-session gitlab
-    ${FCLI} ssc action run gitlab-dast-report --av ${SSC_APPVERSION} --ssc-session gitlab
+    # ${FCLI} sc-dast scan start -n "$SCAN_NAME" -s $SCDAST_SETTINGS_ID --store curScan --ssc-session gitlab
+    # ${FCLI} sc-dast scan wait-for --on-unknown-state=wait --on-unknown-state-requested=ignore ::curScan:: --ssc-session gitlab
+    ${FCLI} ssc action run gitlab-dast-report --av "${SSC_APPVERSION}" --ssc-session gitlab
     ${FCLI} ssc session logout --ssc-session gitlab
   variables:
     SSC_URL: ${SSC_URL}
     SSC_TOKEN: ${SSC_TOKEN}
-    SCAN_NAME: "GitLab Pipeline Scan"
+    SCAN_NAME: "GitLab Pipeline Scan - ${CI_PIPELINE_ID}"
     SCDAST_SETTINGS_ID: ${SCDAST_SETTINGS_ID}
   artifacts:
     reports:
@@ -75,4 +98,39 @@ fortify-dast-scan:
         - gl-fortify-dast.json
   rules:
     - if: ( $SCDAST_SETTINGS_ID != null || $SCDAST_SETTINGS_ID =~ /^./ )
-    - if: '$CI_COMMIT_BRANCH == "main"' # only run DAST scan on main branch
+    # - if: $CI_COMMIT_BRANCH == "main"
+
+fortify-security-gate:
+  extends: fcli
+  stage: scan
+  needs: 
+    - job: fcli-prepare
+    - job: env-prepare
+      artifacts: true
+    - job: fortify-sast-scan
+    - job: fortify-dast-scan
+  before_script: |
+    echo "SSC_APPVERSION=${SSC_APPVERSION}"
+    echo "SSC_PARENT_APPVERSION=${SSC_PARENT_APPVERSION}"
+  script: |
+    ${FCLI} ssc session login --url ${SSC_URL} -t ${SSC_TOKEN} -c ${SC_SAST_TOKEN} --ssc-session gitlab
+    # ${FCLI} ssc action run appversion-summary --av "${SSC_APPVERSION}" -f appversion-summary.md --ssc-session gitlab
+    ${FCLI} ssc action run etc/actions/gitlab-ssc-codequality-report.yml --on-unsigned=ignore --av "${SSC_APPVERSION}" --ssc-session gitlab
+    ${FCLI} ssc action run etc/actions/custom-ssc-check-policy.yml --on-unsigned=ignore --av "${SSC_APPVERSION}" --fs "Quick View" --ssc-session gitlab
+    ${FCLI} ssc session logout --ssc-session gitlab
+  variables:
+    SSC_URL: ${SSC_URL}
+    SSC_TOKEN: ${SSC_TOKEN}
+  artifacts:
+    reports:
+      codequality: 'gl-fortify-codequality.json'
+   # expose_as: 'AppVersion Summary'
+   # paths: [ 'appversion-summary.md' ]
+  rules:
+    - if: ( $SSC_URL != null || $SSC_URL =~ /^./ )
+    - if: $CI_PIPELINE_SOURCE == "merge_request_event"
+    - if: $CI_COMMIT_BRANCH && $CI_OPEN_MERGE_REQUESTS
+      when: never
+    - if: $CI_COMMIT_BRANCH
+    # when: always
+  allow_failure: true
