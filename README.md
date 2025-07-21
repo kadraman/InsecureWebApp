@@ -1,4 +1,4 @@
-[![Fortify on Demand](https://github.com/kadraman/InsecureWebApp/actions/workflows/fod.yml/badge.svg)](https://github.com/kadraman/InsecureWebApp/actions/workflows/fod.yml) [![Debricked](https://github.com/kadraman/InsecureWebApp/actions/workflows/debricked.yml/badge.svg)](https://github.com/kadraman/InsecureWebApp/actions/workflows/debricked.yml)
+[![CodeQL Advanced](https://github.com/kadraman/InsecureWebApp/actions/workflows/codeql.yml/badge.svg)](https://github.com/kadraman/InsecureWebApp/actions/workflows/codeql.yml) [![Fortify on Demand](https://github.com/fortify-presales/InsecureWebApp/actions/workflows/fod.yml/badge.svg)](https://github.com/kadraman/InsecureWebApp/actions/workflows/fod.yml) [![Debricked](https://github.com/fortify-presales/InsecureWebApp/actions/workflows/debricked.yml/badge.svg)](https://github.com/kadraman/InsecureWebApp/actions/workflows/debricked.yml) [![Build and Deploy to Azure](https://github.com/kadraman/InsecureWebApp/actions/workflows/azure_webapp.yml/badge.svg)](https://github.com/kadraman/InsecureWebApp/actions/workflows/azure_webapp.yml)
 
 # InsecureWebApp
 
