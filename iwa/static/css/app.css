@@ -66,6 +66,18 @@ a:hover {
     color: #fff !important;
 }
 
+.btn-nav {
+    min-width: 75px;
+    background: transparent;
+    color: #eee;
+    text-transform: capitalize;
+    font-size: 1em;
+}
+
+.btn-nav:hover {
+    text-decoration: underline;
+}
+
 .form-control {
     height: 43px;
 }
@@ -106,7 +118,6 @@ a:hover {
     background: #3c3d41;
     color: #fff;
     position: relative;
-    z-index: 1000;
 }
 
 /* Site Footer */
@@ -203,7 +214,6 @@ a:hover {
 .dropdown-submenu:hover .dropdown-menu {
     display: block; /* Show the submenu on hover */
 }
-.navbar{ height: 75px;}
 
 /* Blocks */
 .site-blocks-cover {
@@ -243,7 +253,7 @@ a:hover {
 }
 @media (min-width: 768px) {
     .site-blocks-cover h1 {
-        font-size: 70px;
+        font-size: 50px;
     }
 }
 .site-blocks-cover p {

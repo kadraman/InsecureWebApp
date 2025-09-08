@@ -39,7 +39,8 @@ def login_required(view):
     """View decorator that redirects anonymous users to the login page."""
     @functools.wraps(view)
     def wrapped_view(**kwargs):
-        if session['email'] is None:
+        email = session.get("email")
+        if email is None:
             return redirect(url_for("auth.login"))
 
         return view(**kwargs)

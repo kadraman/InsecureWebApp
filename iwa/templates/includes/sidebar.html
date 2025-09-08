@@ -4,18 +4,24 @@
     (url_for('users.security'),  'security', 'bi-lock',             'Security'),
     (url_for('users.orders'),    'orders',   'bi-bag',              'Orders'),
     (url_for('users.reviews'),   'reviews',  'bi-chat-square-text', 'Reviews'),
-    (url_for('users.messages'),  'messages', 'bi-envelope',         'Messages')
+    (url_for('users.messages'),  'messages', 'bi-envelope',         'Messages'),
+    (url_for(request.endpoint),  'divider',  '',                    ''),
+    (url_for('auth.logout'),     'logout',   'bi-box-arrow-right',  'Logout')
 ] -%}
 
 <div class="side-menu">
     <div class="list-group list-group-flush">
         {% for href, id, icon, caption in navigation_bar %}
+            {% if id == 'divider' %}
+                <div class="bg-light" style="height: 50px"></div>
+            {% else %}
             <a {% if id == active_page %} class="list-group-item list-group-item-action active" {% else %} class="list-group-item list-group-item-action" {% endif %} href="{{ href|e }}"><i class="bi {{ icon|e }}"></i> {{ caption|e }}
                 {% if id == 'messages' %}
                     <span id="unread-message-count" class="badge bg-info">0</span>
                     <span class="visually-hidden">unread messages</span>
                 {% endif %}
             </a>
+            {% endif %}
         {% endfor %}
     </div>
 </div>

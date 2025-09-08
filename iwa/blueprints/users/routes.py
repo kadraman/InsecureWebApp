@@ -173,8 +173,9 @@ def load_logged_in_user():
     email = session.get("email")
     if email is None:
         g.user = None
+        logger.debug("No user is logged in.")
     else:
         g.user = (
             get_db().execute("SELECT * FROM users WHERE email = ?", (email,)).fetchone()
-       )
-    logger.debug(f"Loading logged in user {g.user['email']}")
+        )
+        logger.debug(f"Loading logged in user {g.user['email']}")
