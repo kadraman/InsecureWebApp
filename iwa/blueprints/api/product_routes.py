@@ -21,42 +21,48 @@ import logging
 
 from flask import Response, json, request
 from flask_cors import cross_origin
-from flask import current_app
 
 from iwa.blueprints.api import api_bp
 from iwa.repository.db import get_db
 
-
 logger = logging.getLogger(__name__)
 
 
-@api_bp.route("/subscribe-user", methods=['POST'])
+@api_bp.route("/products", methods=['GET'])
 @cross_origin()
-def subscribe_user():
-    """Subscribe a user to the newsletter by writing to the JSON file"""    
-    content = request.json
-    id = content.get('id')
-    name = content.get('name')
-    email = content.get('email')
-    role = content.get('role')
-    logger.debug(f"Registering user: {id},{name},{email},{role}")
-    with open(current_app.config['SUBSCRIBERS_FILENAME'], mode='a+', encoding='utf-8') as f:
-        try: 
-            entries = json.load(f)
-        except ValueError: 
-            entries = []
-        entry = {'id': id, 'name': name, 'email': email, 'role' : role}
-        entries.append(entry)
-        json.dump(entries, f)
-        r = Response(json.dumps({'message': 'Successfully registered user'}), mimetype='application/json')
-        r.status_code = 200
+def search_products():
+    """Search products by keyword in name or description."""
+    keywords = request.args.get('keywords', '')
+    db = get_db()
+    query = "SELECT * FROM products WHERE name LIKE '%" + keywords + "%'"
+    products = db.execute(query).fetchall()
+    data = [dict(product) for product in products]
+    r = Response(json.dumps(data), mimetype='application/json')
+    r.status_code = 200
     return r
 
+@api_bp.route("/products/<int:product_id>", methods=['GET'])
+@cross_origin()
+def products(product_id):
+    """ Get product by id."""
+    db = get_db()
+    if product_id:
+        product = db.execute(
+            "SELECT * FROM products p WHERE p.id = ?", (product_id,)
+        ).fetchone()
+        logger.debug(product)
+        data = dict(product) if product else {}
+        r = Response(json.dumps(data), mimetype='application/json')
+    else:
+        # Return empty JSON object if no id is specified
+        r = Response(json.dumps({}), mimetype='application/json')
+    r.status_code = 200
+    return r
 
 @api_bp.route("/new-products", methods=['GET'])
 @cross_origin()
-def new_products():  
-    limit = request.args.get('limit', 3)  
+def new_products():
+    limit = request.args.get('limit', 3)
 
     """Get 'limit' products, ordered by name."""
     db = get_db()

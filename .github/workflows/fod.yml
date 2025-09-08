@@ -14,7 +14,7 @@
 #   It is recommended to create credentials with 'Security Lead' Role selected.
 #   "Automated Audit preference" should be configured for the release's Static Scan Settings.
 
-name: DevSecOps with Fortify on Demand
+name: OpenText Application Secuirity Core
 permissions:
     # required for all workflows
     security-events: write

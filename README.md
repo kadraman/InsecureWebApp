@@ -1,11 +1,21 @@
-[![CodeQL Advanced](https://github.com/kadraman/InsecureWebApp/actions/workflows/codeql.yml/badge.svg)](https://github.com/kadraman/InsecureWebApp/actions/workflows/codeql.yml) [![Fortify on Demand](https://github.com/fortify-presales/InsecureWebApp/actions/workflows/fod.yml/badge.svg)](https://github.com/kadraman/InsecureWebApp/actions/workflows/fod.yml) [![Debricked](https://github.com/fortify-presales/InsecureWebApp/actions/workflows/debricked.yml/badge.svg)](https://github.com/kadraman/InsecureWebApp/actions/workflows/debricked.yml) [![Build and Deploy to Azure](https://github.com/kadraman/InsecureWebApp/actions/workflows/azure_webapp.yml/badge.svg)](https://github.com/kadraman/InsecureWebApp/actions/workflows/azure_webapp.yml)
+[![CodeQL Advanced](https://github.com/kadraman/InsecureWebApp/actions/workflows/codeql.yml/badge.svg)](https://github.com/kadraman/InsecureWebApp/actions/workflows/codeql.yml) [![Fortify on Demand](https://github.com/fortify-presales/InsecureWebApp/actions/workflows/fod.yml/badge.svg)](https://github.com/kadraman/InsecureWebApp/actions/workflows/fod.yml) [![Build and Deploy to Azure](https://github.com/kadraman/InsecureWebApp/actions/workflows/azure_webapp.yml/badge.svg)](https://github.com/kadraman/InsecureWebApp/actions/workflows/azure_webapp.yml)
 
 # InsecureWebApp
 
 This is a simple Python Flask web application that can be used for the demonstration of Application
-Security testing tools - such as [OpenText Application Security](https://www.opentext.com/products/application-security). 
+Security testing tools (include SAST, DAST and SCA). The application has a few basic features to demonstrate some common vulnerabilities such as:
 
-Pre-requisities
+    - SQL Injection
+    - Cross Site Scripting (XSS)
+    - Insecure Deserialization
+    - Security Misconfiguration
+    - Sensitive Data Exposure
+    - Broken Authentication (with 2FA)
+    - Using Components with Known Vulnerabilities
+
+The application is not intended to be used in production and is provided for educational purposes only.
+
+Pre-requisites
 ---------------
 
  - [Python 3.12 or later](https://www.python.org/downloads/)
@@ -50,17 +60,15 @@ make sure you have no other applications running on port 8080.
 Using the Application
 ---------------------
 
-You can login/logout (user credentials are: user1@localhost.com/password or admin@localhost.com/password)
-for the OTP code, the secret is hard coded to "base32secret3232" so you can use an app or online tool
-such as <a href="https://totp.danhersam.com/">TOTP Token Generator</a> to generate the code.
+Most of the application functionality is available as a guest user, however some features require
+you to login. The application has a basic 2FA implementation using the `pyotp` package.
 
-The following features that are functional in this version of the app:
+You can login using the following credentials:
+- user1@localhost.com/password
+- admin@localhost.com/password
 
-- you can navigate to the "Shop"
-- you can type in some keywords in the Shop search box, e.g. "alphadex" to filter results
-- you can click on any search result to navigate to a details page
-- you can download a datasheet PDF from a details page
-- you can subscribe to the newsletter by entering an email address in the input field of the footer
+For the OTP code, the secret is hard coded to `base32secret3232`.
+You can use an app or online tool such as <a href="https://totp.danhersam.com/">TOTP Token Generator</a> to generate the code.
 
 Scan Application (with bandit)
 ------------------------------
@@ -75,13 +83,13 @@ firefox bandit-report.html
 Scan Application (with OpenText Application Security)
 -----------------------------------------------------
 
-To carry out a Fortify Static Code Analyzer local scan, run the following:
+To carry out an OpenText Static Code Analyzer local scan, run the following:
 
 ```
 make sast-scan
 ```
 
-To carry out a Fortify ScanCentral SAST scan, run the following:
+To carry out a OpenText ScanCentral SAST scan, run the following:
 
 ```
 fcli ssc session login
@@ -91,7 +99,7 @@ fcli sast-scan wait-for ::curScan::
 fcli ssc action run appversion-summary --av "_YOURAPP_:_YOURREL_" -fs "Security Auditor View" -f summary.md
 ```
 
-To carry out a Fortify on Demand scan, run the following:
+To carry out an OpenText Application Security Core scan, run the following:
 
 ```
 fcli fod session login

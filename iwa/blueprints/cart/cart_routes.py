@@ -17,8 +17,16 @@
         along with this program.  If not, see <http://www.gnu.org/licenses/>.
 """
 
-from flask import Blueprint
+import logging
 
-insecure_bp = Blueprint("insecure", __name__, template_folder='templates', static_folder='static')
+from flask import render_template
 
-from iwa.blueprints.insecure import insecure_routes
+from iwa.blueprints.cart import cart_bp
+
+logger = logging.getLogger(__name__)
+
+
+@cart_bp.route("/")
+def index():  
+
+    return render_template("cart/index.html")

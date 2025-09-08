@@ -73,56 +73,52 @@
                     <br />
                     <span class="product-reviews pl-2"><a href="#reviews-start">Customer Reviews</a>&nbsp(<span
                             id="review-count">{{ reviews|length }})</span>
-                    </span>
+                </span>
 
-                    <h6 class="mt-2">Summary</h6>
-                    <p>{{ product.summary }}</p>
-                    <h6>Description</h6>
-                    <p>{{ product.description }}</p>
+                <h6 class="mt-2">Summary</h6>
+                <p>{{ product.summary }}</p>
+                <h6>Description</h6>
+                <p>{{ product.description }}</p>
 
-                    <h5 class="price pt-2 pb-4 item-price">
-                        {% if product.on_sale %}
-                        <del>
-                            <span>
-                                {{ "${:,.2f}".format(product.price) }}
-                            </span>
-                        </del>
-                        <span>&ndash;</span>
-                        <span>
-                            {{ "${:,.2f}".format(product.sale_price) }}
-                        </span>
-                        {% else %}
+                <h5 class="price pt-2 pb-4 item-price">
+                    {% if product.on_sale %}
+                    <del>
                         <span>
                             {{ "${:,.2f}".format(product.price) }}
                         </span>
-                        {% endif %}
-                        {% if product.in_stock %}
-                        <span class="badge badge-success">In Stock</span>
-                        {% else %}
-                        <span class="badge badge-danger">Out of Stock</span>
-                        <span>In stock in {{ product.time_to_stock }} days<span>
-                        {% endif %}
-                    </h5>
-                    <div class="cart-add">
-                        <div class="mb-4">
-                            <div class="input-group mb-3" style="max-width: 180px;">
-                                <button id="quantity-minus" class="btn btn-outline-primary js-btn-minus"
-                                    type="button">&minus;</button>
-                                <input class="form-control text-center" value="1" id="quantity-value" readonly>
-                                <button id="quantity-plus" class="btn btn-outline-primary js-btn-plus"
-                                    type="button">&plus;</button>
-                            </div>
-                        </div>
-                        <p>
-                            {% if product.in_stock %}
-                            <a id="add-to-cart" href="#" onclick="return false;"
-                                class="buy-now btn btn-sm height-auto px-4 py-3 btn-primary">Add To Cart</a>
-                            {% else %}
-                            <a id="add-to-cart" href="#" onclick="return false;"
-                                class="disabled buy-now btn btn-sm height-auto px-4 py-3 btn-primary">Add To Cart</a>
-                            {% endif %}
-                        </p>
+                    </del>
+                    <span>&ndash;</span>
+                    <span>
+                        {{ "${:,.2f}".format(product.sale_price) }}
+                    </span>
+                    {% else %}
+                    <span>
+                        {{ "${:,.2f}".format(product.price) }}
+                    </span>
+                    {% endif %}
+                    {% if product.in_stock %}
+                    <span class="badge badge-success">In Stock</span>
+                    {% else %}
+                    <span class="badge badge-danger">Out of Stock</span>
+                    <span>In stock in {{ product.time_to_stock }} days<span>
+                    {% endif %}
+                </h5>
+                <div class="cart-add">
+                  <div class="d-flex align-items-center mb-4">
+                    <div class="input-group me-3" style="max-width: 180px;">
+                      <button id="quantity-minus" class="btn btn-outline-primary js-btn-minus" type="button">&minus;</button>
+                      <input class="form-control text-center" value="1" id="quantity-value" readonly>
+                      <button id="quantity-plus" class="btn btn-outline-primary js-btn-plus" type="button">&plus;</button>
                     </div>
+                    {% if product.in_stock %}
+                    <a id="add-to-cart" href="#" onclick="return false;"
+                       class="buy-now btn btn-sm height-auto px-4 py-3 btn-primary">Add To Cart</a>
+                    {% else %}
+                    <a id="add-to-cart" href="#" onclick="return false;"
+                       class="disabled buy-now btn btn-sm height-auto px-4 py-3 btn-primary">Add To Cart</a>
+                    {% endif %}
+                  </div>
+                </div>
 
             </div>
 
@@ -146,4 +142,16 @@
     </div>
 
 </div>
+{% endblock %}
+
+{% block scripts %}
+<script type="text/javascript" src="{{ url_for('cart.static', filename='js/CartAdd.js') }}"></script>
+
+<script type="text/javascript">
+    (function ($) {
+      $(document).ready(function () {
+        $('.cart-add').CartAdd({ pid: {{ product.id }} });
+      });
+    })(jQuery);
+</script>
 {% endblock %}

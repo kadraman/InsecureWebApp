@@ -19,6 +19,6 @@
 
 from flask import Blueprint
 
-main_bp = Blueprint('main', __name__, template_folder='templates')
+main_bp = Blueprint('main', __name__, template_folder='templates', static_folder='static', static_url_path='/main_static')
 
-from iwa.blueprints.main import routes
+from iwa.blueprints.main import main_routes

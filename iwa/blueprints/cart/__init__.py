@@ -19,6 +19,6 @@
 
 from flask import Blueprint
 
-insecure_bp = Blueprint("insecure", __name__, template_folder='templates', static_folder='static')
+cart_bp = Blueprint("cart", __name__, template_folder='templates', static_folder='static')
 
-from iwa.blueprints.insecure import insecure_routes
+from iwa.blueprints.cart import cart_routes

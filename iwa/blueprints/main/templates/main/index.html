@@ -171,8 +171,7 @@
 {% endblock %}
 
 {% block scripts %}
-<script type="text/javascript" src="{{ url_for('static', filename='js/components/NewProducts.js') }}"></script>
-
+<script type="text/javascript" src="{{ url_for('products.static', filename='js/NewProducts.js') }}"></script>
 <script type="text/javascript">
   (function ($) {
     $(document).ready(function () {

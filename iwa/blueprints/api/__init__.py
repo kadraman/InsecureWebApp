@@ -19,6 +19,6 @@
 
 from flask import Blueprint
 
-api_bp = Blueprint("api", __name__, template_folder='templates')
+api_bp = Blueprint("api", __name__, template_folder='templates', static_folder='static')
 
-from iwa.blueprints.api import routes
+from iwa.blueprints.api import product_routes, user_routes

@@ -29,7 +29,7 @@
                       <div class="form-floating mb-3">
                         <input type="email" class="form-control {{ 'is-invalid' if errors.email }}" name="email"
                           id="email" aria-describedby="email-feedback" value="{{ email }}"
-                          pattern="[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}" placeholder="name@example.com"
+                          type="email" placeholder="name@example.com"
                           autofocus="autofocus" required>
                         <label for="email" class="form-label">Email</label>
                         {% if errors.email %}

@@ -19,6 +19,6 @@
 
 from flask import Blueprint
 
-users_bp = Blueprint("users", __name__, template_folder='templates')
+users_bp = Blueprint("users", __name__, template_folder='templates', static_folder='static')
 
-from iwa.blueprints.users import routes
+from iwa.blueprints.users import users_routes

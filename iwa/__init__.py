@@ -95,19 +95,21 @@ def create_app(test_config=None):
     app.config['SUBSCRIBERS_FILENAME'] = os.path.join(site_root, "static", "data", "email-db.json")
 
     # register blueprints
-    from iwa.blueprints.main.routes import main_bp
+    from iwa.blueprints.main.main_routes import main_bp
     app.register_blueprint(main_bp, url_prefix='/')
-    from iwa.blueprints.auth.routes import auth_bp
+    from iwa.blueprints.auth.auth_routes import auth_bp
     app.register_blueprint(auth_bp, url_prefix='/auth')
-    from iwa.blueprints.api.routes import api_bp
+    from iwa.blueprints.api.product_routes import api_bp
     app.register_blueprint(api_bp, url_prefix='/api')
-    from iwa.blueprints.users.routes import users_bp
+    from iwa.blueprints.users.users_routes import users_bp
     app.register_blueprint(users_bp, url_prefix='/user')
-    from iwa.blueprints.products.routes import products_bp
+    from iwa.blueprints.products.products_routes import products_bp
     app.register_blueprint(products_bp, url_prefix='/products')
+    from iwa.blueprints.cart.cart_routes import cart_bp
+    app.register_blueprint(cart_bp, url_prefix='/cart')
     #from iwa.agent.routes import agent_bp
     #app.register_blueprint(agent_bp)
-    from iwa.blueprints.insecure.routes import insecure_bp
+    from iwa.blueprints.insecure.insecure_routes import insecure_bp
     app.register_blueprint(insecure_bp, url_prefix='/insecure')
 
     return app
