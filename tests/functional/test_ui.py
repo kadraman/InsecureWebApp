@@ -26,7 +26,7 @@ def test_home_page(test_client):
     """
     response = test_client.get('/')
     assert response.status_code == 200
-    assert b"Welcome To IWA Pharmacy Direct" in response.data
+    assert b"Welcome To <br/>IWA Pharmacy Direct" in response.data
     assert b"Register" in response.data
     assert b"Shop Now" in response.data
 

@@ -1,8 +1,8 @@
 
 # Create GitHub Action Secrets for your version of the application:
-#   DEBRICKEN_TOKEN should be an API Access Token from your Debricked tenant.
+#   DEBRICKED_TOKEN should be an API Access Token from your Debricked tenant.
 
-name: OSS SCA with Debricked
+name: OpenText SCA Core
 permissions:
     # required for all workflows
     security-events: write
@@ -26,7 +26,7 @@ on:
   workflow_dispatch:
     inputs:
       runDebrickedScan:
-        description: 'Carry out SCA scan using Debricked'
+        description: 'Scan using OpenText Core SCA'
         required: true
         default: 'true'
 
@@ -65,3 +65,16 @@ jobs:
         env:
           APP_NAME: ${{ env.DEFAULT_APP_NAME }}
           DEBRICKED_TOKEN: ${{ secrets.DEBRICKED_TOKEN }}
+
+scan_frontend:
+  stage: scan
+  image: debricked/cli:2-resolution-debian
+  script:
+    - debricked scan "$COMPONENT_DIR" -r ${DEBRICKED_REPO} -b ${DEBRICKED_BRANCH} -t ${DEBRICKED_TOKEN} --sbom CycloneDX --sbom-output gl-sbom-cdx.json
+  dependencies:
+    - build_frontend
+  allow_failure: true
+  artifacts:
+    reports:
+      cyclonedx:
+        - gl-sbom-cdx.json

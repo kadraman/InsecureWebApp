@@ -14,7 +14,7 @@
 #   It is recommended to create credentials with 'Security Lead' Role selected.
 #   "Automated Audit preference" should be configured for the release's Static Scan Settings.
 
-name: OpenText Application Secuirity Core
+name: OpenText Core Application Security
 permissions:
     # required for all workflows
     security-events: write
@@ -50,19 +50,19 @@ on:
   workflow_dispatch:
     inputs:
       runFoDSASTScan:
-        description: 'Carry out SAST scan using Fortify on Demand'
+        description: 'Carry out SAST scan using OpenText Core Application Security'
         required: false
         default: 'true'
       runFoDOSSScan:
-        description: 'Carry out OSS scan using Fortify on Demand'
+        description: 'Carry out OSS scan using OpenText Core Application Security'
         required: false
         default: 'true'       
       deployApp:
-        description: 'Deploy App'
+        description: 'Deploy App to Azure'
         required: false
         default: 'true'           
       runFoDDASTScan:
-        description: 'Carry out DAST scan using Fortify on Demand'
+        description: 'Carry out DAST scan using OpenText Core Application Security'
         required: false
         default: 'false'     
 
@@ -97,8 +97,8 @@ jobs:
           fi
 
   Build-And-Unit-Test:
-    # The type of runner that the job will run on
     runs-on: ubuntu-latest
+    needs: [ Env-Prepare ]
     steps:
       - name: Checkout
         uses: actions/checkout@v4
@@ -156,7 +156,7 @@ jobs:
       # See: https://github.com/marketplace/actions/fortify-ast-scan
       #
       - name: Run Fortify on Demand SAST Scan
-        uses: fortify/github-action@v1
+        uses: fortify/github-action@v2
         with:
           sast-scan: true
           debricked-sca-scan: false # we will do this separately using fcli
@@ -202,7 +202,7 @@ jobs:
       - name: Checkout
         uses: actions/checkout@v4
       - name: Setup Fortify tools
-        uses: fortify/github-action/setup@v1
+        uses: fortify/github-action/setup@v2
         with:
           #tool-definitions: https://github.com/fortify/tool-definitions/releases/download/v1/tool-definitions.yaml.zip
           export-path: true
@@ -252,16 +252,16 @@ jobs:
       #    app-name: ${{ env.AZURE_WEBAPP_NAME }}
       #    publish-profile: ${{ secrets.AZUREAPPSERVICE_PUBLISHPROFILE_94429323A56E479BA44DAB94865DCF4A }}
 
-  #Functional-Test:
-  #  runs-on: ubuntu-latest
-  #  if: ${{ always() }}
-  #  needs: [ Env-Prepare, Deploy-App ]
-  #  env: 
-  #    FOD_RELEASE: ${{ needs.Env-Prepare.outputs.FOD_RELEASE }}
-  #    FOD_PARENT_RELEASE: ${{ needs.Env-Prepare.outputs.FOD_PARENT_RELEASE }}
-  #  steps:
-  #    - name: Checkout
-  #      uses: actions/checkout@v4
+  Functional-Test:
+    runs-on: ubuntu-latest
+    if: ${{ always() }}
+    needs: [ Env-Prepare, Deploy-App ]
+    env:
+      FOD_RELEASE: ${{ needs.Env-Prepare.outputs.FOD_RELEASE }}
+      FOD_PARENT_RELEASE: ${{ needs.Env-Prepare.outputs.FOD_PARENT_RELEASE }}
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
    
   FoD-DAST-Scan:
     runs-on: ubuntu-latest
@@ -274,7 +274,7 @@ jobs:
       - name: Checkout
         uses: actions/checkout@v4
       - name: Setup Fortify tools
-        uses: fortify/github-action/setup@v1
+        uses: fortify/github-action/setup@v2
         with:
           #tool-definitions: https://github.com/fortify/tool-definitions/releases/download/v1/tool-definitions.yaml.zip
           export-path: true
@@ -305,7 +305,7 @@ jobs:
       - name: Checkout
         uses: actions/checkout@v4
       - name: Setup Fortify tools
-        uses: fortify/github-action/setup@v1
+        uses: fortify/github-action/setup@v2
         with:
           #tool-definitions: https://github.com/fortify/tool-definitions/releases/download/v1/tool-definitions.yaml.zip
           export-path: true
