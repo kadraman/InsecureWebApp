@@ -14,6 +14,7 @@
     <link href="{{ url_for('static', filename='css/lib/star-rating-theme.min.css') }}" rel="stylesheet"/>
     <link href="{{ url_for('static', filename='css/app.css') }}" rel="stylesheet"/>
     <link href="{{ url_for('static', filename='favicon.ico') }}" rel="shortcut icon" type="image/ico"/>
+    {% block styles %} {% endblock %}
 </head>
 
 <body>
@@ -165,7 +166,7 @@
                             <ul aria-labelledby="navbarDropdownMenuLinkAdvice"
                                 class="dropdown-menu dropdown-menu-dark">
                                 <li><a class="dropdown-item" href="">Health Hub</a></li>
-                                <li><a class="dropdown-item" href="">Ask Charlie</a></li>
+                                <li><a class="dropdown-item" href="{{ url_for('assistant.index') }}">AI Assistant</a></li>
                             </ul>
                         </li>
                     </ul>

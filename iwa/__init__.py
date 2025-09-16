@@ -67,7 +67,7 @@ def create_app(test_config=None):
     # enabled CORS on api routes
     cors = CORS(app, resources={r"/api/*": {"origins": "*"}})
 
-    # OpenAI configuration for Agent
+    # OpenAI configuration for assistant
     #app.config['OPENAI_API_KEY'] = os.getenv('OPENAI_API_KEY')
     #openai_extension.init_app(app)
 
@@ -107,8 +107,8 @@ def create_app(test_config=None):
     app.register_blueprint(products_bp, url_prefix='/products')
     from iwa.blueprints.cart.cart_routes import cart_bp
     app.register_blueprint(cart_bp, url_prefix='/cart')
-    #from iwa.agent.routes import agent_bp
-    #app.register_blueprint(agent_bp)
+    from iwa.blueprints.assistant.assistant_routes import assistant_bp
+    app.register_blueprint(assistant_bp, url_prefix='/assistant')
     from iwa.blueprints.insecure.insecure_routes import insecure_bp
     app.register_blueprint(insecure_bp, url_prefix='/insecure')
 

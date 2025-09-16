@@ -1,0 +1,162 @@
+{% extends 'base.html' %}
+
+{% block title %} InsecureWebApp :: AI Assistant {% endblock %}
+
+{% block styles %}
+<link href="{{ url_for('assistant.static', filename='css/assistant.css') }}" rel="stylesheet"/>
+{% endblock %}
+
+{% block content %}
+<!-- page title -->
+<div class="bg-white py-3">
+    <div class="container">
+        <div class="row">
+            <div class="col-md-12 mb-0"><a href="{{ url_for('assistant.index') }}">AI Assistant</a> </div>
+        </div>
+    </div>
+</div>
+
+<!-- content -->
+<div class="site-section bg-light">
+
+    <div class="container min-vh-100">
+
+        {% if session.assistant_enabled %}
+            <div class="chat-container bg-white rounded">
+                <div class="disclaimer" role="alert">
+                    <h4 class="alert-heading">Important Notice</h4>
+                    <p>This is a demonstration application, any information is displayed for demonstration purposes only and should not be followed. Responses are not intended as medical advice.</p>
+                    <p>You must be at least 16 years old to use this service.</p>
+                    <p>Please do not action any information without first consulting a pharmacist or doctor.</p>
+                </div>
+                <div class="messages">
+                    {% for message in chat_history %}
+                    <div class="message-role {{ 'user' if message.role == 'user' else '' }}">
+                        {{ message.role.capitalize() }}
+                    </div>
+                    <div class="{{ 'user-message' if message.role == 'user' else 'assistant-message' }}">
+                        {{ message.content }}
+                    </div>
+                    {% endfor %}
+                </div>
+                <div class="message-input-container">
+                    <form id="chat-form" action="{{ url_for('assistant.chat') }}" method="post" autocomplete="off">
+                        <div class="position-relative w-100">
+                            <textarea
+                                    name="message"
+                                    class="form-control pr-5 w-100"
+                                    placeholder="Ask me a health question"
+                                    required
+                                    style="padding-right: 3rem; resize: none;"
+                                    rows="2"
+                            ></textarea>
+                            <button type="submit" id="send-btn"
+                                    class="btn btn-primary position-absolute"
+                                    style="right: 0.5rem; bottom: 0.5rem; z-index: 2; padding: 0.5rem 0.75rem;"
+                                    tabindex="-1"
+                            >
+                                <i class="bi bi-send"></i>
+                            </button>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        {% else %}
+            <div class="alert alert-info alert-dismissible" data-timeout="6000" role="alert">
+                <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+                {{ message }}
+            </div>
+        {% endif %}
+
+    </div>
+
+</div>
+{% endblock %}
+
+{% block scripts %}
+<script src="{{ url_for('static', filename='js/lib/showdown.min.js') }}" type="text/javascript"></script>
+
+<script type="text/javascript">
+
+    $(document).ready(function () {
+        var converter = new showdown.Converter();
+
+        // Load messages
+        $.getJSON("/assistant/get_messages", function (data) {
+            if (data.success) {
+                var chatContainer = $(".messages");
+                $.each(data.messages, function (i, msg) {
+                    var roleDiv = $("<div>").addClass("message-role");
+                    if (msg.role === "user") {
+                        roleDiv.addClass("user");
+                    }
+                    roleDiv.text(msg.role.charAt(0).toUpperCase() + msg.role.slice(1));
+                    chatContainer.append(roleDiv);
+
+                    var messageDiv = $("<div>").addClass(msg.role === "user" ? "user-message" : "assistant-message");
+                    var html = converter.makeHtml(msg.content);
+                    console.log(html);
+                    messageDiv.html(html);
+                    chatContainer.append(messageDiv);
+                });
+            }
+        });
+
+        // Load IDs
+        $.getJSON("/assistant/get_ids", function (data) {
+            console.log("Data: ", data, "Assistant ID: ", data.assistant_id, "Thread ID: ", data.thread_id);
+        });
+
+        var $chatForm = $("#chat-form");
+        if ($chatForm.length) {
+            $chatForm.on("submit", function (event) {
+                event.preventDefault();
+                var $messageInput = $('textarea[name="message"]');
+                var message = $messageInput.val().trim();
+                var $chatContainer = $(".messages");
+                if (message) {
+                    var roleDiv = $("<div>").addClass("message-role user").text("User");
+                    $chatContainer.append(roleDiv);
+
+                    var userMessageDiv = $("<div>").addClass("user-message").text(message);
+                    $chatContainer.append(userMessageDiv);
+                }
+                $messageInput.val("");
+
+                // Typing indicator
+                var typingIndicatorContainer = $("<div>").addClass("typing-indicator-container");
+                var typingIndicator = $("<div>").addClass("typing-indicator").text("•••");
+                typingIndicatorContainer.append(typingIndicator);
+                $chatContainer.append(typingIndicatorContainer);
+                $chatContainer.scrollTop($chatContainer[0].scrollHeight);
+
+                $.ajax({
+                    url: "/assistant/chat",
+                    method: "POST",
+                    contentType: "application/json",
+                    data: JSON.stringify({ message: message }),
+                    dataType: "json",
+                    success: function (data) {
+                        if (data.success) {
+                            var roleDiv = $("<div>").addClass("message-role assistant").text("Assistant");
+                            $chatContainer.append(roleDiv);
+
+                            typingIndicatorContainer.remove();
+
+                            var html = converter.makeHtml(data.message);
+                            console.log(html);
+                            var assistantMessageDiv = $("<div>").addClass("assistant-message").html(html);
+                            $chatContainer.append(assistantMessageDiv);
+                            $chatContainer.scrollTop($chatContainer[0].scrollHeight);
+                        }
+                    },
+                    error: function (xhr, status, error) {
+                        console.error("Error:", error);
+                    }
+                });
+            });
+        }
+    });
+
+</script>
+{% endblock %}
