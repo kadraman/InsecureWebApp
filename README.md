@@ -86,6 +86,14 @@ Scan Application (with OpenText Application Security)
 To carry out an OpenText Static Code Analyzer local scan, run the following:
 
 ```
+sourceanalyzer -b iwa -clean
+sourceanalyzer -b iwa -python-path ".venv\\Lib\\site-packages" iwa
+sourceanalyzer -b iwa -scan
+```
+
+or you can use the Makefile target:
+
+```
 make sast-scan
 ```
 
@@ -93,7 +101,7 @@ To carry out a OpenText ScanCentral SAST scan, run the following:
 
 ```
 fcli ssc session login
-scancentral package -o package.zip -bt none --python-virtual-env .venv -oss
+scancentral package -o package.zip -bt none --python-virtual-env .venv
 fcli sast-scan start --release "_YOURAPP_:_YOURREL_" -f package.zip --store curScan
 fcli sast-scan wait-for ::curScan::
 fcli ssc action run appversion-summary --av "_YOURAPP_:_YOURREL_" -fs "Security Auditor View" -f summary.md
