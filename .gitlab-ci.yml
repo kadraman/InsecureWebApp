@@ -1,5 +1,5 @@
 #
-# An example GitLab CI/CD pipeline configuration file for a Python application yhat includes build, test, deploy and 
+# An example GitLab CI/CD pipeline configuration file for a Python/Flask application that includes build, test, deploy and:
 #   - OpenText Application Security Core (FoD) SAST/DAST/SCA scans ... or
 #   - OpenText Application Security (ScanCentral) SAST/DAST scans
 #   - OpenText SCA Core (Debricked) ... or
@@ -28,10 +28,6 @@
 #
 # If using OpenText SCA Core (Debricked) set the following variables in your GitLab project/organisation:
 #   - DEBRICKED_TOKEN: Debricked Access Token
-#
-# These variables are used to control which jobs to run
-#
-
 
 spec:
   inputs:
@@ -76,52 +72,38 @@ cache:
 
 # include CI/CD components and jobs depending on what we want to run
 include:
-  # include fortifu jobs
+  # include fcli component to run `fcli` commands
   - component: $CI_SERVER_FQDN/Fortify/components/fcli/linux@main
     inputs:
       stage: scan                # Stage in which to run the fcli commands
-  - component: $CI_SERVER_FQDN/Fortify/components/ast-scan/linux@main
-    inputs:
-      job-name: fortify-sast-scan # Optional job name used for running the AST scan, defaults to 'fortify-ast-scan'
-      stage: scan                 # Stage in which to run the AST scan, defaults to 'test'
-  # include Sonatype Nexus IQ jobs if NEXUS_IQ_URL is defined
-  - component: $CI_SERVER_FQDN/sonatype-integrations/components/evaluate-sbom@main
-    inputs:
-      application-id: $DEFAULT_SONATYPE_IQ_APPLICATION_ID
-      scan-targets:
-        - deps
-      result-file: evaluation-result.json
-      report-name: evaluation-report.html
-      sbom-standard: cycloneDx
-      sbom-version: "1.5"
-      ignore-system-errors: true
-      ci-needs:
-        - python-build # for cache of deps
-    rules:
-      - if: ( $NEXUS_IQ_URL != null || $NEXUS_IQ_URL =~ /^./ )
-  # include Debricked jobs if $DEBRICKED_TOKEN is defined
-  - local: etc/gitlab-debricked.yml 
-    rules:
-      - if: ( $DEBRICKED_TOKEN != null || $DEBRICKED_TOKEN =~ /^./ )
-  # include FoD jobs is $FOD_URL is defined
-  - local: etc/gitlab-fod.yml
-    rules:
-      - if: ( $FOD_URL != null || $FOD_URL =~ /^./ )
-  # include ScanCentral jobs if $SSC_URL is defined
-  - local: etc/gitlab-scancentral.yml 
-    rules:
-      - if: ( $SSC_URL != null || $SSC_URL =~ /^./ )
 
-      
-# Set fcli job to "never run" as it will be extended by other jobs included
-fcli:
-  stage: scan
-  rules:
-    - when: never
+  #
+  # uncomment one or more includes below depending on what scans you want to run
+  #
+
+  # include OpenText Application Security Core (FoD) jobs
+  #- component: $CI_SERVER_FQDN/Fortify/components/ast-scan/linux@main
+  #  inputs:
+  #    job-name: fod-sast-scan # Optional job name used for running the AST scan, defaults to 'fortify-ast-scan'
+  #    stage: scan                 # Stage in which to run the AST scan, defaults to 'test'
+  #- remote: 'https://gitlab.com/fortify-presales/gitlab-pipelines/raw/main/templates/gitlab-fod.yml'
+
+  # include OpenText ScanCentral jobs
+  #- component: $CI_SERVER_FQDN/Fortify/components/ast-scan/linux@main
+  #  inputs:
+  #    job-name: scancentral-sast-scan # Optional job name used for running the AST scan, defaults to 'fortify-ast-scan'
+  #    stage: scan                 # Stage in which to run the AST scan, defaults to 'test'
+  #- remote: 'https://gitlab.com/fortify-presales/gitlab-pipelines/raw/main/templates/gitlab-scancentral.yml'
+
+  # include OpenText Software Composition Analysis Core (Debricked) jobs
+  #- remote: 'https://gitlab.com/fortify-presales/gitlab-pipelines/raw/main/templates/gitlab-debricked.yml'
+
+  # include Sonatype Nexus IQ jobs
+  #- remote: 'https://gitlab.com/fortify-presales/gitlab-pipelines/raw/main/templates/gitlab-sonatype.yml'
 
 
 # This is a sample job to build the application. You can replace it with your actual build job.
-python-build:
+build:
   stage: build
   before_script:
     - python -m venv .venv
@@ -132,7 +114,7 @@ python-build:
     - echo "Building the application..."
 
 # This is a sample job to test a Python application using pytest. You can replace it with your actual test job.
-python-test:
+test:
   stage: test
   before_script:
 #    - python -m venv .venv
@@ -152,11 +134,11 @@ python-test:
         path: coverage.xml
 
 # This is a sample job to build the application into a Docker image and push it to the GitLab Container Registry
-docker-build:
+dockerize:
   stage: dockerize
   image: docker:latest
   dependencies:
-    - python-build
+    - build
   services:
     - docker:dind
   before_script:
@@ -168,34 +150,10 @@ docker-build:
   rules:
     - if: $CI_COMMIT_BRANCH == "main"
 
-# This job runs Sonatype Nexus IQ evaluation on the Docker image built in the docker-build job.
-sonatype-docker-scan:
-  stage: test
-  image: docker:latest
-  services:
-    - docker:dind
-  needs:
-  - job: docker-build
-  before_script:
-    - echo $CI_JOB_TOKEN | docker login -u gitlab-ci-token --password-stdin $CI_REGISTRY
-    - echo $IMAGE_TAG
-    - docker pull $IMAGE_TAG
-    - export NEXUS_CONTAINER_IMAGE_REGISTRY_USER=gitlab-ci-token
-    - export NEXUS_CONTAINER_IMAGE_REGISTRY_PASSWORD=$CI_JOB_TOKEN
-    - export NEXUS_CONTAINER_INCLUDE_ONLY_OS_COMPONENTS=true
-  script:
-    - |
-      docker run -v /tmp:/tmp -v $CI_PROJECT_DIR:/sonatype/reports -v /var/run/docker.sock:/var/run/docker.sock \
-      -e NEXUS_IQ_URL -e NEXUS_IQ_USERNAME -e NEXUS_IQ_PASSWORD -e NEXUS_CONTAINER_IMAGE_REGISTRY_USER -e NEXUS_CONTAINER_IMAGE_REGISTRY_PASSWORD \
-      sonatype/gitlab-nexus-iq-pipeline:latest /sonatype/evaluate -i $DEFAULT_SONATYPE_IQ_APPLICATION_ID -t stage-release container:$IMAGE_TAG
-  artifacts:
-    paths:
-      - $CI_PROJECT_DIR/$CI_PROJECT_NAME-policy-eval-report.html
-  rules:
-    - if: $CI_COMMIT_BRANCH == "main"
-
 # This is a sample job to deploy the application. You can replace it with your actual deploy job.
 deploy:
   stage: deploy
   script:
     - echo "Deploying the application..."
+  rules:
+  - if: $CI_COMMIT_BRANCH == "main"

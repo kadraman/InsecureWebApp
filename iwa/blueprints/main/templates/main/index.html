@@ -3,6 +3,13 @@
 {% block title %} InsecureWebApp :: Home {% endblock %}
 
 {% block content %}
+
+<!-- Health Assistant Banner -->
+<div class="alert alert-info text-center rounded-0 mb-0" role="alert" style="border-bottom: 1px solid #bce8f1;">
+  <strong>Need medical advice?</strong>
+  <a href="{{ url_for('assistant.health_assistant') }}" class="alert-link">Try our new Health Assistant!</a>
+</div>
+
 <div class="site-blocks-cover" style="background-image: url('/static/img/home_hero_1a.jpg');">
   <div class="container">
     <div class="row">

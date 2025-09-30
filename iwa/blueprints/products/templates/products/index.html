@@ -7,7 +7,7 @@
 <div class="bg-white py-3">
     <div class="container">
         <div class="row">
-            <div class="col-md-12 mb-0"><a href="{{ url_for('products.index') }}">Shop</a> </div>
+            <div class="col-md-12 mb-0">Advice <span class="mx-2 mb-0">/</span> <a href="{{ url_for('products.index') }}">Shop</a> </div>
         </div>
     </div>
 </div>
@@ -73,44 +73,45 @@
 
         <div class="row row-cols-1 row-cols-md-3 g-4 pt-2"">
             {% for p in products %}
-            <div class=" col text-center item mb-4">
-            <div class="card h-100">
-                {% if p.on_sale %}
-                <span class="tag">Sale</span>
-                {% endif %}
-
-                <a href="{{ url_for('products.view', code=p['code']) }}">
-                    {% if p.image %}
-                    <img src="{{ url_for('static', filename='img/products/' + p['image']) }}" alt="Image"
-                        class="card-img-top">
-                    {% else %}
-                    <img src="{{ url_for('static', filename='img/products/awaiting-image-sm.png') }}" alt="Image"
-                        class="card-img-top">
+            <div class="col text-center item mb-4">
+                <div class="card h-100">
+                    {% if p.on_sale %}
+                    <span class="tag">Sale</span>
                     {% endif %}
-                </a>
-                <div class="card-body">
-                    <h3 class="card-title text-dark"><a href="#">{{ p['name'] }}</a></h3>
-                    <p class="card-text">
-                        {% if p.on_sale %}
-                        <del>
+
+                    <a href="{{ url_for('products.view', code=p['code']) }}">
+                        {% if p.image %}
+                        <img src="{{ url_for('static', filename='img/products/' + p['image']) }}" alt="Image"
+                            class="card-img-top">
+                        {% else %}
+                        <img src="{{ url_for('static', filename='img/products/awaiting-image-sm.png') }}" alt="Image"
+                            class="card-img-top">
+                        {% endif %}
+                    </a>
+                    <div class="card-body">
+                        <h3 class="card-title text-dark"><a href="#">{{ p['name'] }}</a></h3>
+                        <p class="card-text">
+                            {% if p.on_sale %}
+                            <del>
+                                <span>
+                                    {{ "${:,.2f}".format(p.price) }}
+                                </span>
+                            </del>
+                            <span>&ndash;</span>
+                            <span>
+                                {{ "${:,.2f}".format(p.sale_price) }}
+                            </span>
+                            {% else %}
                             <span>
                                 {{ "${:,.2f}".format(p.price) }}
                             </span>
-                        </del>
-                        <span>&ndash;</span>
-                        <span>
-                            {{ "${:,.2f}".format(p.sale_price) }}
-                        </span>
-                        {% else %}
-                        <span>
-                            {{ "${:,.2f}".format(p.price) }}
-                        </span>
-                        {% endif %}
-                    </p>
+                            {% endif %}
+                        </p>
+                    </div>
                 </div>
             </div>
+            {% endfor %}
         </div>
-        {% endfor %}
     </div>
 
     <div class="row pt-4">

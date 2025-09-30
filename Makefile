@@ -46,7 +46,6 @@ else
 	.venv/bin/pip install -r requirements.txt
 endif
 
-
 .PHONY: build-docker
 build-docker: ## build the project as a docker image
 	docker build -f Dockerfile -t $(PROJECT):$(VERSION) .

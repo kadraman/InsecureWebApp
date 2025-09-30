@@ -1,9 +1,12 @@
-[![CodeQL Advanced](https://github.com/kadraman/InsecureWebApp/actions/workflows/codeql.yml/badge.svg)](https://github.com/kadraman/InsecureWebApp/actions/workflows/codeql.yml) [![Fortify on Demand](https://github.com/fortify-presales/InsecureWebApp/actions/workflows/fod.yml/badge.svg)](https://github.com/kadraman/InsecureWebApp/actions/workflows/fod.yml) [![Build and Deploy to Azure](https://github.com/kadraman/InsecureWebApp/actions/workflows/azure_webapp.yml/badge.svg)](https://github.com/kadraman/InsecureWebApp/actions/workflows/azure_webapp.yml)
+[![CodeQL Advanced](https://github.com/kadraman/InsecureWebApp/actions/workflows/codeql.yml/badge.svg)](https://github.com/kadraman/InsecureWebApp/actions/workflows/codeql.yml) 
+[![Fortify on Demand](https://github.com/fortify-presales/InsecureWebApp/actions/workflows/fod.yml/badge.svg)](https://github.com/kadraman/InsecureWebApp/actions/workflows/fod.yml) 
+[![Build and Deploy to Azure](https://github.com/kadraman/InsecureWebApp/actions/workflows/azure_webapp.yml/badge.svg)](https://github.com/kadraman/InsecureWebApp/actions/workflows/azure_webapp.yml)
 
 # InsecureWebApp
 
 This is a simple Python Flask web application that can be used for the demonstration of Application
-Security testing tools (include SAST, DAST and SCA). The application has a few basic features to demonstrate some common vulnerabilities such as:
+Security testing tools (include SAST, DAST and SCA). The application has a few basic features to 
+demonstrate some common vulnerabilities such as:
 
     - SQL Injection
     - Cross Site Scripting (XSS)
@@ -20,7 +23,7 @@ Pre-requisites
 
  - [Python 3.12 or later](https://www.python.org/downloads/)
  - [Pip package manager](https://pypi.org/project/pip/)
- - [CygWin](https://www.cygwin.com/) - if running on Windows
+ - [w64devkit](https://github.com/skeeto/w64devkit) or [CygWin](https://www.cygwin.com/) - if running on Windows
  - [Rust Compiler](https://www.rust-lang.org/tools/install) - if running on Windows as some Pip packages require it
  - Docker installation (optional)
 

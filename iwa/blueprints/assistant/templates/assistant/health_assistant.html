@@ -1,6 +1,6 @@
 {% extends 'base.html' %}
 
-{% block title %} InsecureWebApp :: AI Assistant {% endblock %}
+{% block title %} InsecureWebApp :: Health Assistant {% endblock %}
 
 {% block styles %}
 <link href="{{ url_for('assistant.static', filename='css/assistant.css') }}" rel="stylesheet"/>
@@ -11,7 +11,7 @@
 <div class="bg-white py-3">
     <div class="container">
         <div class="row">
-            <div class="col-md-12 mb-0"><a href="{{ url_for('assistant.index') }}">AI Assistant</a> </div>
+            <div class="col-md-12 mb-0">Advice <span class="mx-2 mb-0">/</span> <a href="{{ url_for('assistant.health_assistant') }}">Health Assistant</a> </div>
         </div>
     </div>
 </div>
@@ -22,14 +22,15 @@
     <div class="container min-vh-100">
 
         {% if session.assistant_enabled %}
-            <div class="chat-container bg-white rounded">
-                <div class="disclaimer" role="alert">
+            <div id="health-assistant" class="chat-container bg-white rounded">
+                <div class="disclaimer">
                     <h4 class="alert-heading">Important Notice</h4>
-                    <p>This is a demonstration application, any information is displayed for demonstration purposes only and should not be followed. Responses are not intended as medical advice.</p>
                     <p>You must be at least 16 years old to use this service.</p>
                     <p>Please do not action any information without first consulting a pharmacist or doctor.</p>
+                    <hr/>
+                    <p class="mb-0"><b>This is a demonstration application. Information provided is for demonstration purposes only and should not be followed. Responses are not intended as medical advice.</b></p>
                 </div>
-                <div class="messages">
+                <div class="messages mb-2">
                     {% for message in chat_history %}
                     <div class="message-role {{ 'user' if message.role == 'user' else '' }}">
                         {{ message.role.capitalize() }}
@@ -42,27 +43,20 @@
                 <div class="message-input-container">
                     <form id="chat-form" action="{{ url_for('assistant.chat') }}" method="post" autocomplete="off">
                         <div class="position-relative w-100">
-                            <textarea
-                                    name="message"
-                                    class="form-control pr-5 w-100"
-                                    placeholder="Ask me a health question"
-                                    required
-                                    style="padding-right: 3rem; resize: none;"
-                                    rows="2"
-                            ></textarea>
-                            <button type="submit" id="send-btn"
-                                    class="btn btn-primary position-absolute"
-                                    style="right: 0.5rem; bottom: 0.5rem; z-index: 2; padding: 0.5rem 0.75rem;"
-                                    tabindex="-1"
-                            >
-                                <i class="bi bi-send"></i>
-                            </button>
+                            <div class="input-group" role="group">
+                                <input class="form-control" id="message-input" name="message"
+                                    placeholder="Please ask me a health related question"
+                                    required type="text"/>
+                                <button class="btn btn-secondary" id="message-button" type="submit" tabindex="-1">
+                                    <i class="bi bi-send"></i>
+                                </button>
+                            </div>
                         </div>
                     </form>
                 </div>
             </div>
         {% else %}
-            <div class="alert alert-info alert-dismissible" data-timeout="6000" role="alert">
+            <div class="alert alert-info alert-dismissible" role="alert">
                 <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
                 {{ message }}
             </div>
@@ -95,10 +89,10 @@
 
                     var messageDiv = $("<div>").addClass(msg.role === "user" ? "user-message" : "assistant-message");
                     var html = converter.makeHtml(msg.content);
-                    console.log(html);
                     messageDiv.html(html);
                     chatContainer.append(messageDiv);
                 });
+                $('#message-input').focus()[0].scrollIntoView({ behavior: 'smooth', block: 'center' });
             }
         });
 
@@ -111,8 +105,11 @@
         if ($chatForm.length) {
             $chatForm.on("submit", function (event) {
                 event.preventDefault();
-                var $messageInput = $('textarea[name="message"]');
-                var message = $messageInput.val().trim();
+                var $messageInput = $('#message-input');
+                var message = "";
+                if ($messageInput.length) {
+                    message = $messageInput.val().trim();
+                }
                 var $chatContainer = $(".messages");
                 if (message) {
                     var roleDiv = $("<div>").addClass("message-role user").text("User");
@@ -128,10 +125,11 @@
                 var typingIndicator = $("<div>").addClass("typing-indicator").text("•••");
                 typingIndicatorContainer.append(typingIndicator);
                 $chatContainer.append(typingIndicatorContainer);
-                $chatContainer.scrollTop($chatContainer[0].scrollHeight);
+                //$chatContainer.scrollTop($chatContainer[0].scrollHeight);
+                $('#message-input').focus()[0].scrollIntoView({ behavior: 'smooth', block: 'center' });
 
                 $.ajax({
-                    url: "/assistant/chat",
+                    url: "{{ url_for('assistant.chat') }}",
                     method: "POST",
                     contentType: "application/json",
                     data: JSON.stringify({ message: message }),
@@ -144,14 +142,18 @@
                             typingIndicatorContainer.remove();
 
                             var html = converter.makeHtml(data.message);
-                            console.log(html);
                             var assistantMessageDiv = $("<div>").addClass("assistant-message").html(html);
                             $chatContainer.append(assistantMessageDiv);
-                            $chatContainer.scrollTop($chatContainer[0].scrollHeight);
+                            //$chatContainer.scrollTop($chatContainer[0].scrollHeight);
+                            $('#message-input').focus()[0].scrollIntoView({ behavior: 'smooth', block: 'center' });
                         }
                     },
                     error: function (xhr, status, error) {
                         console.error("Error:", error);
+                        $chatContainer.append('<div class="alert alert-danger">An error occurred. Please try again.</div>');
+                        //$chatContainer.scrollTop($chatContainer[0].scrollHeight);
+                        $('#message-input').focus()[0].scrollIntoView({ behavior: 'smooth', block: 'center' });
+                        typingIndicatorContainer.remove();
                     }
                 });
             });

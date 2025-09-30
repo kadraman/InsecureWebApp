@@ -1,0 +1,110 @@
+{% extends 'base.html' %}
+
+{% block title %} InsecureWebApp :: Symptom Checker {% endblock %}
+
+{% block styles %}
+<link href="{{ url_for('assistant.static', filename='css/assistant.css') }}" rel="stylesheet"/>
+{% endblock %}
+
+{% block content %}
+<!-- page title -->
+<div class="bg-white py-3">
+    <div class="container">
+        <div class="row">
+            <div class="col-md-12 mb-0">Advice <span class="mx-2 mb-0">/</span> <a href="{{ url_for('assistant.symptom_checker') }}">Symptom Checker</a></div>
+        </div>
+    </div>
+</div>
+
+<!-- content -->
+<div class="site-section bg-light">
+
+    <div class="container min-vh-100">
+
+        {% if session.checker_enabled %}
+            <div id="symptom-checker" class="chat-container bg-white rounded">
+                <div class="disclaimer">
+                    <h4 class="alert-heading">Important Notice</h4>
+                    <p>The purpose of this tool is to help you narrow your search along your information journey; this is not a diagnostic tool.</p>
+                    <p>You must be at least 16 years old to use this service.</p>
+                    <p>Please consult a pharmacist or doctor before taking any action.</p>
+                    <hr/>
+                    <p class="mb-0"><b>This is a demonstration application. Information provided is for demonstration purposes only and should not be followed. Responses are not intended as medical advice.</b></p>
+                </div>
+                <div class="message-input-container">
+                    <form id="symptoms-form" action="{{ url_for('assistant.symptom_checker') }}" method="post" autocomplete="off">
+                        <div class="form-group mb-2">
+                            <div class="row mb-2">
+                                <label><b>Select your symptoms:</b></label>
+                            </div>
+                            <div class="row">
+                                {% set symptoms_list = [
+                                    ("Headache", "symptom-headache"),
+                                    ("Fever", "symptom-fever"),
+                                    ("Cough", "symptom-cough"),
+                                    ("Sore throat", "symptom-sorethroat"),
+                                    ("Runny nose", "symptom-runnynose"),
+                                    ("Fatigue", "symptom-fatigue"),
+                                    ("Nausea", "symptom-nausea"),
+                                    ("Vomiting", "symptom-vomiting"),
+                                    ("Diarrhea", "symptom-diarrhea"),
+                                    ("Dizziness", "symptom-dizziness"),
+                                    ("Constipation", "symptom-constipation"),
+                                    ("Swelling", "symptom-swelling"),
+                                    ("Bruising", "symptom-bruising"),
+                                    ("Palpitations", "symptom-palpitations"),
+                                    ("Numbness", "symptom-numbness")
+                                ] %}
+                                {% for label, id in symptoms_list %}
+                                <div class="col-md-3 mb-2">
+                                    <div class="form-check">
+                                        <input class="form-check-input" type="checkbox" name="symptoms" value="{{ label }}" id="{{ id }}">
+                                        <label class="form-check-label" for="{{ id }}">{{ label }}</label>
+                                    </div>
+                                </div>
+                                {% endfor %}
+                            </div>
+                        </div>
+                        <div class="form-group mb-3">
+                            <div class="input-group" role="group">
+                                <input
+                                    class="form-control"
+                                    id="additional-symptoms"
+                                    name="additional-symptoms"
+                                    placeholder="Please describe any other additional symptoms"
+                                    type="text"/>
+                                <button class="btn btn-primary" id="symptom-checker-button" type="submit">
+                                    <i class="bi bi-send"></i>
+                                </button>
+                            </div>
+                        </div>
+                    </form>
+                </div>
+                <div id="messages" class="mb-3">
+                    {% if response %}
+                        <div class="assistant-message" style="max-width: 100%">
+                            {{ response.content|safe if response and response.content else response }}
+                        </div>
+                    {% endif %}
+                </div>
+            </div>
+        {% else %}
+            <div class="alert alert-info alert-dismissible" role="alert">
+                <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+                {{ message }}
+            </div>
+        {% endif %}
+    </div>
+</div>
+{% endblock %}
+
+{% block scripts %}
+<script type="text/javascript">
+    $(document).ready(function () {
+        $('#symptoms-form').on('submit', function () {
+            $('#symptom-checker-button').prop('disabled', true);
+            $('#symptom-checker-button').html('<span class="spinner-border spinner-border-sm" role="status" aria-hidden="true"></span> Checking...');
+        });
+    });
+</script>
+{% endblock %}

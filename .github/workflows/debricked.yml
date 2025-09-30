@@ -40,18 +40,28 @@ jobs:
     runs-on: ubuntu-latest
     if: ${{ (github.event_name == 'push') || (github.event_name == 'pull_request') || (github.event.inputs.runDebrickedScan == 'true') }}
     steps:
-      # Docker example - uncomment to use Docker instead of GitHub Action
-      - uses: actions/checkout@v4
-      - uses: debricked/fingerprint@v4
-      - uses: debricked/resolve@v4
-      - uses: debricked/actions@v4
+      - name: Checkout
+        uses: actions/checkout@v4
+        with:
+          # Fetch at least the immediate parents so that if this is a pull request then we can checkout the head.
+          fetch-depth: 2
+      # Java is required to run the various Fortify utilities.
+      # Setup JDK 11 on host
+      - uses: actions/setup-java@v4
+        with:
+          distribution: 'temurin'
+          java-version: '11'
+      # Install Fortify (if required)
+      - name: Setup Fortify tools
+        uses: fortify/github-action/setup@v1.2.2
+        with:
+          export-path: true
+          fcli: latest
+      # Run debricked scan    
+      - name: Download Debricked CLI
+        run: curl -L https://github.com/debricked/cli/releases/latest/download/cli_linux_x86_64.tar.gz | tar -xz debricked
+      - name: Run Debricked scan  
+        run: ./debricked scan -r "${APP_NAME}" --access-token="${DEBRICKED_TOKEN}"  -e "*/**.lock" -e "**/build/classes/test/**" -e "**/target/classes/test-classes/**" .
         env:
+          APP_NAME: ${{ env.DEFAULT_APP_NAME }}
           DEBRICKED_TOKEN: ${{ secrets.DEBRICKED_TOKEN }}
-      # CLI example - uncomment to use CLI instead of GitHub Action
-      #- name: Download Debricked CLI
-      #  run: curl -L https://github.com/debricked/cli/releases/latest/download/cli_linux_x86_64.tar.gz | tar -xz debricked
-      #- name: Run Debricked scan
-      #  run: ./debricked scan -r "${APP_NAME}" --access-token="${DEBRICKED_TOKEN}"  -e "*/**.lock" -e "**/build/classes/test/**" -e "**/target/classes/test-classes/**" .
-      #  env:
-      #    APP_NAME: ${{ env.DEFAULT_APP_NAME }}
-      #    DEBRICKED_TOKEN: ${{ secrets.DEBRICKED_TOKEN }}
