@@ -13,11 +13,11 @@ FLASK_APP := iwa
 SAST_DEFAULT_OPTS := -Dcom.fortify.sca.ProjectRoot=.fortify -b "$(PROJECT)"
 SAST_SCAN_OPTS := $(SAST_DEFAULT_OPTS)
 ifeq ($(OS),Windows_NT)
-	SAST_TRANSLATE_OPTS := $(SAST_DEFAULT_OPTS) -python-path "$(PYTHON_LIB)" iwa
+	SAST_TRANSLATE_OPTS := $(SAST_DEFAULT_OPTS) -python-path "$(PYTHON_LIB):$(PYTHON_DEFAULT_LIB)" iwa
 	SAST_CUSTOM_RULES := etc\\sast-custom-rules\\example-custom-rules.xml
 	SAST_FILTER := etc\\sast-filters\\example-filter.txt
 else
-	SAST_TRANSLATE_OPTS := $(SAST_DEFAULT_OPTS) -python-path "$(PYTHON_LIB)" iwa
+	SAST_TRANSLATE_OPTS := $(SAST_DEFAULT_OPTS) -python-path "$(PYTHON_LIB);$(PYTHON_DEFAULT_LIB)" iwa
 	SAST_CUSTOM_RULES := $(ROOT_DIR)/etc/sast-custom-rules/example-custom-rules.xml
 	SAST_FILTER := $(ROOT_DIR)/etc/sast-filters/example-filter.txt 
 endif
@@ -40,11 +40,11 @@ build:  ## build the project
 	python -m venv .venv
 	pip install -U flask
 ifeq ($(OS),Windows_NT)
-	cmd /c .\.venv\Scripts\activate.bat
+#	cmd /c .\.venv\Scripts\activate.bat
 #	.\.venv\Scripts\Activate.ps1
 	.venv\Scripts\pip install -r requirements.txt
 else
-	. .venv/bin/activate
+#	. .venv/bin/activate
 	.venv/bin/pip install -r requirements.txt
 endif
 
@@ -53,7 +53,7 @@ build-docker: ## build the project as a docker image
 	docker build -f Dockerfile -t $(PROJECT):$(VERSION) .
 
 .PHONY: run
-run: ## run the project
+run: build ## run the project
 	@echo "Running $(PROJECT)..."
 ifeq ($(OS),Windows_NT)
 	cmd /C ".\.venv\Scripts\activate.bat && set FLASK_ENV=development && set FLASK_DEBUG=1 && set FLASK_APP=$(FLASK_APP) && flask run --host 0.0.0.0"

@@ -22,13 +22,13 @@ import logging
 from flask import Response, json, request
 from flask_cors import cross_origin
 
-from iwa.blueprints.api import api_bp
+from iwa.blueprints.products import products_api_bp
 from iwa.repository.db import get_db
 
 logger = logging.getLogger(__name__)
 
 
-@api_bp.route("/products", methods=['GET'])
+@products_api_bp.route("/", methods=['GET'])
 @cross_origin()
 def search_products():
     """Search products by keyword in name or description."""
@@ -41,7 +41,7 @@ def search_products():
     r.status_code = 200
     return r
 
-@api_bp.route("/products/<int:product_id>", methods=['GET'])
+@products_api_bp.route("/<int:product_id>", methods=['GET'])
 @cross_origin()
 def products(product_id):
     """ Get product by id."""
@@ -59,7 +59,7 @@ def products(product_id):
     r.status_code = 200
     return r
 
-@api_bp.route("/new-products", methods=['GET'])
+@products_api_bp.route("/new-products", methods=['GET'])
 @cross_origin()
 def new_products():
     limit = request.args.get('limit', 3)

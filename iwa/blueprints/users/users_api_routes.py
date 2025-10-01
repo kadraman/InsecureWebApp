@@ -18,17 +18,17 @@
 """
 
 import logging
+import os
 
-from flask import Response, json, request
-from flask import current_app
+from flask import Response, current_app, json, request
 from flask_cors import cross_origin
 
-from iwa.blueprints.api import api_bp
+from iwa.blueprints.users import users_api_bp
 
 logger = logging.getLogger(__name__)
 
 
-@api_bp.route("/subscribe-user", methods=['POST'])
+@users_api_bp.route("/subscribe-user", methods=['POST'])
 @cross_origin()
 def subscribe_user():
     """Subscribe a user to the newsletter by writing to the JSON file"""
@@ -38,7 +38,12 @@ def subscribe_user():
     email = content.get('email')
     role = content.get('role')
     logger.debug(f"Registering user: {id},{name},{email},{role}")
-    with open(current_app.config['SUBSCRIBERS_FILENAME'], mode='a+', encoding='utf-8') as f:
+
+    # Ensure the directory exists
+    filename = current_app.config['SUBSCRIBERS_FILENAME']
+    os.makedirs(os.path.dirname(filename), exist_ok=True)
+
+    with open(filename, mode='a+', encoding='utf-8') as f:
         try:
             entries = json.load(f)
         except ValueError:

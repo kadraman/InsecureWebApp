@@ -22,3 +22,7 @@ from flask import Blueprint
 users_bp = Blueprint("users", __name__, template_folder='templates', static_folder='static')
 
 from iwa.blueprints.users import users_routes
+
+users_api_bp = Blueprint('users_api', __name__, template_folder='templates', static_folder='static')
+
+from iwa.blueprints.users import users_api_routes

@@ -71,7 +71,7 @@ $.fn.SubscribeNewsletter = function (options) {
             }
         )
         return await $.ajax({
-            url: '/api/subscribe-user',
+            url: '/api/users/subscribe-user',
             type: 'POST',
             contentType: 'application/json',
             data: data

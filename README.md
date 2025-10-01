@@ -13,7 +13,7 @@ demonstrate some common vulnerabilities such as:
     - Insecure Deserialization
     - Security Misconfiguration
     - Sensitive Data Exposure
-    - Broken Authentication (with 2FA)
+    - Path Manipulation
     - Using Components with Known Vulnerabilities
 
 The application is not intended to be used in production and is provided for educational purposes only.
@@ -24,7 +24,6 @@ Pre-requisites
  - [Python 3.12 or later](https://www.python.org/downloads/)
  - [Pip package manager](https://pypi.org/project/pip/)
  - [w64devkit](https://github.com/skeeto/w64devkit) or [CygWin](https://www.cygwin.com/) - if running on Windows
- - [Rust Compiler](https://www.rust-lang.org/tools/install) - if running on Windows as some Pip packages require it
  - Docker installation (optional)
 
 Run Application (locally)
@@ -104,7 +103,7 @@ To carry out a OpenText ScanCentral SAST scan, run the following:
 
 ```
 fcli ssc session login
-scancentral package -o package.zip -bt none --python-virtual-env .venv
+scancentral package -o package.zip -bt none --python-version 3 --python-requirements requirements.txt
 fcli sast-scan start --release "_YOURAPP_:_YOURREL_" -f package.zip --store curScan
 fcli sast-scan wait-for ::curScan::
 fcli ssc action run appversion-summary --av "_YOURAPP_:_YOURREL_" -fs "Security Auditor View" -f summary.md
@@ -114,7 +113,7 @@ To carry out an OpenText Application Security Core scan, run the following:
 
 ```
 fcli fod session login
-scancentral package -o package.zip -bt none --python-virtual-env .venv -oss
+scancentral package -o package.zip -bt none --python-version 3 --python-requirements requirements.txt
 fcli fod sast-scan start --release "_YOURAPP_:_YOURREL_" -f package.zip --store curScan
 fcli fod sast-scan wait-for ::curScan::
 fcli fod action run release-summary --rel "_YOURAPP_:_YOURREL_" -f summary.md

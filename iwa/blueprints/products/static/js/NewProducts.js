@@ -54,7 +54,7 @@ $.fn.NewProducts = function (options) {
     }
 
     async function _getProducts(limit) {
-        return await $.get(`/api/new-products?limit=${limit}`).then();
+        return await $.get(`/api/products/new-products?limit=${limit}`).then();
     }
 
 };
