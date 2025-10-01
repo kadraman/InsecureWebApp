@@ -148,11 +148,11 @@
                             </a>
                             <ul aria-labelledby="navbarDropdownMenuLinkServices"
                                 class="dropdown-menu dropdown-menu-dark">
-                                <li><a class="dropdown-item" href="{{ url_for('insecure.xss1') }}">Flu
+                                <li><a class="dropdown-item" href="#">Flu
                                     vaccinations</a></li>
-                                <li><a class="dropdown-item" href="{{ url_for('insecure.xss2') }}">Stop smoking</a>
+                                <li><a class="dropdown-item" href="#">Stop smoking</a>
                                 </li>
-                                <li><a class="dropdown-item" href="{{ url_for('insecure.xss1') }}">Travel
+                                <li><a class="dropdown-item" href="#">Travel
                                     vaccinations</a></li>
                             </ul>
                         </li>
@@ -217,9 +217,9 @@
                     </div>
                     <div class="col-md-6">
                         <ul class="list">
-                            <li><a href="{{ url_for('insecure.load_file') }}">About Us</a></li>
-                            <li><a href="{{ url_for('insecure.command_injection') }}">Contacts</a></li>
-                            <li><a href="{{ url_for('insecure.template_injection') }}">Terms & Condition</a></li>
+                            <li><a href="#">About Us</a></li>
+                            <li><a href="#">Contacts</a></li>
+                            <li><a href="#">Terms & Condition</a></li>
                             <li><a href="#">Privacy Policy</a></li>
                         </ul>
                     </div>
@@ -322,6 +322,11 @@
                     cookieModal.show();
                     $('#acceptCookies').on('click', function () {
                       localStorage.setItem('cookieConsent', 'true');
+                      // TODO: Implement logic to enable non-essential cookies
+                      cookieModal.hide();
+                    });
+                    $('#rejectCookies').on('click', function () {
+                      localStorage.setItem('cookieConsent', 'false');
                       cookieModal.hide();
                     });
                 }

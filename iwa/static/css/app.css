@@ -670,3 +670,20 @@ a:hover {
   right: 0px;
   display: block;
 }
+
+.modal-dialog-bottom {
+    position: fixed;
+    bottom: 0;
+    left: 0;
+    right: 0;
+    margin: 0;
+    width: 100%;
+    max-width: 100%;
+}
+.modal.fade .modal-dialog-bottom {
+    transform: translate(0, 100%);
+    transition: transform 0.3s ease-out;
+}
+.modal.show .modal-dialog-bottom {
+    transform: translate(0, 0);
+}

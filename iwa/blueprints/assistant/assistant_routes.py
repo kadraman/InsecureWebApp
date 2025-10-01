@@ -110,20 +110,21 @@ def symptom_checker(symptoms=None, additional_symptoms=None):
     if request.method == 'POST':
         # Get symptoms from form data
         symptoms_list = request.form.getlist('symptoms')  # For checkboxes
-        additional = request.form.get('additional-symptoms', '').strip()
+        additional_symptoms = request.form.get('additional-symptoms', '').strip()
         symptoms = ', '.join(symptoms_list)
-        if additional:
-            symptoms = symptoms + ', ' + additional if symptoms else additional
+        if additional_symptoms:
+            symptoms = symptoms + ', ' + additional_symptoms if symptoms else additional_symptoms
 
         if symptoms:
             logger.debug("Health Assistant: user provided symptoms: %s", symptoms)
             # Call OpenAI API to get medicine recommendation
             messages = [
-                {"role": "system", "content": "I have " + symptoms},
-                {"role": "user", "content": """You are a helpful medical assistant.
+                {"role": "system", "content": 
+                 """You are a helpful medical assistant.
                     Recommend me a medicine to alleviate the symptoms provided. 
                     Please provide a stockist or shop where it can be purchased over the counter and an approximate price.
                  """}
+                , {"role": "user", "content": "I have the following symptoms: " + symptoms}
             ]
             completion = assistant_service.chat_completion(messages)
             response = {

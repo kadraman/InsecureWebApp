@@ -1,0 +1,23 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Command Injection Demo</title>
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css">
+</head>
+<body class="bg-light">
+    <div class="container py-5">
+        <h2 class="mb-4">Command Injection Demo</h2>
+        <form action="{{ url_for('insecure.command_injection') }}" method="get" class="card p-4 shadow-sm">
+            <div class="mb-3">
+                <label for="arguments" class="form-label">Command Arguments</label>
+                <input type="text" class="form-control" id="arguments" name="arguments" placeholder="Enter command arguments">
+            </div>
+            <button type="submit" class="btn btn-danger">Run Command</button>
+        </form>
+        <div class="alert alert-warning mt-4">
+            <strong>Warning:</strong> This demo is intentionally vulnerable to command injection. Do not use in production!
+        </div>
+    </div>
+</body>
+</html>

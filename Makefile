@@ -6,17 +6,18 @@ PROJECT_LOWER := $(call tolower,$(PROJECT))
 PROJECTS := $(filter %project%,$(wildcard *))
 VERSION ?= $(shell git describe --tags --always --dirty --match=v* 2> /dev/null || echo "1.0.0")
 COMMIT := $(shell git log -1 --pretty=format:"%H")
+PYTHON_LIB := $(shell python -c "import sysconfig; print(sysconfig.get_paths()['purelib'])")
 
 FLASK_APP := iwa
 
 SAST_DEFAULT_OPTS := -Dcom.fortify.sca.ProjectRoot=.fortify -b "$(PROJECT)"
 SAST_SCAN_OPTS := $(SAST_DEFAULT_OPTS)
 ifeq ($(OS),Windows_NT)
-	SAST_TRANSLATE_OPTS := $(SAST_DEFAULT_OPTS) -python-path ".venv\\Lib\\site-packages" iwa
+	SAST_TRANSLATE_OPTS := $(SAST_DEFAULT_OPTS) -python-path "$(PYTHON_LIB)" iwa
 	SAST_CUSTOM_RULES := etc\\sast-custom-rules\\example-custom-rules.xml
 	SAST_FILTER := etc\\sast-filters\\example-filter.txt
 else
-	SAST_TRANSLATE_OPTS := $(SAST_DEFAULT_OPTS) -python-path ".venv/lib/python3.12/site-packages" iwa
+	SAST_TRANSLATE_OPTS := $(SAST_DEFAULT_OPTS) -python-path "$(PYTHON_LIB)" iwa
 	SAST_CUSTOM_RULES := $(ROOT_DIR)/etc/sast-custom-rules/example-custom-rules.xml
 	SAST_FILTER := $(ROOT_DIR)/etc/sast-filters/example-filter.txt 
 endif
@@ -40,7 +41,8 @@ build:  ## build the project
 	pip install -U flask
 ifeq ($(OS),Windows_NT)
 	cmd /c .\.venv\Scripts\activate.bat
-	.venv/Scripts/pip install -r requirements.txt
+#	.\.venv\Scripts\Activate.ps1
+	.venv\Scripts\pip install -r requirements.txt
 else
 	. .venv/bin/activate
 	.venv/bin/pip install -r requirements.txt

@@ -23,13 +23,10 @@ from flask import Flask, g, redirect, render_template, url_for, session
 from flask_session import Session
 from flask_cors import CORS
 
-#from iwa.openai import OpenAI
 from iwa.repository.db import get_db
 
 
 logger = logging.getLogger(__name__)
-#openai_extension = OpenAI()
-
 
 def create_app(test_config=None):
     """Create and configure an instance of the Flask application."""
@@ -66,10 +63,6 @@ def create_app(test_config=None):
 
     # enabled CORS on api routes
     cors = CORS(app, resources={r"/api/*": {"origins": "*"}})
-
-    # OpenAI configuration for assistant
-    #app.config['OPENAI_API_KEY'] = os.getenv('OPENAI_API_KEY')
-    #openai_extension.init_app(app)
 
     Session(app)
   
