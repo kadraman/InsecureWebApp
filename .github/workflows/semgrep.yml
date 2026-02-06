@@ -1,0 +1,72 @@
+name: Semgrep (SARIF export)
+
+on:
+  push:
+    branches: [ "main" ]
+  pull_request:
+    branches: [ "main" ]
+  workflow_dispatch:
+    inputs:
+      upload_sarif:
+        description: 'Set to "true" to upload SARIF to GitHub Code Scanning'
+        required: false
+        default: 'false'
+
+permissions:
+  contents: read
+  security-events: write   # required to upload SARIF to Code Scanning
+  actions: read
+
+jobs:
+  semgrep:
+    # only run this job if the repository is origin 'kadraman/InsecureWeb not forked repositories
+    if: ${{ github.repository == 'kadraman/InsecureWebApp' }}
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      # Run Semgrep via the official action
+      # DOCS: semgrep/semgrep-action
+      - name: Run Semgrep and export SARIF
+        id: semgrep
+        uses: returntocorp/semgrep-action@v1
+        with:
+          # Choose your rules:
+          # - p/ci             (recommended default for CI)
+          # - p/security-audit (broader, more findings)
+          # - path/to/.semgrep  (repo config)
+          config: p/security-audit
+
+          # Emit SARIF file(s) to a folder
+          sarif: "sarif-out/semgrep.sarif"
+
+          # Optional: fail CI on findings
+          # audit_on: push
+          # generate Sarif only; code scanning upload will be handled below (or set upload: "true" if you want action to upload)
+        env:
+          # Optional Semgrep App token if you use Semgrep Cloud Platform features
+          # SEMGREP_APP_TOKEN: ${{ secrets.SEMGREP_APP_TOKEN }}
+
+      - name: Upload SARIF to GitHub Code Scanning
+        if: ${{ github.event.inputs.upload_sarif == 'true' }}
+        uses: github/codeql-action/upload-sarif@v3
+        with:
+          sarif_file: sarif-out/semgrep.sarif
+          category: "semgrep"
+
+      - name: Prepare SARIF export bundle
+        run: |
+          set -euo pipefail
+          ts="$(date -u +'%Y%m%dT%H%M%SZ')"
+          mkdir -p export
+          cp sarif-out/semgrep.sarif "export/semgrep_${ts}.sarif"
+
+      - name: Upload SARIF artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: sarif-semgrep-${{ github.run_id }}
+          path: export/*.sarif
+          retention-days: 30
+          if-no-files-found: error
