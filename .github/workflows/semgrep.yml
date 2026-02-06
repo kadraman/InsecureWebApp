@@ -21,37 +21,27 @@ jobs:
   semgrep:
     runs-on: ubuntu-latest
 
+    container:
+      # A Docker image with Semgrep installed. Do not change this.
+      image: semgrep/semgrep
+
     steps:
       - name: Checkout
         uses: actions/checkout@v4
 
-      # Run Semgrep via the official action
-      # DOCS: semgrep/semgrep-action
-      - name: Run Semgrep and export SARIF
-        id: semgrep
-        uses: returntocorp/semgrep-action@v1
-        with:
-          # Choose your rules:
-          # - p/ci             (recommended default for CI)
-          # - p/security-audit (broader, more findings)
-          # - path/to/.semgrep  (repo config)
-          config: p/security-audit
-
-          # Emit SARIF file(s) to a folder
-          sarif: "sarif-out/semgrep.sarif"
-
-          # Optional: fail CI on findings
-          # audit_on: push
-          # generate Sarif only; code scanning upload will be handled below (or set upload: "true" if you want action to upload)
-        env:
-          # Optional Semgrep App token if you use Semgrep Cloud Platform features
-          # SEMGREP_APP_TOKEN: ${{ secrets.SEMGREP_APP_TOKEN }}
+      # Run the "semgrep ci" command on the command line of the docker image.
+      - run: semgrep ci --sarif > semgrep.sarif
+        #env:
+          # Connect to Semgrep AppSec Platform through your SEMGREP_APP_TOKEN.
+          # Generate a token from Semgrep AppSec Platform > Settings
+          # and add it to your GitHub secrets.
+        #  SEMGREP_APP_TOKEN: ${{ secrets.SEMGREP_APP_TOKEN }}
 
       - name: Import SARIF results to GitHub Code Scanning
         if: ${{ github.event.inputs.import_sarif == 'true' }}
         uses: github/codeql-action/upload-sarif@v4
         with:
-          sarif_file: sarif-out/semgrep.sarif
+          sarif_file: semgrep.sarif
           category: "semgrep"
 
       - name: Prepare SARIF export bundle
