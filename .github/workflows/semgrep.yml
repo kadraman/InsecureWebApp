@@ -1,14 +1,14 @@
 name: Semgrep (SARIF export)
 
 on:
-  push:
-    branches: [ "main" ]
-  pull_request:
-    branches: [ "main" ]
   workflow_dispatch:
     inputs:
       upload_sarif:
-        description: 'Set to "true" to upload SARIF to GitHub Code Scanning'
+        description: 'Set to "true" to upload SARIF artifact to GitHub'
+        required: false
+        default: 'true'
+      import_sarif:
+        description: 'Set to "true" to import SARIF results to GitHub Code Scanning'
         required: false
         default: 'false'
 
@@ -19,8 +19,6 @@ permissions:
 
 jobs:
   semgrep:
-    # only run this job if the repository is origin 'kadraman/InsecureWeb not forked repositories
-    if: ${{ github.repository == 'kadraman/InsecureWebApp' }}
     runs-on: ubuntu-latest
 
     steps:
@@ -49,9 +47,9 @@ jobs:
           # Optional Semgrep App token if you use Semgrep Cloud Platform features
           # SEMGREP_APP_TOKEN: ${{ secrets.SEMGREP_APP_TOKEN }}
 
-      - name: Upload SARIF to GitHub Code Scanning
-        if: ${{ github.event.inputs.upload_sarif == 'true' }}
-        uses: github/codeql-action/upload-sarif@v3
+      - name: Import SARIF results to GitHub Code Scanning
+        if: ${{ github.event.inputs.import_sarif == 'true' }}
+        uses: github/codeql-action/upload-sarif@v4
         with:
           sarif_file: sarif-out/semgrep.sarif
           category: "semgrep"
@@ -64,6 +62,7 @@ jobs:
           cp sarif-out/semgrep.sarif "export/semgrep_${ts}.sarif"
 
       - name: Upload SARIF artifact
+        if: ${{ github.event.inputs.upload_sarif == 'true' }}
         uses: actions/upload-artifact@v4
         with:
           name: sarif-semgrep-${{ github.run_id }}

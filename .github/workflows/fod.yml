@@ -38,11 +38,11 @@ on:
       - 'tests/**'
       - '*.md'
       - 'LICENSE'
-    #branches-ignore:
-    #  - main
-    #  - develop
     branches:
-      - '**'        # matches every branch
+      - main
+      - develop
+      - feature/**
+      - bugfix/**
   pull_request:
     branches: [ main, develop ]
 
@@ -56,11 +56,7 @@ on:
       runFoDOSSScan:
         description: 'Carry out OSS scan using OpenText Core Application Security'
         required: false
-        default: 'true'       
-      deployApp:
-        description: 'Deploy App to Azure'
-        required: false
-        default: 'true'           
+        default: 'true'                
       runFoDDASTScan:
         description: 'Carry out DAST scan using OpenText Core Application Security'
         required: false
@@ -94,48 +90,7 @@ jobs:
             echo "Running in a branch pipeline ..."
             echo "FOD_RELEASE=${{ env.DEFAULT_APP_NAME }}${{ vars.FORTIFY_APP_NAME_POSTFIX }}:${{ github.ref_name }}" >> $GITHUB_OUTPUT
             echo "FOD_PARENT_RELEASE=${{ env.DEFAULT_APP_NAME }}${{ vars.FORTIFY_APP_NAME_POSTFIX }}:${{ env.DEFAULT_PARENT_RELEASE_NAME }}" >> $GITHUB_OUTPUT
-          fi
-
-  Build-And-Unit-Test:
-    runs-on: ubuntu-latest
-    needs: [ Env-Prepare ]
-    steps:
-      - name: Checkout
-        uses: actions/checkout@v4
-      - name: Set up Python
-        uses: actions/setup-python@v5
-        with:
-          python-version: ${{ env.PYTHON_VERSION }}
-          cache: 'pip'
-      - name: Create and start virtual environment
-        run: |
-          python -m venv venv
-          source venv/bin/activate          
-      - name: Install dependencies
-        run: |
-          pip install -r requirements.txt
-          pip install pytest pytest-md pytest-emoji
-      - uses: pavelzw/pytest-action@v2
-        with:
-          emoji: false
-          verbose: false
-          job-summary: true
-      # Publish test results
-      #- name: Publish Test Results
-      #  uses: EnricoMi/publish-unit-test-result-action@v2
-      #  if: always()
-      #  with:
-      #    files: |
-      #      build/test-results/**/*.xml
-      #      build/test-results/**/*.trx
-      #      build/test-results/**/*.json
-      - name: Upload artifact for deployment jobs
-        uses: actions/upload-artifact@v4
-        with:
-          name: python-app
-          path: |
-            .
-            !venv/     
+          fi   
 
   FoD-SAST-Scan:
     runs-on: ubuntu-latest
@@ -194,7 +149,7 @@ jobs:
   FoD-OSS-Scan:
     runs-on: ubuntu-latest
     if: ${{ (github.event_name == 'push') || (github.event_name == 'pull_request') || (github.event.inputs.runFoDOSSScan == 'true') }}
-    needs: [ Env-Prepare, FoD-SAST-Scan ] # for creating new FoD release (if required)
+    needs: [ Env-Prepare ]
     env: 
       FOD_RELEASE: ${{ needs.Env-Prepare.outputs.FOD_RELEASE }}
       FOD_PARENT_RELEASE: ${{ needs.Env-Prepare.outputs.FOD_PARENT_RELEASE }}
@@ -227,46 +182,11 @@ jobs:
           FOD_CLIENT_SECRET: ${{ secrets.FOD_CLIENT_SECRET }}
           PACKAGE_FILE: "fortifypackage.zip"
           FOD_RELEASE: ${{ env.FOD_RELEASE }}
-
-  Deploy-App:
-    permissions:
-      contents: none
-    runs-on: ubuntu-latest
-    needs: [ Build-And-Unit-Test, FoD-SAST-Scan, FoD-OSS-Scan ]
-    environment:
-      name: 'Development'
-      #url: ${{ steps.deploy-to-webapp.outputs.webapp-url }}
-    if: ${{ success() && github.ref_name == github.event.repository.default_branch }}
-    steps:
-      - name: Download artifact from build job
-        uses: actions/download-artifact@v4
-        with:
-          name: python-app
-          path: .
-      # Example deployment to azure web app
-      # This is commented out as it is done in workflows/azure_webapp..yml
-      #- name: 'Deploy to Azure Web App'
-      #  id: deploy-to-webapp
-      #   uses: azure/webapps-deploy@v3
-      #  with:
-      #    app-name: ${{ env.AZURE_WEBAPP_NAME }}
-      #    publish-profile: ${{ secrets.AZUREAPPSERVICE_PUBLISHPROFILE_94429323A56E479BA44DAB94865DCF4A }}
-
-  Functional-Test:
-    runs-on: ubuntu-latest
-    if: ${{ always() }}
-    needs: [ Env-Prepare, Deploy-App ]
-    env:
-      FOD_RELEASE: ${{ needs.Env-Prepare.outputs.FOD_RELEASE }}
-      FOD_PARENT_RELEASE: ${{ needs.Env-Prepare.outputs.FOD_PARENT_RELEASE }}
-    steps:
-      - name: Checkout
-        uses: actions/checkout@v4
-   
+  
   FoD-DAST-Scan:
     runs-on: ubuntu-latest
     if: ${{ (github.ref_name == github.event.repository.default_branch) && (github.event.inputs.runFoDDASTScan == 'true') }}
-    needs: [ Env-Prepare, Deploy-App ]
+    needs: [ Env-Prepare, FoD-SAST-Scan, FoD-OSS-Scan ]
     env: 
       FOD_RELEASE: ${{ needs.Env-Prepare.outputs.FOD_RELEASE }}
       FOD_PARENT_RELEASE: ${{ needs.Env-Prepare.outputs.FOD_PARENT_RELEASE }}
@@ -323,13 +243,3 @@ jobs:
           FOD_CLIENT_ID: ${{ secrets.FOD_CLIENT_ID }}
           FOD_CLIENT_SECRET: ${{ secrets.FOD_CLIENT_SECRET }}
           FOD_RELEASE: ${{ env.FOD_RELEASE }}
-
-  #Release-To-Prod:
-  #  runs-on: ubuntu-latest
-  #  needs: [ Env-Prepare, Verify-Security-Policy ]
-  #  env: 
-  #    FOD_RELEASE: ${{ needs.Env-Prepare.outputs.FOD_RELEASE }}
-  #    FOD_PARENT_RELEASE: ${{ needs.Env-Prepare.outputs.FOD_PARENT_RELEASE }}
-  #  steps:
-  #    - name: Checkout
-  #      uses: actions/checkout@v4

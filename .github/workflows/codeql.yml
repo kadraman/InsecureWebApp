@@ -85,7 +85,7 @@ jobs:
 
     # Initializes the CodeQL tools for scanning.
     - name: Initialize CodeQL
-      uses: github/codeql-action/init@v3
+      uses: github/codeql-action/init@v4
       with:
         languages: ${{ matrix.language }}
         build-mode: ${{ matrix.build-mode }}
@@ -114,7 +114,7 @@ jobs:
 
     - name: Perform CodeQL Analysis
       id: analyze
-      uses: github/codeql-action/analyze@v3
+      uses: github/codeql-action/analyze@v4
       with:
         category: "/language:${{matrix.language}}"
         output: sarif-out/${{ matrix.language }}
@@ -139,3 +139,37 @@ jobs:
         path: export/*.sarif
         if-no-files-found: error
         retention-days: 30
+
+  merge-sarif:
+    name: Merge SARIF files
+    needs: analyze
+    runs-on: ubuntu-latest
+    permissions:
+      security-events: write
+      contents: read
+    steps:
+      - name: Download all SARIF artifacts
+        uses: actions/download-artifact@v4
+        with:
+          path: artifacts
+
+      - name: Install jq
+        run: sudo apt-get update && sudo apt-get install -y jq
+
+      - name: Merge SARIF files
+        run: |
+          set -euo pipefail
+          mkdir -p export
+          # Find all SARIF files downloaded from matrix jobs and merge their `runs` arrays.
+          find artifacts -type f -name '*.sarif' -print0 | xargs -0 jq -s '{version: (.[0].version), "$schema": (.[0]."$schema"), runs: map(.runs) | add}' > export/combined_${{ github.run_id }}.sarif
+          # Also copy individual SARIF files into export/ for convenience
+          find artifacts -type f -name '*.sarif' -exec cp {} export/ \;
+          echo "Prepared $(ls -1 export | wc -l) SARIF files in export/"
+
+      - name: Upload merged SARIF artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: sarif-combined-${{ github.run_id }}
+          path: export/*.sarif
+          if-no-files-found: error
+          retention-days: 30
