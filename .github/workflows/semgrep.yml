@@ -1,4 +1,4 @@
-name: Semgrep (SARIF export)
+name: Semgrep OSS (SARIF export)
 
 on:
   workflow_dispatch:
@@ -21,22 +21,14 @@ jobs:
   semgrep:
     runs-on: ubuntu-latest
 
-    container:
-      # A Docker image with Semgrep installed. Do not change this.
-      image: semgrep/semgrep
-
     steps:
       - name: Checkout
         uses: actions/checkout@v4
 
-      # Run the "semgrep ci" command on the command line of the docker image.
-      - run: semgrep ci --sarif > semgrep.sarif
-        #env:
-          # Connect to Semgrep AppSec Platform through your SEMGREP_APP_TOKEN.
-          # Generate a token from Semgrep AppSec Platform > Settings
-          # and add it to your GitHub secrets.
-        #  SEMGREP_APP_TOKEN: ${{ secrets.SEMGREP_APP_TOKEN }}
-
+      # Run the "semgrep scan" command on the command line of the docker image.
+      - run: |
+            docker run --rm -v "$PWD":/src -w /src semgrep/semgrep:latest semgrep --config p/security-audit --sarif -o semgrep.sarif
+            
       - name: Import SARIF results to GitHub Code Scanning
         if: ${{ github.event.inputs.import_sarif == 'true' }}
         uses: github/codeql-action/upload-sarif@v4
@@ -49,7 +41,7 @@ jobs:
           set -euo pipefail
           ts="$(date -u +'%Y%m%dT%H%M%SZ')"
           mkdir -p export
-          cp sarif-out/semgrep.sarif "export/semgrep_${ts}.sarif"
+          cp semgrep.sarif "export/semgrep_${ts}.sarif"
 
       - name: Upload SARIF artifact
         if: ${{ github.event.inputs.upload_sarif == 'true' }}

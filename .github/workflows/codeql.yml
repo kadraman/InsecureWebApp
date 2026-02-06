@@ -9,7 +9,7 @@
 # the `language` matrix defined below to confirm you have the correct set of
 # supported CodeQL languages.
 #
-name: "CodeQL Advanced"
+name: "CodeQL Advanced Scan"
 
 on:
   # Triggers the workflow on push or pull request events but only for the main or develop branches
@@ -32,7 +32,8 @@ on:
       - '**'        # matches every branch
   pull_request:
     branches: [ main, develop ]
-    
+  workflow_dispatch:
+
 jobs:
   analyze:
     # only run this job if the repository is origin 'kadraman/InsecureWeb not forked repositories

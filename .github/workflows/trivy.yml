@@ -1,4 +1,4 @@
-name: Trivy container SARIF scan
+name: Trivy OSS container scan (SARIF export)
 
 on:
   workflow_dispatch:
@@ -32,7 +32,7 @@ jobs:
         run: |
           set -euo pipefail
           # Run Trivy in a container and output SARIF to a file
-          docker run --rm -v /var/run/docker.sock:/var/run/docker.sock -v "$PWD:/work" aquasecurity/trivy:latest image --format sarif -o /work/trivy.sarif "$IMAGE"
+          docker run --rm -v /var/run/docker.sock:/var/run/docker.sock -v "$PWD:/work" aquasec/trivy:latest image --format sarif -o /work/trivy.sarif "$IMAGE"
 
       - name: Import SARIF results to GitHub Code Scanning
         if: ${{ github.event.inputs.import_sarif == 'true' }}

@@ -2,7 +2,7 @@
 # Create GitHub Action Secrets for your version of the application:
 #   DEBRICKED_TOKEN should be an API Access Token from your Debricked tenant.
 
-name: OpenText SCA Core
+name: OpenText SCA Core (Debricked) Scan
 permissions:
     # required for all workflows
     security-events: write
